@@ -1,0 +1,10 @@
+{
+  "name": "Game",
+  "version": "0.0.0",
+  "description": "Game",
+  "main": "server.js",
+  "author": {
+    "name": "Loklok",
+    "email": ""
+  }
+}
