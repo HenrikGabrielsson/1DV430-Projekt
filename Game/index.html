@@ -7,6 +7,16 @@
     <link href="style/game.css" rel="stylesheet" />
     </head>
     <body>
+    
+    <script src="/socket.io/socket.io.js"></script>
+<script>
+  var socket = io.connect();
+  socket.on('news', function (data) {
+    console.log(data);
+    socket.emit('my other event', { my: 'data' });
+  });
+</script>
+    
         <h1>My Game</h1>
         <canvas id="GameCanvas">
             <p>Sorry, Your browser can not run this game :(</p> <!--Gammal webbläsare eller ingen javascript-->
