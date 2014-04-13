@@ -1,22 +1,21 @@
-var http = require("http");
-var fs = require("fs");
-var io = require('socket.io/index')
+var static = require('node-static');
+var http = require('http');
+var io = require('socket.io');
 
-var httpServer = http.createServer(function(req,res)
-{
-    fs.readFile(__dirname + "/index.html",function(err,data)
-    {    res.writeHead(200, {"Content-Type":"text/html"});
-    res.write(data);
-    res.end();})  
+var fileServer = new static.Server('./Game', {cache: 60});
 
-})
+var app = http.createServer(function (req, res) {
+    req.addListener('end', function () {
 
-var serv_io = io.listen(httpServer);
-serv_io.sockets.on('connection', function (socket) {
-  socket.emit('news', { hello: 'world' });
-  socket.on('my other event', function (data) {
+
+        fileServer.serve(req, res);
+    }).resume();
+}).listen(8080);
+
+var test = io.listen(app);
+
+test.sockets.on('connection', function (socket) {
+  socket.on('test', function (data) {
     console.log(data);
   });
 });
-
-httpServer.listen(8080);
