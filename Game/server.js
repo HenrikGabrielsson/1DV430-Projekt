@@ -44,8 +44,6 @@ function mapSeedMaker (gameMode) {
     var seed = new Array();
     
     var tileType; //här ska en framslumpad typ av tile (eller 'ruta' på en plattform) sparas
-    var tileAmount; //hur många ska ligga på rad efter varandra.
-    var totalAmount = 0; //antalet tiles totalt. Ska vara 418 på en bana.
     
     /*
     Tile types:
@@ -55,45 +53,13 @@ function mapSeedMaker (gameMode) {
     8: Ruta med en vägg under sig. Väggar går att slå sönder med två slag.
     9: Oförstörbar ruta.
     */
-    
-    //Antalet tiles ska vara 418. Därefter behöver inga mer läggas till.
-    while(totalAmount < 418)
+
+    for (var i = 0; i < 418; i++) 
     {
         //ett nummber (0-9) bestämmer en tiletype. 
-        tileType = Math.floor(Math.random() * 10); 
-        
-        //sedan väljs hur många som ska visas på raken i spelet. Detta beror på vilken typ av tile det är.
-        switch(tileType)
-        {
-            case 0:
-                tileAmount = Math.floor(Math.random() * 3 + 1); //1-3
-                break;
-            case 1:
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-                tileAmount = Math.floor(Math.random() * 6 + 2 ) //2-6
-                break;
-            case 6:
-            case 7:
-                tileAmount = Math.floor(Math.random() * 3 + 1) // 1-3
-                break;
-            case 8: 
-                tileAmount = 1; //endast 1
-                break;
-            case 9:
-                tileAmount = Math.floor(Math.random() * 3 + 1) // 1-3
-                break;
+        seed[i] = tileType = Math.floor(Math.random() * 10); 
+    }        
 
-        }
-        
-        seed.push(tileType);
-        seed.push(tileAmount);
-        
-        totalAmount += tileAmount; //Antalet tiles som läggs till 
-    }
-    console.log(seed.length);
     return seed;
 }
 
