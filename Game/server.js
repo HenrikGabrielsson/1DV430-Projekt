@@ -41,7 +41,7 @@ io.sockets.on('connection', function(socket){
 
 //Denna funktion skapar en array som bestämmer hur banan ska se ut (en tilemap)
 function mapSeedMaker (gameMode) {
-    var seed = new Array();
+    var seed = [];
     
     var tileType; //här ska en framslumpad typ av tile (eller 'ruta' på en plattform) sparas
     
