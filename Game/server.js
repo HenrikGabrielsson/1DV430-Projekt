@@ -54,7 +54,7 @@ function mapSeedMaker (gameMode) {
     9: Oförstörbar ruta.
     */
 
-    for (var i = 0; i < 418; i++) 
+    for (var i = 0; i < 420; i++) 
     {
         //ett nummber (0-9) bestämmer en tiletype. 
         seed[i] = tileType = Math.floor(Math.random() * 10); 
