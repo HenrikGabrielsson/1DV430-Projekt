@@ -3,21 +3,38 @@ var init = function(){
     var socket = io.connect();
     socket.emit('sendMap', {gameMode:"sp"}); //skicka single-player-bana
     socket.on('map', function(data){
+        
+        //funktion som skapar kartan.
         var mapArray = createMap(data.map, "sp");
         
-        renderMap(mapArray);
+        //så här ofta ska spel-loopen köras
+        var frameTime = 1000/60;
+        
+        //skapa spelare och ange startposition
+        var player = new Player();
+        alert(player.right);
+    
+        //Spel-loopen
+        setInterval(function()
+        {
+            
+            renderMap(mapArray); //rita banan
+        }, frameTime);
+        
     })
     
 }
 
 window.onload = init();
 
+
+
 //Den här funktionen tar emot ett seed och en speltyp och skapar en bana (en tvådimensionell array).
 function createMap(seed, gameMode)
 {
     var mapArray = []; //här sparas banan
 
-    var k = 0; //index i seedet
+    var seedIndex = 0; //index i seedet
     for (var i = 0; i <= 76; i++)//rader 
     {
         mapArray[i] = [];
@@ -25,14 +42,20 @@ function createMap(seed, gameMode)
         
         for (var j = 0; j < 40; j++) //kolumner
         {
-            if(i === 76)
+            if((i === 0 || i === 4) && j < i/2 + 2  ) //De två översta våningarna ser alltid likadana ut.
             {
-                mapArray[i][j] = 9; //längst ner finns ett golv av oförstörbara tiles
+                mapArray[i][j] = 1;
+            }
+            
+            else if(i === 76) //längst ner finns ett golv av oförstörbara tiles
+            {
+                mapArray[i][j] = 9; 
             }
             else if(i % 4 === 0 && j < i/2 + 2) //plattformar ska finnas på var 5:e rad
             {
-                mapArray[i][j] = seed[k]; //lägger in numret i rätt fält.
-                k++;        
+                
+                mapArray[i][j] = seed[seedIndex]; //lägger in numret i rätt fält.
+                seedIndex++;        
             }
             else //annars tomrum
             {
@@ -47,7 +70,6 @@ function createMap(seed, gameMode)
             }
         }
     }
-
     return mapArray;
     
 }
