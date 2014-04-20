@@ -7,18 +7,25 @@ var init = function(){
         //funktion som skapar kartan.
         var mapArray = createMap(data.map, "sp");
         
+        //Canvas hämtas    
+        var canvas = document.getElementById("gamecanvas");
+        var context = canvas.getContext("2d");          
+        
         //så här ofta ska spel-loopen köras
         var frameTime = 1000/60;
         
         //skapa spelare och ange startposition
-        var player = new Player();
-        alert(player.right);
-    
+        var player = new Player(100,0);
+        
+        var map = renderMap(mapArray,canvas,context); //rita banan
+        player.renderPlayer(context); //rita spelare
+        
         //Spel-loopen
         setInterval(function()
         {
+            player.moveRight();
+            player.renderPlayer(context);
             
-            renderMap(mapArray); //rita banan
         }, frameTime);
         
     })
@@ -34,28 +41,35 @@ function createMap(seed, gameMode)
 {
     var mapArray = []; //här sparas banan
 
+    var rows = 76;
+    var cols = 40;
+
     var seedIndex = 0; //index i seedet
-    for (var i = 0; i <= 76; i++)//rader 
+    for (var i = 0; i <= rows; i++)//rader 
     {
         mapArray[i] = [];
         
         
-        for (var j = 0; j < 40; j++) //kolumner
+        for (var j = 0; j < cols; j++) //kolumner
         {
-            if((i === 0 || i === 4) && j < i/2 + 2  ) //De två översta våningarna ser alltid likadana ut.
-            {
-                mapArray[i][j] = 1;
-            }
             
-            else if(i === 76) //längst ner finns ett golv av oförstörbara tiles
+            if(i === rows) //längst ner finns ett golv av oförstörbara tiles
             {
                 mapArray[i][j] = 9; 
             }
-            else if(i % 4 === 0 && j < i/2 + 2) //plattformar ska finnas på var 5:e rad
+            //j < i/2 + 2
+            else if(i % 4 === 0 && ((j > cols/2 - ((i/4) + 2)) && (j < cols/2 + ((i/4) + 2))  )) //plattformar ska finnas på var 4:e rad. De ökar med 2 rutor varje gång.
             {
-                
+                //De översta våningarna ska alltid vara likadana och behöver inte använda seedet för att genereras .
+                if(i === 0 || i === 4)
+                {
+                    mapArray[i][j] = 1;
+                }
+                else
+                {
                 mapArray[i][j] = seed[seedIndex]; //lägger in numret i rätt fält.
                 seedIndex++;        
+                }
             }
             else //annars tomrum
             {
@@ -74,10 +88,8 @@ function createMap(seed, gameMode)
     
 }
 
-function renderMap(mapArray)
+function renderMap(mapArray,canvas,context)
 {
-    var canvas = document.getElementById("gamecanvas");
-    var context = canvas.getContext("2d");  
     
     var tileSize = 20;
     
