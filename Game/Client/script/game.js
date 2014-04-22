@@ -4,27 +4,95 @@ var init = function(){
     socket.emit('sendMap', {gameMode:"sp"}); //skicka single-player-bana
     socket.on('map', function(data){
         
-        //funktion som skapar kartan.
-        var mapArray = createMap(data.map, "sp");
         
-        //Canvas hämtas    
-        var canvas = document.getElementById("gamecanvas");
-        var context = canvas.getContext("2d");          
+        //skapa ett nytt map-objekt
+        var map = new Map(data.map);
+        
+        //skapa spelare och ange startposition
+        var player = new Player(map.tileSize * 5,(map.rows-2) * map.tileSize);
+        
+        
+        //lyssnar efter input från spelare
+        var keys = []; //här sparas de tangenter som trycks ner med en boolean som bestämmer om de fortfarande är nertryckta
+        
+    
+        //trycker på tangent
+        document.addEventListener('keydown', function(event) {
+            event.preventDefault();
+            keys[event.keyCode] = true;
+        });
+        
+        //släpper tangent
+        document.addEventListener('keyup', function(event) {
+            event.preventDefault();
+            keys[event.keyCode] = false;
+        });
+        
+        
+        
         
         //så här ofta ska spel-loopen köras
         var frameTime = 1000/60;
         
-        //skapa spelare och ange startposition
-        var player = new Player(100,0);
-        
-        var map = renderMap(mapArray,canvas,context); //rita banan
-        player.renderPlayer(context); //rita spelare
-        
         //Spel-loopen
         setInterval(function()
         {
-            player.moveRight();
-            player.renderPlayer(context);
+            //Styrning av karaktär och slag
+            if(keys[87])//W
+            {
+                player.jump();    
+            }
+            if(keys[65])//A
+            {
+                player.moveLeft();    
+            }
+            if(keys[68])//D
+            {
+                player.moveRight();    
+            }
+            if(keys[16]) //Left Shift
+            {
+                console.log("punch");
+            }
+            
+            //gravitation
+            player.fall();
+            
+            //collision detection
+            //ta reda på vilken ruta i banans tileset som spelaren befinner sig i;
+            var playerRow = Math.floor(player.posY / map.tileSize);
+            var playerCol = Math.floor(player.posX / map.tileSize);
+            
+            //finns nåt under?
+            if(map.mapArray[playerRow+1][playerCol] > 0)
+            {
+                player.posY = playerRow * map.tileSize;
+            }
+            
+            //finns nåt över?
+            if(map.mapArray[playerRow-1][playerCol] > 0)
+            {
+                player.posY = (playerRow+1) * map.tileSize;
+            }
+            
+            //finns nåt till höger?
+            if(map.mapArray[playerRow][playerCol+1] > 0)
+            {
+                player.posX = playerCol * map.tileSize;
+            }
+            
+            //finns nåt till vänster?
+            if(map.mapArray[playerRow][playerCol-1] > 0)
+            {
+                player.posX = (playerCol+1) * map.tileSize;
+            }
+            
+            
+            
+            
+            
+            //rita bana och karaktär på nytt
+            renderer(map,player);
             
         }, frameTime);
         
@@ -36,102 +104,21 @@ window.onload = init();
 
 
 
-//Den här funktionen tar emot ett seed och en speltyp och skapar en bana (en tvådimensionell array).
-function createMap(seed, gameMode)
+//funktion som ritar både spelare och karta.
+function renderer(map,player)
 {
-    var mapArray = []; //här sparas banan
-
-    var rows = 76;
-    var cols = 40;
-
-    var seedIndex = 0; //index i seedet
-    for (var i = 0; i <= rows; i++)//rader 
-    {
-        mapArray[i] = [];
-        
-        
-        for (var j = 0; j < cols; j++) //kolumner
-        {
             
-            if(i === rows) //längst ner finns ett golv av oförstörbara tiles
-            {
-                mapArray[i][j] = 9; 
-            }
-            //j < i/2 + 2
-            else if(i % 4 === 0 && ((j > cols/2 - ((i/4) + 2)) && (j < cols/2 + ((i/4) + 2))  )) //plattformar ska finnas på var 4:e rad. De ökar med 2 rutor varje gång.
-            {
-                //De översta våningarna ska alltid vara likadana och behöver inte använda seedet för att genereras .
-                if(i === 0 || i === 4)
-                {
-                    mapArray[i][j] = 1;
-                }
-                else
-                {
-                mapArray[i][j] = seed[seedIndex]; //lägger in numret i rätt fält.
-                seedIndex++;        
-                }
-            }
-            else //annars tomrum
-            {
-                if(i > 0 && mapArray[i-1][j] === 8) //om rutan ovan visar att det ska finnas en vägg här så fortsätter väggen neråt.
-                {
-                    mapArray[i][j] = 8;    
-                }
-                else
-                {
-                    mapArray[i][j] = 0;
-                }
-            }
-        }
-    }
-    return mapArray;
+    //Canvas hämtas    
+    var canvas = document.getElementById("gamecanvas");
+    var context = canvas.getContext("2d");  
+    
+    //ta bort tidigare ritat på canvas
+    context.clearRect(0,0,canvas.width,canvas.height);
+    
+    map.renderMap(canvas,context);
+    player.renderPlayer(context);   
+    
     
 }
 
-function renderMap(mapArray,canvas,context)
-{
-    
-    var tileSize = 20;
-    
-    var rows = 77;
-    var cols = 40;
-   
-    canvas.width = tileSize * cols;
-    canvas.height= tileSize * rows;
-   
-    
-    for (var i = 0; i < rows; i++) 
-    {
-        for (var j = 0; j < cols; j++) 
-        {
-            switch(mapArray[i][j])
-            {
-                case 0:
-                    break;
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                    context.fillStyle = "#aa0000";
-                    context.fillRect(j*tileSize,i*tileSize,tileSize,tileSize);
-                    break;
-                case 6:
-                case 7:
-                    context.fillStyle = "#ff0000";
-                    context.fillRect(j*tileSize,i*tileSize,tileSize,tileSize);
-                    break;
-                case 8:
-                    context.fillStyle = "#aa0000";
-                    context.fillRect(j*tileSize,i*tileSize,tileSize,tileSize);
-                    break;
-                case 9:
-                    context.fillStyle = "#000000";
-                    context.fillRect(j*tileSize,i*tileSize,tileSize,tileSize);
-                    break;
-                default:
-                    break;
-            }
-        }    
-    }   
-}
+

@@ -11,12 +11,9 @@ function Player(posX, posY)
 //rita spelare
 Player.prototype.renderPlayer = function(context)
 {   
-    
     context.fillStyle = "#0000FF";
     context.fillRect(this.posX,this.posY, 20,20)
 };
-
-
 
 //funktioner för att förflytta spelaren
 Player.prototype.moveLeft = function()
@@ -29,14 +26,14 @@ Player.prototype.moveRight = function()
     this.posX += 1;
 };
 
-Player.prototype.moveUp = function()
+Player.prototype.jump = function()
 {
-    this.posY += -1;
+    this.posY += -20;
 };
 
-Player.prototype.moveDown = function()
+Player.prototype.fall = function()
 {
-    this.posY += 1;
+    this.posY += 10;
 };
 
 
