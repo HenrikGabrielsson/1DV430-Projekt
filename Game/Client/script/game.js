@@ -18,17 +18,14 @@ var init = function(){
     
         //trycker på tangent
         document.addEventListener('keydown', function(event) {
-            event.preventDefault();
+
             keys[event.keyCode] = true;
         });
         
         //släpper tangent
         document.addEventListener('keyup', function(event) {
-            event.preventDefault();
             keys[event.keyCode] = false;
         });
-        
-        
         
         
         //så här ofta ska spel-loopen köras
@@ -37,58 +34,97 @@ var init = function(){
         //Spel-loopen
         setInterval(function()
         {
-            //Styrning av karaktär och slag
-            if(keys[87])//W
-            {
-                player.jump();    
-            }
-            if(keys[65])//A
-            {
-                player.moveLeft();    
-            }
-            if(keys[68])//D
-            {
-                player.moveRight();    
-            }
-            if(keys[16]) //Left Shift
-            {
-                console.log("punch");
-            }
-            
-            //gravitation
-            player.fall();
-            
-            //collision detection
-            //ta reda på vilken ruta i banans tileset som spelaren befinner sig i;
+
+            //ta reda på vilken ruta i banans tileset som spelaren befinner sig i
             var playerRow = Math.floor(player.posY / map.tileSize);
             var playerCol = Math.floor(player.posX / map.tileSize);
             
-            //finns nåt under?
-            if(map.mapArray[playerRow+1][playerCol] > 0)
+            //Styrning av karaktär och slag
+            if(keys[87] && map.mapArray[playerRow+1][playerCol] > 0 )//W och står på en plattform
             {
-                player.posY = playerRow * map.tileSize;
+                player.jumpState = 10; 
+                player.ySpeed = -3 * player.jumpState;
+
+            }
+            else if (player.jumpState > 0) //Mitt i ett hopp
+            {
+                player.ySpeed = -3 * player.jumpState;
+                player.jumpState--;
+                
+            }
+            else
+            {
+                player.ySpeed = 0
             }
             
-            //finns nåt över?
-            if(map.mapArray[playerRow-1][playerCol] > 0)
+            if(keys[65])//A
             {
-                player.posY = (playerRow+1) * map.tileSize;
+                player.xSpeed = -2;
             }
+
+            else if(keys[68])//D
+            {
+                player.xSpeed = 2;  
+                
+            }
+            else //om varken A/D är nedtryckta
+            {
+                player.xSpeed = 0;
+            }
+            
+            
+            if(keys[16]) //Left Shift
+            {
+                console.log("punch");
+            }  
+            
+            //gravitation 
+            player.ySpeed += 10;
+            
+            //ändra spelarens position
+            player.moveX();
+            player.moveY();
+
+            
+            //collision detection
+            playerRow = Math.floor(player.posY / map.tileSize);
+            playerCol = Math.floor(player.posX / map.tileSize);
             
             //finns nåt till höger?
-            if(map.mapArray[playerRow][playerCol+1] > 0)
+            if(map.mapArray[playerRow][playerCol+1] > 0 && player.xSpeed > 0)
             {
                 player.posX = playerCol * map.tileSize;
             }
             
             //finns nåt till vänster?
-            if(map.mapArray[playerRow][playerCol-1] > 0)
+            if(map.mapArray[playerRow][playerCol] > 0 && player.xSpeed < 0)
             {
+                player.xSpeed = 0;
                 player.posX = (playerCol+1) * map.tileSize;
+                
             }
             
+            playerRow = Math.floor(player.posY / map.tileSize);
+            playerCol = Math.floor(player.posX / map.tileSize);
             
+            //finns nåt under?
+            if(map.mapArray[playerRow+1][playerCol] > 0 && player.ySpeed >= 0 )
+            {
+                player.posY = playerRow * map.tileSize;
+            }
             
+            //finns nåt över(i ett högt hopp)
+            if(player.jumpState*3 > map.tileSize && map.mapArray[playerRow-1][playerCol] > 0)
+            {
+                player.posY = (playerRow+1) * map.tileSize;
+            }   
+            
+            //finns nåt över?
+            if(map.mapArray[playerRow][playerCol] > 0)
+            {
+                player.posY = (playerRow + 1) * map.tileSize;
+            }
+
             
             
             //rita bana och karaktär på nytt

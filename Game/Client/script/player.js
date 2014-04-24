@@ -1,10 +1,19 @@
-//konstruktor, tar emot kontroller
+//konstruktor, tar emot startposition
 function Player(posX, posY)
 {
 
+    //position
     this.posX = posX;
     this.posY = posY;
     
+    
+    
+    //hastighet (horisontell och vertikal)
+    this.xSpeed = 0;
+    this.ySpeed = 0;
+    
+    //mitt i ett hopp?
+    this.jumpState = 0;
     
 }
 
@@ -16,25 +25,19 @@ Player.prototype.renderPlayer = function(context)
 };
 
 //funktioner för att förflytta spelaren
-Player.prototype.moveLeft = function()
+Player.prototype.moveX = function()
 {
-    this.posX += -1;
+    this.posX += this.xSpeed;
 };
 
-Player.prototype.moveRight = function()
+
+Player.prototype.moveY = function()
 {
-    this.posX += 1;
+    
+    this.posY += this.ySpeed;
 };
 
-Player.prototype.jump = function()
-{
-    this.posY += -20;
-};
 
-Player.prototype.fall = function()
-{
-    this.posY += 10;
-};
 
 
 

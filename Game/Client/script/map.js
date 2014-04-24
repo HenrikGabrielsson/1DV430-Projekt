@@ -32,7 +32,7 @@ Map.prototype.createMap = function(seed)
             {
                 mapArray[i][j] = 9; 
             }
-            //j < i/2 + 2
+        
             else if(i % 4 === 0 && ((j > cols/2 - ((i/4) + 2)) && (j < cols/2 + ((i/4) + 2))  )) //plattformar ska finnas på var 4:e rad. De ökar med 2 rutor varje gång.
             {
                 //De översta våningarna ska alltid vara likadana och behöver inte använda seedet för att genereras .
