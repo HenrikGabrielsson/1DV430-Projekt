@@ -5,7 +5,7 @@ var io = require('socket.io').listen(app); //socket för kommunikation med klien
 app.listen(8080); //port 8080 används på c9. 
 
 //Game/Client är mappen där alla publika filer ligger
-var fileServer = new ns.Server('./Game/Client', {cache: 10}); 
+var fileServer = new ns.Server('./Game/Client', {cache: 1}); 
 
 //När en klient ansluter körs denna funktion.
 function handler (req, res) {
@@ -54,7 +54,7 @@ function mapSeedMaker (gameMode) {
     9: Oförstörbar ruta.
     */
 
-    for (var i = 0; i < 374; i++) 
+    for (var i = 0; i < 391; i++) //391 = 7+9+11+13...37+39
     {
         //ett nummber (0-9) bestämmer en tiletype. 
         seed[i] = tileType = Math.floor(Math.random() * 10); 

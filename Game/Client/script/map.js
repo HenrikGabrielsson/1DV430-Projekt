@@ -32,7 +32,7 @@ Map.prototype.createMap = function(seed)
             {
                 mapArray[i][j] = 9; 
             }
-            //j < i/2 + 2
+        
             else if(i % 4 === 0 && ((j > cols/2 - ((i/4) + 2)) && (j < cols/2 + ((i/4) + 2))  )) //plattformar ska finnas på var 4:e rad. De ökar med 2 rutor varje gång.
             {
                 //De översta våningarna ska alltid vara likadana och behöver inte använda seedet för att genereras .
@@ -46,6 +46,11 @@ Map.prototype.createMap = function(seed)
                 seedIndex++;        
                 }
             }
+            //man ska inte kunna gå utanför pyramiden så allt där blir oslagbara rutor.
+            else if(    (j < cols/2 - ((i/4) + 2)) || (j > cols/2 + ((i/4) + 2)) )
+            {
+                mapArray[i][j] = 9;
+            }
             else //annars tomrum
             {
                 if(i > 0 && mapArray[i-1][j] === 8) //om rutan ovan visar att det ska finnas en vägg här så fortsätter väggen neråt.
@@ -57,6 +62,8 @@ Map.prototype.createMap = function(seed)
                     mapArray[i][j] = 0;
                 }
             }
+            
+ 
         }
     }
     return mapArray;
