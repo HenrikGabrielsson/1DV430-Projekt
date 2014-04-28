@@ -55,7 +55,7 @@ function mapSeedMaker (gameMode) {
     9: Oförstörbar ruta.
     */
 
-    for (var i = 0; i < 391; i++) //391 = 7+9+11+13...37+39
+    for (var i = 0; i < 390; i++) //390 är exakt så många tiles som behöver randomizas
     {
         //ett nummber (0-9) bestämmer en tiletype. 
         if(i != 356)

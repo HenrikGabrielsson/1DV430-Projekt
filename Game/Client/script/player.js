@@ -7,7 +7,7 @@ function Player(posX, posY)
     this.posY = posY;
     
     //sidlängd i pixlar
-    this.side = 18;
+    this.side = 15;
     
     //hastighet (horisontell och vertikal)
     this.xSpeed = 0;

@@ -27,8 +27,12 @@ Map.prototype.createMap = function(seed)
         
         for (var j = 0; j < cols; j++) //kolumner
         {
-            
-            if(i === rows) //längst ner finns ett golv av oförstörbara tiles
+            if(j === 0 || j === 39)
+            {
+                mapArray[i][j] = 9;
+            }
+                
+            else if(i === rows) //längst ner finns ett golv av oförstörbara tiles
             {
                 mapArray[i][j] = 9; 
             }
@@ -46,7 +50,7 @@ Map.prototype.createMap = function(seed)
                 seedIndex++;        
                 }
             }
-            //man ska inte kunna gå utanför pyramiden så allt där blir oslagbara rutor.
+            //man ska inte kunna gå utanför "pyramiden" så allt där blir oslagbara rutor.
             else if(    (j < cols/2 - ((i/4) + 2)) || (j > cols/2 + ((i/4) + 2)) )
             {
                 mapArray[i][j] = 9;
@@ -63,8 +67,8 @@ Map.prototype.createMap = function(seed)
                 }
             }
             
- 
         }
+        
     }
     return mapArray;
     

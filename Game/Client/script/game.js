@@ -37,11 +37,12 @@ var init = function(){
 
             //ta reda på vilken ruta i banans tileset som spelaren befinner sig i
             var playerRow = Math.floor(player.posY / map.tileSize);
-            var playerCol = Math.floor(player.posX / map.tileSize);
+            var playerColL = Math.floor(player.posX / map.tileSize);
+            var playerColR = Math.floor((player.posX+player.side) / map.tileSize);
             
             
             //Styrning av karaktär och slag
-            if(keys[87] && map.mapArray[playerRow+1][playerCol] > 0 )//W och står på en plattform
+            if(keys[87] && (map.mapArray[playerRow+1][playerColL] > 0 || map.mapArray[playerRow+1][playerColR] > 0 ) )//W och står på en plattform
             {
                 player.jumpState = 10; 
                 player.ySpeed = -3 * player.jumpState;
@@ -94,49 +95,53 @@ var init = function(){
             
             //collision detection
             playerRow = Math.floor(player.posY / map.tileSize);
-            playerCol = Math.floor(player.posX / map.tileSize);
+            playerColL = Math.floor(player.posX / map.tileSize);
+            playerColR = Math.floor((player.posX+player.side) / map.tileSize);
             
             
-            //finns nåt till höger?
-            if(map.mapArray[playerRow][playerCol+1] > 0 && player.xSpeed > 0)
+            
+            if(player.xSpeed != 0)
             {
-                player.posX = playerCol * map.tileSize + map.tileSize - player.side;
-            }
-            
-            //finns nåt till vänster?
-            if(map.mapArray[playerRow][playerCol] > 0 && player.xSpeed < 0)
-            {
-                player.xSpeed = 0;
-                player.posX = (playerCol+1) * map.tileSize;
+                //finns nåt till höger?
+                if(map.mapArray[playerRow][playerColR] > 0 && player.xSpeed > 0)
+                {   
+                    player.posX = playerColL * map.tileSize + (map.tileSize - player.side);
+                    player.posX--;
+                }
                 
+                //finns nåt till vänster?
+                if(map.mapArray[playerRow][playerColL] > 0 && player.xSpeed < 0)
+                {
+                    player.xSpeed = 0;
+                    player.posX = (playerColL+1) * map.tileSize;
+                    
+                }
             }
             
             playerRow = Math.floor(player.posY / map.tileSize);
-            playerCol = Math.floor(player.posX / map.tileSize);
+            playerColL = Math.floor(player.posX / map.tileSize);
+            playerColR = Math.floor((player.posX+player.side) / map.tileSize);
 
-
-            if(map.mapArray[playerRow+1][Math.floor((player.posX+player.side) / map.tileSize)] > 0 && player.xSpeed < 0)
+            if(player.ySpeed !== 0)
             {
-                player.posY = playerRow * map.tileSize + map.tileSize - player.side;
-            }
-
-            //finns nåt under?
-            if(map.mapArray[playerRow+1][playerCol] > 0 && player.ySpeed >= 0)
-            {
-                player.posY = playerRow * map.tileSize + map.tileSize - player.side;
-            }
-            
-            
-            //finns nåt över(i ett högt hopp)
-            if(player.jumpState*3 > map.tileSize && map.mapArray[playerRow-1][playerCol] > 0)
-            {
-                player.posY = (playerRow+1) * map.tileSize;
-            }   
-            
-            //finns nåt över?
-            if(map.mapArray[playerRow][playerCol] > 0)
-            {
-                player.posY = (playerRow + 1) * map.tileSize;
+                //finns nåt under?
+                if((map.mapArray[playerRow+1][playerColL] > 0 || map.mapArray[playerRow+1][playerColR] > 0) && player.ySpeed >= 0)
+                {
+                    player.posY = playerRow * map.tileSize + map.tileSize - player.side;
+                }
+                
+                
+                //finns nåt över(i ett högt hopp)
+                if(player.jumpState*3 > map.tileSize && (map.mapArray[playerRow-1][playerColL] > 0 ||map.mapArray[playerRow-1][playerColR] > 0))
+                {
+                    player.posY = (playerRow+1) * map.tileSize;
+                }   
+                
+                //finns nåt över?
+                if(map.mapArray[playerRow][playerColL] > 0)
+                {
+                    player.posY = (playerRow + 1) * map.tileSize;
+                }
             }
 
         
@@ -215,6 +220,3 @@ function changeBlock(hitBlock)
             
     }
 }
-
-
-
