@@ -44,6 +44,7 @@ function mapSeedMaker (gameMode) {
     var seed = [];
     
     var tileType; //här ska en framslumpad typ av tile (eller 'ruta' på en plattform) sparas
+    var amount;
     
     /*
     Tile types:
@@ -57,7 +58,44 @@ function mapSeedMaker (gameMode) {
     for (var i = 0; i < 391; i++) //391 = 7+9+11+13...37+39
     {
         //ett nummber (0-9) bestämmer en tiletype. 
-        seed[i] = tileType = Math.floor(Math.random() * 10); 
+        if(i != 356)
+        {
+            tileType = Math.floor(Math.random() * 10); 
+            
+            while(tileType === 8 && seed[i-1] == 8) //aldrig mer än en vägg efter varandra
+            {
+                tileType = Math.floor(Math.random() * 10); 
+            }
+            seed[i] = tileType;
+            
+            if(tileType >= 1 && tileType <= 5) //En vanlig tvåslagsruta skapas i kluster om 1-3;
+            {
+                amount = Math.floor(Math.random() * 3 + 1); 
+            }
+            
+            else if(tileType >= 6 && tileType <= 7 || tileType === 9)//Enslagsrutor och oslagbara kommer ofta i par.
+            {
+                amount = Math.floor(Math.random() * 2 + 1); 
+            }
+            else //Tomma rutor och väggar = 1 gång
+            {
+                amount = 1;
+            }
+                    
+    
+            //lägg till alla block i seedet.
+            for (var j = 1; j < amount; j++)
+            {
+                i++;
+                seed[i] = tileType;
+            }
+                
+            
+        }
+        else
+        {
+            seed[i] = tileType = 9; //Alltid en oförstörbara ruta ovanför startplatsen (för att undvika en vägg igenom spelaren)
+        }
     }        
 
     return seed;

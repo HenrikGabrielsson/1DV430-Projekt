@@ -100,7 +100,7 @@ var init = function(){
             //finns nåt till höger?
             if(map.mapArray[playerRow][playerCol+1] > 0 && player.xSpeed > 0)
             {
-                player.posX = playerCol * map.tileSize;
+                player.posX = playerCol * map.tileSize + map.tileSize - player.side;
             }
             
             //finns nåt till vänster?
@@ -114,11 +114,18 @@ var init = function(){
             playerRow = Math.floor(player.posY / map.tileSize);
             playerCol = Math.floor(player.posX / map.tileSize);
 
+
+            if(map.mapArray[playerRow+1][Math.floor((player.posX+player.side) / map.tileSize)] > 0 && player.xSpeed < 0)
+            {
+                player.posY = playerRow * map.tileSize + map.tileSize - player.side;
+            }
+
+            //finns nåt under?
             if(map.mapArray[playerRow+1][playerCol] > 0 && player.ySpeed >= 0)
             {
-                player.posY = playerRow * map.tileSize;
+                player.posY = playerRow * map.tileSize + map.tileSize - player.side;
             }
-    
+            
             
             //finns nåt över(i ett högt hopp)
             if(player.jumpState*3 > map.tileSize && map.mapArray[playerRow-1][playerCol] > 0)
@@ -205,7 +212,6 @@ function changeBlock(hitBlock)
         //oslagbara block påverkas inte.
         case 9:
             return 9;
-            
             
     }
 }
