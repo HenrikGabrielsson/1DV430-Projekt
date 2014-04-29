@@ -7,7 +7,7 @@ function Player(posX, posY)
     this.posY = posY;
     
     //sidlängd i pixlar
-    this.side = 15;
+    this.side = 24;
     
     //hastighet (horisontell och vertikal)
     this.xSpeed = 0;
@@ -16,6 +16,11 @@ function Player(posX, posY)
     //mitt i ett hopp?
     this.jumpState = 0;
     
+    //slag
+    this.hitState = 0;
+    
+
+    
 }
 
 //rita spelare
@@ -23,6 +28,9 @@ Player.prototype.renderPlayer = function(context)
 {   
     context.fillStyle = "#0000FF";
     context.fillRect(this.posX,this.posY, this.side,this.side)
+
+    
+    
 };
 
 //funktioner för att förflytta spelaren
