@@ -39,12 +39,18 @@ io.sockets.on('connection', function(socket){
         
     });
     
-    
+    //ger varje monster ett unikt id för att undvika dupliceringar
     var monsterNumber = 0;
+    
+    //Ett nummer som står för ett monster sparas här
+    var monsterType = 0;
     
     socket.on("monsterCall", function()
     {            
-        socket.emit("monster", {monster: monsterNumber});
+        monsterType = Math.floor(Math.random()*3);
+        
+        socket.emit("monster", {monsterNumber: monsterNumber, 
+                                monsterType: monsterType });
         monsterNumber++;
     })
     

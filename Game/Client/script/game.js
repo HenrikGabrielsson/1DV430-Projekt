@@ -121,6 +121,7 @@ Game.prototype.gameInit = function()
         socket.on("monster", function(data)
         {
             displayMonster(data);
+            
         });        
         
         //collision detection
@@ -138,7 +139,7 @@ function displayMonster(data)
 {
     if(data.monster == monsterNumber)
     {
-        console.log(data.monster);
+        console.log(data.monsterType);
         monsterNumber++;
     }
 }
