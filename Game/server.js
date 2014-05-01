@@ -5,7 +5,7 @@ var io = require('socket.io').listen(app); //socket för kommunikation med klien
 app.listen(8080); //port 8080 används på c9. 
 
 //Game/Client är mappen där alla publika filer ligger
-var fileServer = new ns.Server('./Game/Client', {cache: 1}); 
+var fileServer = new ns.Server('./Game/Client', {cache: 10}); 
 
 //När en klient ansluter körs denna funktion.
 function handler (req, res) {
@@ -20,6 +20,8 @@ function handler (req, res) {
 
 //här bestäms det vad som ska göras när ett meddelande skickas från en klient
 io.sockets.on('connection', function(socket){
+    
+    
     socket.on('sendMap', function(data){
         
         //kollar det som togs emot(speltyp) och skickar sedan ett seed till klienten/klienterna.
@@ -36,7 +38,18 @@ io.sockets.on('connection', function(socket){
         socket.emit("map", {map: seed} );
         
     });
+    
+    
+    var monsterNumber = 0;
+    
+    socket.on("monsterCall", function()
+    {            
+        socket.emit("monster", {monster: monsterNumber});
+        monsterNumber++;
+    })
+    
 });
+
 
 
 //Denna funktion skapar en array som bestämmer hur banan ska se ut (en tilemap)

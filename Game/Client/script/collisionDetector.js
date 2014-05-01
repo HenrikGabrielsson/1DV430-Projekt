@@ -17,8 +17,6 @@ function detectCollision(player,map)
         player.posY = playerRow * map.tileSize + map.tileSize - player.side;
     }
 
-
-    
     
     playerRow = Math.floor(player.posY / map.tileSize);
     playerColL = Math.floor(player.posX / map.tileSize);
