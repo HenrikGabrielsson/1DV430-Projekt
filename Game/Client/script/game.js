@@ -11,7 +11,9 @@ function Game(data,canvas,context)
     
     //skapa ett nytt map-objekt
     this.map = new Map(this.data.map, mapSprites);
-
+    
+    //alla monster sparas här     
+    this.monsters = [];
 }
 
 //Startar spelet
@@ -43,11 +45,17 @@ Game.prototype.gameInit = function()
     
     //så här ofta ska spel-loopen köras
     var frameTime = 1000/60;
-
+    
+    var spawnMonster = this.spawnMonster;
+    var renderer = this.renderer;
+    var monsters = this.monsters;
+    
+    
+    
     //Spel-loopen
     setInterval(function()
     {
-            
+           
         //ta reda på vilken ruta i banans tileset som spelaren befinner sig i
         var playerRow = Math.floor(player.posY / map.tileSize);
         var playerColL = Math.floor(player.posX / map.tileSize);
@@ -81,7 +89,6 @@ Game.prototype.gameInit = function()
             player.ySpeed = 0;
         }
         
-        
         if(keys[65])//A
         {
             player.xSpeed = -runningSpeed;
@@ -109,7 +116,6 @@ Game.prototype.gameInit = function()
             player.hitState--;
         }
         
-        
         //gravity
         player.ySpeed += 8;
         
@@ -117,36 +123,55 @@ Game.prototype.gameInit = function()
         player.moveX();
         player.moveY();
 
-        socket.emit("monsterCall");
+
+        //nytt monster spawnar
         socket.on("monster", function(data)
         {
-            displayMonster(data);
-            
+            spawnMonster(data, monsters, map);
         });        
         
         //collision detection
         detectCollision(player,map);
         
         //rita bana och karaktär på nytt
-        renderer(map,player);
+        renderer(map,player,monsters);
         
     }, frameTime);
     
-}
+};
+
+
 
 var monsterNumber = 0;
-function displayMonster(data)
+Game.prototype.spawnMonster = function(data, monsters, map)
 {
-    if(data.monster == monsterNumber)
+    var monster;
+    
+    //Varje monster ska bara visa sig en gång.
+    if(data.monsterNumber == monsterNumber)
     {
-        console.log(data.monsterType);
-        monsterNumber++;
+        monsterNumber++; //nästa monster, tack!
+        
+        //skapar ett nytt monster
+        if(data.monsterType === 0)
+        {
+            monster = new Bat(data.monsterType, data.monsterFloor, data.monsterDirection);
+        }
+        else if(data.monsterType === 1)
+        {
+            monster = new Troll(data.monsterType, data.monsterFloor, data.monsterDirection);
+        }
+        else if(data.monsterType === 2)
+        {
+            monster = new Sandworm(data.monsterType, data.monsterFloor, data.monsterDirection);
+        }
+        monsters.push(monster);
     }
 }
 
 
 //funktion som ritar både spelare och karta.
-function renderer(map,player)
+Game.prototype.renderer = function(map,player,monsters)
 {
     //Canvas hämtas    
     var canvas = document.getElementById("gamecanvas");
@@ -157,6 +182,12 @@ function renderer(map,player)
     
     map.renderMap(canvas,context);
     player.renderPlayer(context);   
+    
+    //flytta varje monster
+    monsters.forEach(function(monster)
+    {   
+        monster.renderMonster(context, map); 
+    });
     
 }
 

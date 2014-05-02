@@ -28,8 +28,6 @@ Player.prototype.renderPlayer = function(context)
 {   
     context.fillStyle = "#0000FF";
     context.fillRect(this.posX,this.posY, this.side,this.side)
-
-    
     
 };
 

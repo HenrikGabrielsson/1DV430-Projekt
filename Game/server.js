@@ -41,19 +41,19 @@ io.sockets.on('connection', function(socket){
     
     //ger varje monster ett unikt id för att undvika dupliceringar
     var monsterNumber = 0;
-    
-    //Ett nummer som står för ett monster sparas här
-    var monsterType = 0;
-    
-    socket.on("monsterCall", function()
-    {            
-        monsterType = Math.floor(Math.random()*3);
-        
-        socket.emit("monster", {monsterNumber: monsterNumber, 
-                                monsterType: monsterType });
+
+    //skickar ett monster 
+    setInterval(function()
+    {
+        socket.emit("monster", 
+        {
+            monsterNumber: monsterNumber, //monsterid som ska kunna jämföras med
+            monsterType: Math.floor(Math.random()*3), //Monstertyp
+            monsterFloor: Math.floor(Math.random()*81), //Monstrets våning på banan
+            monsterDirection: Math.floor(Math.random()*2) //Monstrets riktning(höger/vänster)
+        });
         monsterNumber++;
-    })
-    
+    },1000);
 });
 
 
@@ -101,7 +101,6 @@ function mapSeedMaker (gameMode) {
                 amount = 1;
             }
                     
-    
             //lägg till alla block i seedet.
             for (var j = 1; j < amount; j++)
             {
