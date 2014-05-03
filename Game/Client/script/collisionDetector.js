@@ -1,48 +1,81 @@
-function detectCollision(player,map)
+
+//konstruktor
+function CollisionDetector(map, player, monsters)
+{
+    this.map = map;
+    this.player = player;
+    this.monsters = monsters;
+    
+}
+
+
+CollisionDetector.prototype.detectWallCollision = function()
 {
     //ta reda på vilken ruta i banans tileset som spelaren befinner sig i
-    var playerRow = Math.floor(player.posY / map.tileSize);
-    var playerColL = Math.floor(player.posX / map.tileSize);
-    var playerColR = Math.floor((player.posX+player.side) / map.tileSize);
+    var playerRow = Math.floor(this.player.posY / this.map.tileSize);
+    var playerColL = Math.floor(this.player.posX / this.map.tileSize);
+    var playerColR = Math.floor((this.player.posX+this.player.side) / this.map.tileSize);
 
     //finns nåt över?
-    if(map.mapArray[playerRow][playerColL] > 0 || map.mapArray[playerRow][playerColR] > 0)
+    if(this.map.mapArray[playerRow][playerColL] > 0 || this.map.mapArray[playerRow][playerColR] > 0)
     {
-        player.posY = (playerRow + 1) * map.tileSize;
+        this.player.posY = (playerRow + 1) * this.map.tileSize;
     }
     
     //finns nåt under?
-    if((map.mapArray[playerRow+1][playerColL] > 0 || map.mapArray[playerRow+1][playerColR] > 0) && player.ySpeed >= 0)
+    if((this.map.mapArray[playerRow+1][playerColL] > 0 || this.map.mapArray[playerRow+1][playerColR] > 0) && this.player.ySpeed >= 0)
     {
-        player.posY = playerRow * map.tileSize + map.tileSize - player.side;
+        this.player.posY = playerRow * this.map.tileSize + this.map.tileSize - this.player.side;
     }
 
     
-    playerRow = Math.floor(player.posY / map.tileSize);
-    playerColL = Math.floor(player.posX / map.tileSize);
-    playerColR = Math.floor((player.posX+player.side) / map.tileSize);      
+    playerRow = Math.floor(this.player.posY / this.map.tileSize);
+    playerColL = Math.floor(this.player.posX / this.map.tileSize);
+    playerColR = Math.floor((this.player.posX+this.player.side) / this.map.tileSize);      
     
     
-    if(player.xSpeed !== 0)
+    if(this.player.xSpeed !== 0)
     {
         
         //finns nåt till höger?
-        if(map.mapArray[playerRow][playerColR] > 0 && player.xSpeed > 0)
+        if(this.map.mapArray[playerRow][playerColR] > 0 && this.player.xSpeed > 0)
         {
-            console.log("höger")
-            player.posX = playerColL * map.tileSize + (map.tileSize - player.side);
-            player.posX--;
+            console.log("höger");
+            this.player.posX = playerColL * this.map.tileSize + (this.map.tileSize - this.player.side);
+            this.player.posX--;
         }
         
         //finns nåt till vänster?
-        if(map.mapArray[playerRow][playerColL] > 0 && player.xSpeed < 0)
+        if(this.map.mapArray[playerRow][playerColL] > 0 && this.player.xSpeed < 0)
         {
             console.log("vänster")
-            player.xSpeed = 0;
-            player.posX = (playerColL+1) * map.tileSize;
+            this.player.xSpeed = 0;
+            this.player.posX = (playerColL+1) * this.map.tileSize;
             
         }
     }
-
-
 }
+
+CollisionDetector.prototype.detectMonsterCollision = function()
+{
+    var player = this.player;
+    
+    this.monsters.forEach(function(monster)
+    {
+        if(
+            ((player.posX > monster.posX && player.posX < monster.posX+monster.width) || (player.posX + player.side > monster.posX && player.posX + player.side < monster.posX+monster.width)) &&
+            ((player.posY > monster.posY && player.posY < monster.posY+monster.height) || (player.posY + player.side > monster.posY && player.posY + player.side < monster.posY+monster.height))
+        )
+        {
+            alert("You're DEAD, FUCKAAAAAH!");
+        }
+        
+    })
+    
+}
+
+
+
+
+
+

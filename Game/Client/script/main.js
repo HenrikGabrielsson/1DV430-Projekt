@@ -18,8 +18,13 @@ var init = function(){
         
         //Klicka på Enter för att ta bort 
         document.addEventListener('keydown', function(event) {
+            
+            
             if(event.keyCode == 13)
             {
+                //säger till servern att spelet startar.
+                socket.emit("gameIsOn");
+                
                 //startar spelet.
                 game.gameInit();
             }

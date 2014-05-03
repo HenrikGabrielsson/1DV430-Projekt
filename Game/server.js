@@ -39,21 +39,25 @@ io.sockets.on('connection', function(socket){
         
     });
     
-    //ger varje monster ett unikt id för att undvika dupliceringar
-    var monsterNumber = 0;
-
-    //skickar ett monster 
-    setInterval(function()
+    socket.on("gameIsOn", function()
     {
-        socket.emit("monster", 
+        //ger varje monster ett unikt id för att undvika dupliceringar
+        var monsterNumber = 0;
+    
+        //skickar ett monster 
+        setInterval(function()
         {
-            monsterNumber: monsterNumber, //monsterid som ska kunna jämföras med
-            monsterType: Math.floor(Math.random()*3), //Monstertyp
-            monsterFloor: Math.floor(Math.random()*81), //Monstrets våning på banan
-            monsterDirection: Math.floor(Math.random()*2) //Monstrets riktning(höger/vänster)
-        });
-        monsterNumber++;
-    },1000);
+            socket.emit("monster", 
+            {
+                monsterNumber: monsterNumber, //monsterid som ska kunna jämföras med
+                monsterType: Math.floor(Math.random()*3), //Monstertyp
+                monsterFloor: Math.floor(Math.random()*81), //Monstrets våning på banan
+                monsterDirection: Math.floor(Math.random()*2) //Monstrets riktning(höger/vänster)
+            });
+            monsterNumber++;
+        },1000);
+    })    
+
 });
 
 

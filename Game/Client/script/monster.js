@@ -5,7 +5,8 @@ function Monster(type,floor,direction,map)
     this.type = type;
     this.floor = floor;
     this.direction = direction;
-    this.side = 20;
+    this.width = 20;
+    this.height = 20;
     
     //positionering
     this.posX;
@@ -26,16 +27,16 @@ Monster.prototype.renderMonster = function(context)
 {
     //rita på banan
     context.fillStyle = "#FF0000";
-    context.fillRect(this.posX, this.posY, this.side, this.side);
+    context.fillRect(this.posX, this.posY, this.width, this.height);
     
     //uppdatera monstrets position
     if(this.direction === 0)
     {
-        this.posX++;
+        this.posX += this.speed;
     }
     else
     {
-        this.posX--;
+        this.posX -= this.speed;
     }
     
     
@@ -47,22 +48,27 @@ Monster.prototype.renderMonster = function(context)
 function Bat(type,floor,direction, map)
 {
     Monster.call(this,type,floor,direction);
+    this.speed = 5;
     
 }
 Bat.prototype = new Monster();
+
 
 //Troll-konstruktor
 function Troll(type,floor,direction,map)
 {
     Monster.call(this,type,floor,direction);
+    this.speed = 1;
     
 }
 Troll.prototype = new Monster();
+
 
 //Sandworm
 function Sandworm(type,floor,direction,map)
 {
     Monster.call(this,type,floor,direction);
+    this.speed = 3;
 }
 Sandworm.prototype = new Monster();
 

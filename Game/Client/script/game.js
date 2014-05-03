@@ -7,7 +7,7 @@ function Game(data,canvas,context)
     
     //sprite för block
     var mapSprites = new Image();
-    mapSprites.src ="pics/tileset1.png";
+    mapSprites.src ="pics/fanbryrsig.png";
     
     //skapa ett nytt map-objekt
     this.map = new Map(this.data.map, mapSprites);
@@ -20,11 +20,17 @@ function Game(data,canvas,context)
 Game.prototype.gameInit = function()
 {
     
-    var map = this.map;
     var socket = io.connect();
+    
+    var map = this.map;
+    var spawnMonster = this.spawnMonster;
+    var renderer = this.renderer;
+    var monsters = this.monsters;
     
     //skapa spelare och ange startposition
     var player = new Player(map.tileSize * 5,(map.rows-2) * map.tileSize);
+    
+    var cd = new CollisionDetector(map, player, monsters);
     
     //lyssnar efter input från spelare
     var keys = []; //här sparas de tangenter som trycks ner med en boolean som bestämmer om de fortfarande är nertryckta
@@ -45,10 +51,6 @@ Game.prototype.gameInit = function()
     
     //så här ofta ska spel-loopen köras
     var frameTime = 1000/60;
-    
-    var spawnMonster = this.spawnMonster;
-    var renderer = this.renderer;
-    var monsters = this.monsters;
     
     
     
@@ -130,8 +132,10 @@ Game.prototype.gameInit = function()
             spawnMonster(data, monsters, map);
         });        
         
-        //collision detection
-        detectCollision(player,map);
+        //kollision med väggar eller monster
+        cd.detectWallCollision();
+        cd.detectMonsterCollision();
+        
         
         //rita bana och karaktär på nytt
         renderer(map,player,monsters);
