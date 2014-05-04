@@ -102,7 +102,8 @@ Map.prototype.renderMap = function(canvas,context)
             switch(this.mapArray[i][j])
             {
                 case 0: //tom
-                    context.drawImage(this.sprite,0,0,this.tileSize,this.tileSize,j*this.tileSize,i*this.tileSize,this.tileSize,this.tileSize);
+                    context.fillStyle = "#000000";
+                    context.fillRect([j*this.tileSize], [i*this.tileSize], this.tileSize,this.tileSize);
                     break;
                 //1-5: rutor som kräver två slag för att krossas    
                 case 1:
@@ -110,18 +111,25 @@ Map.prototype.renderMap = function(canvas,context)
                 case 3:
                 case 4:
                 case 5:
-                    context.drawImage(this.sprite,40,0,this.tileSize,this.tileSize,j*this.tileSize,i*this.tileSize,this.tileSize,this.tileSize);
+                    context.drawImage(this.sprite,0,0,this.tileSize,this.tileSize,j*this.tileSize,i*this.tileSize,this.tileSize,this.tileSize);
                     break;
                 //6-7: rutor som kräver ett slag för att krossas
                 case 6:
                 case 7:
-                    context.drawImage(this.sprite,80,0,this.tileSize,this.tileSize,j*this.tileSize,i*this.tileSize,this.tileSize,this.tileSize);
+                    context.drawImage(this.sprite,40,0,this.tileSize,this.tileSize,j*this.tileSize,i*this.tileSize,this.tileSize,this.tileSize);
                     break;
                 case 8: //vägg
-                    context.drawImage(this.sprite,120,0,this.tileSize,this.tileSize,j*this.tileSize,i*this.tileSize,this.tileSize,this.tileSize);
+                    if(this.mapArray[i-1][j])
+                    {
+                        context.drawImage(this.sprite,0,0,this.tileSize,this.tileSize,j*this.tileSize,i*this.tileSize,this.tileSize,this.tileSize);
+                    }
+                    else
+                    {
+                        context.drawImage(this.sprite,80,0,this.tileSize,this.tileSize,j*this.tileSize,i*this.tileSize,this.tileSize,this.tileSize);
+                    }
                     break;
                 case 9: //oförstörbar
-                    context.drawImage(this.sprite,160,0,this.tileSize,this.tileSize,j*this.tileSize,i*this.tileSize,this.tileSize,this.tileSize);
+                    context.drawImage(this.sprite,120,0,this.tileSize,this.tileSize,j*this.tileSize,i*this.tileSize,this.tileSize,this.tileSize);
                     break;
                 default:
                     break;

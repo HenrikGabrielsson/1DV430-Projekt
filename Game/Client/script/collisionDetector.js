@@ -56,6 +56,63 @@ CollisionDetector.prototype.detectWallCollision = function()
     }
 }
 
+CollisionDetector.prototype.detectMonsterWallCollision = function()
+{
+    var map = this.map;
+    var monsters = this.monsters;
+    
+    var monsterRow;
+    var monsterColL;
+    var monsterColR;
+    
+    var monsterIndex = 0; 
+    this.monsters.forEach(function(monster)
+    {
+        
+        
+        monsterRow = Math.floor(monster.posY / map.tileSize);
+        monsterColL = Math.floor(monster.posX / map.tileSize);
+        monsterColR = Math.floor((monster.posX+monster.width) / map.tileSize);    
+    
+        //gravitation
+        monster.posY += 8;
+        
+        //om ett monster går utanför banan
+        if(map.mapArray[monsterRow][monsterColL] === undefined || map.mapArray[monsterRow][monsterColR] === undefined) //&& (monsterColL <= 0 || monsterColR >= map.cols)
+        {
+            monsters.splice(monsterIndex,1); // tar bort monster från array
+            monster = null; //låter garbage collectorn äta upp monstret
+            return; //avbryter collision detection
+        }
+        
+        //krock med vägg
+        if ((monster.direction === 0 && map.mapArray[monsterRow][monsterColR] === 8) || (monster.direction === 1 && map.mapArray[monsterRow][monsterColL] === 8))
+        {
+            
+            //monster vänder om de stöter på en vägg
+            if(monster.direction === 0)
+            {
+                monster.direction = 1;
+            }
+            else if(monster.direction === 1)
+            {
+                monster.direction = 0;
+            }
+        }
+        
+           
+        //finns nåt under?
+        else if((map.mapArray[monsterRow+1][monsterColL] > 0 || map.mapArray[monsterRow+1][monsterColR] > 0) || (monster.direction === 0 && map.mapArray[monsterRow][monsterColR] === 9) || (monster.direction === 1 && map.mapArray[monsterRow][monsterColL] === 9) )
+        {
+            monster.posY = monsterRow * map.tileSize + map.tileSize - monster.height;
+        }
+        
+        monsterIndex++;
+        
+        
+    });
+}
+
 CollisionDetector.prototype.detectMonsterCollision = function()
 {
     var player = this.player;

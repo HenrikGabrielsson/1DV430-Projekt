@@ -7,9 +7,7 @@ function Game(data,canvas,context)
     
     //sprite för block
     var mapSprites = new Image();
-    mapSprites.src ="pics/fanbryrsig.png";
-    
-    //skapa ett nytt map-objekt
+    mapSprites.src = "https://photos-6.dropbox.com/t/0/AACleUaup3ahZ5ISt-bDjAQVNLfabYQP8wvorX0wCIMjpw/12/66926963/png/32x32/3/_/1/2/tileset.png/tTt_iorlZatiuC9RmBxdA0h-dIDCPwUvkRxWTHAP-N0?size=1280x960";    //skapa ett nytt map-objekt
     this.map = new Map(this.data.map, mapSprites);
     
     //alla monster sparas här     
@@ -134,11 +132,13 @@ Game.prototype.gameInit = function()
         
         //kollision med väggar eller monster
         cd.detectWallCollision();
-        cd.detectMonsterCollision();
+        cd.detectMonsterWallCollision();
         
+        cd.detectMonsterCollision();
         
         //rita bana och karaktär på nytt
         renderer(map,player,monsters);
+        
         
     }, frameTime);
     
@@ -150,6 +150,7 @@ var monsterNumber = 0;
 Game.prototype.spawnMonster = function(data, monsters, map)
 {
     var monster;
+
     
     //Varje monster ska bara visa sig en gång.
     if(data.monsterNumber == monsterNumber)
@@ -159,15 +160,15 @@ Game.prototype.spawnMonster = function(data, monsters, map)
         //skapar ett nytt monster
         if(data.monsterType === 0)
         {
-            monster = new Bat(data.monsterType, data.monsterFloor, data.monsterDirection);
+            monster = new Bat(data.monsterType, data.monsterFloor, data.monsterDirection, map);
         }
         else if(data.monsterType === 1)
         {
-            monster = new Troll(data.monsterType, data.monsterFloor, data.monsterDirection);
+            monster = new Troll(data.monsterType, data.monsterFloor, data.monsterDirection, map);
         }
         else if(data.monsterType === 2)
         {
-            monster = new Sandworm(data.monsterType, data.monsterFloor, data.monsterDirection);
+            monster = new Sandworm(data.monsterType, data.monsterFloor, data.monsterDirection, map);
         }
         monsters.push(monster);
     }
