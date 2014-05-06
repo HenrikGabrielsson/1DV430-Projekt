@@ -27,6 +27,7 @@ var init = function(){
                 
                 //startar spelet.
                 game.gameInit();
+
             }
         });
 
@@ -36,4 +37,7 @@ var init = function(){
     });
     
 };
+
+
+
 window.onload = init();

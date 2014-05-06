@@ -112,7 +112,6 @@ function mapSeedMaker (gameMode) {
                 seed[i] = tileType;
             }
                 
-            
         }
         else
         {

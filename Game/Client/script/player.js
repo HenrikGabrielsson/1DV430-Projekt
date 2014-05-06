@@ -7,7 +7,7 @@ function Player(posX, posY)
     this.posY = posY;
     
     //sidlängd i pixlar
-    this.side = 24;
+    this.side = 40;
     
     //hastighet (horisontell och vertikal)
     this.xSpeed = 0;
@@ -22,6 +22,7 @@ function Player(posX, posY)
 
     
 }
+
 
 //rita spelare
 Player.prototype.renderPlayer = function(context)

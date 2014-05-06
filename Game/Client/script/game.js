@@ -5,10 +5,7 @@ function Game(data,canvas,context)
     this.canvas = canvas;
     this.context = context;
     
-    //sprite för block
-    var mapSprites = new Image();
-    mapSprites.src = "https://photos-6.dropbox.com/t/0/AACleUaup3ahZ5ISt-bDjAQVNLfabYQP8wvorX0wCIMjpw/12/66926963/png/32x32/3/_/1/2/tileset.png/tTt_iorlZatiuC9RmBxdA0h-dIDCPwUvkRxWTHAP-N0?size=1280x960";    //skapa ett nytt map-objekt
-    this.map = new Map(this.data.map, mapSprites);
+    this.map = new Map(this.data.map, canvas);
     
     //alla monster sparas här     
     this.monsters = [];
@@ -20,10 +17,17 @@ Game.prototype.gameInit = function()
     
     var socket = io.connect();
     
+    var canvas = this.canvas;
+    var context = this.context;
+    
     var map = this.map;
+    var monsters = this.monsters;
+    
+    
     var spawnMonster = this.spawnMonster;
     var renderer = this.renderer;
-    var monsters = this.monsters;
+    var deathLoop = this.deathLoop;
+    var winLoop = this.winLoop;
     
     //skapa spelare och ange startposition
     var player = new Player(map.tileSize * 5,(map.rows-2) * map.tileSize);
@@ -51,9 +55,8 @@ Game.prototype.gameInit = function()
     var frameTime = 1000/60;
     
     
-    
     //Spel-loopen
-    setInterval(function()
+    var gameLoop = setInterval(function()
     {
            
         //ta reda på vilken ruta i banans tileset som spelaren befinner sig i
@@ -62,18 +65,11 @@ Game.prototype.gameInit = function()
         var playerColR = Math.floor((player.posX+player.side) / map.tileSize);
         
         
-        //kolla om karaktären vann(kom till toppen)
-        if(playerRow === 3 && (map.mapArray[playerRow+1][playerColL] > 0 || map.mapArray[playerRow+1][playerColR] > 0 ))
-        {
-            console.log("du vann!");
-        }
-        
         //Styrning av karaktär och slag
         if(keys[87] && (map.mapArray[playerRow+1][playerColL] > 0 || map.mapArray[playerRow+1][playerColR] > 0 ) && player.jumpState === 0 )//W och står på en plattform
         {
             player.ySpeed = 0; //återställer
-            
-            player.jumpState = 28; 
+            player.jumpState = player.side * 0.9; 
             player.ySpeed -= player.jumpState;
             player.jumpState--;
         }
@@ -117,7 +113,7 @@ Game.prototype.gameInit = function()
         }
         
         //gravity
-        player.ySpeed += 8;
+        player.ySpeed += 10;
         
         //ändra spelarens position
         player.moveX();
@@ -134,10 +130,33 @@ Game.prototype.gameInit = function()
         cd.detectWallCollision();
         cd.detectMonsterWallCollision();
         
-        cd.detectMonsterCollision();
+
         
+
+
+
         //rita bana och karaktär på nytt
         renderer(map,player,monsters);
+        
+        //kolla om några monster slagit ihjäl spelare.
+        var dead = cd.detectMonsterCollision();
+        var won = (playerRow === 3 && (map.mapArray[playerRow+1][playerColL] > 0 || map.mapArray[playerRow+1][playerColR] > 0 ));
+        
+        //spelloopen stängs av ifall spelaren dör
+        if(dead || won )
+        {
+            clearInterval(gameLoop);
+            
+            //om man vinner
+            if(won)
+            {
+                winLoop(map,player,monsters, canvas, context)
+            }
+            else if(dead)
+            {
+                deathLoop(map,player,monsters, canvas, context)
+            }
+        }
         
         
     }, frameTime);
@@ -185,14 +204,33 @@ Game.prototype.renderer = function(map,player,monsters)
     //ta bort tidigare ritat på canvas
     context.clearRect(0,0,canvas.width,canvas.height);
     
-    map.renderMap(canvas,context);
-    player.renderPlayer(context);   
     
-    //flytta varje monster
+ 
+    //flytta och rita varje monster
     monsters.forEach(function(monster)
-    {   
-        monster.renderMonster(context, map); 
-    });
+    {
+        //fladdermus
+        if(monster.type === 0)
+        {
+            monster.renderBat(context); 
+        }
+        
+        //troll
+        else if (monster.type === 1)
+        {
+            monster.renderTroll(context, player);
+        }
+        else if(monster.type === 2)
+        {
+            monster.renderMonster(context,player)
+        }
+        
+    });  
+    
+    player.renderPlayer(context);     
+
+
+     map.renderMap(context);     
     
 }
 
@@ -249,6 +287,8 @@ function changeBlock(hitBlock)
         //oslagbara block påverkas inte.
         case 9:
             return 9;
+        case 10:
+            return 10;
             
     }
 }
@@ -267,8 +307,37 @@ Game.prototype.getInstructions = function()
     this.context.fillStyle = "black";
     this.context.font= fontSize+"px Arial";
     this.context.fillText("Hello World!", this.canvas.width/2 - boxWidth/2 , this.canvas.height/2 - boxHeight/2 + fontSize);
+}
+
+//funktion som körs när man dör
+Game.prototype.deathLoop = function(map,player,monsters, canvas,context)
+{
+    var boxWidth = 600;
+    var boxHeight = 800;
     
+    var fontSize = 50;
     
+    context.fillStyle = "DDDDDD";
+    context.fillRect(canvas.width/2 - boxWidth/2 , canvas.height/2 - boxHeight/2, boxWidth, boxHeight);
+    
+    context.fillStyle = "black";
+    context.font= fontSize+"px Arial";
+    context.fillText("Du dog jättemycket!", canvas.width/2 - boxWidth/2 , canvas.height/2 - boxHeight/2 + fontSize);
+}
+
+Game.prototype.winLoop = function(map,player,monsters, canvas,context)
+{
+    var boxWidth = 600;
+    var boxHeight = 800;
+    
+    var fontSize = 50;
+    
+    context.fillStyle = "DDDDDD";
+    context.fillRect(canvas.width/2 - boxWidth/2 , canvas.height/2 - boxHeight/2, boxWidth, boxHeight);
+    
+    context.fillStyle = "black";
+    context.font= fontSize+"px Arial";
+    context.fillText("Grattis! Du vann", canvas.width/2 - boxWidth/2 , canvas.height/2 - boxHeight/2 + fontSize);
 }
 
 

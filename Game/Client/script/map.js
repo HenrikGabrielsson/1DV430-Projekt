@@ -1,5 +1,5 @@
 //konstruktorfunktion som skapar kartan
-function Map (seed, sprite)
+function Map (seed, canvas)
 {
     this.seed = seed;
     this.mapArray = this.createMap(this.seed);
@@ -7,9 +7,14 @@ function Map (seed, sprite)
     //banans höjd och bredd i tiles
     this.rows = 81; 
     this.cols = 40;
-    this.tileSize = 40;
+    this.tileSize = 64;
     
-    this.sprite = sprite;
+    this.sprite = new Image();
+    this.sprite.src = "pics/tileset.png";
+    
+    //hur stor ska canvas vara
+    canvas.width = this.tileSize * this.cols;
+    canvas.height= this.tileSize * this.rows;
 }
 
 //Den här funktionen tar emot ett seed och skapar en bana (en tvådimensionell array).
@@ -30,7 +35,7 @@ Map.prototype.createMap = function(seed)
         {
             if(j === 0 || j === 39 || i === rows) //oförstörbara tiles omringar banan. ingen får fly...
             {
-                mapArray[i][j] = 9;
+                mapArray[i][j] = 10;
             }
 
             else if(i % 4 === 0 && ((j > cols/2 - ((i/4) + 2)) && (j < cols/2 + ((i/4) + 2))  )) //plattformar ska finnas på var 4:e rad. De ökar med 2 rutor varje gång.
@@ -49,7 +54,7 @@ Map.prototype.createMap = function(seed)
             //man ska inte kunna gå utanför "pyramiden" så allt där blir oslagbara rutor.
             else if(    (j < cols/2 - ((i/4) + 2)) || (j > cols/2 + ((i/4) + 2)) )
             {
-                mapArray[i][j] = 9;
+                mapArray[i][j] = 10;
             }
             else //annars tomrum
             {
@@ -75,7 +80,7 @@ Map.prototype.createMap = function(seed)
         {
             if(l < 17 || l > 21)
             {
-               mapArray[0].unshift(9); 
+               mapArray[0].unshift(10); 
             }
             else
             {
@@ -88,22 +93,19 @@ Map.prototype.createMap = function(seed)
 }
 
 //Funktion som ritar banan. tar emot mapArray(tileset som beskriver vad som ska ritas) och canvas + context
-Map.prototype.renderMap = function(canvas,context)
+Map.prototype.renderMap = function(context)
 {
     
-   //hur stor ska canvas vara
-    canvas.width = this.tileSize * this.cols;
-    canvas.height= this.tileSize * this.rows;
     for (var i = 0; i < this.rows; i++) //rader
     {
         for (var j = 0; j < this.cols; j++) //kolumner
         {
+            
             //switch tittar på varje siffra i arrayen och bestämmer vad som ska ritas på aktuell position
             switch(this.mapArray[i][j])
             {
+                
                 case 0: //tom
-                    context.fillStyle = "#000000";
-                    context.fillRect([j*this.tileSize], [i*this.tileSize], this.tileSize,this.tileSize);
                     break;
                 //1-5: rutor som kräver två slag för att krossas    
                 case 1:
@@ -116,7 +118,7 @@ Map.prototype.renderMap = function(canvas,context)
                 //6-7: rutor som kräver ett slag för att krossas
                 case 6:
                 case 7:
-                    context.drawImage(this.sprite,40,0,this.tileSize,this.tileSize,j*this.tileSize,i*this.tileSize,this.tileSize,this.tileSize);
+                    context.drawImage(this.sprite,this.tileSize,0,this.tileSize,this.tileSize,j*this.tileSize,i*this.tileSize,this.tileSize,this.tileSize);
                     break;
                 case 8: //vägg
                     if(this.mapArray[i-1][j])
@@ -125,12 +127,15 @@ Map.prototype.renderMap = function(canvas,context)
                     }
                     else
                     {
-                        context.drawImage(this.sprite,80,0,this.tileSize,this.tileSize,j*this.tileSize,i*this.tileSize,this.tileSize,this.tileSize);
+                        context.drawImage(this.sprite,this.tileSize*2,0,this.tileSize,this.tileSize,j*this.tileSize,i*this.tileSize,this.tileSize,this.tileSize);
                     }
                     break;
                 case 9: //oförstörbar
-                    context.drawImage(this.sprite,120,0,this.tileSize,this.tileSize,j*this.tileSize,i*this.tileSize,this.tileSize,this.tileSize);
+                    context.drawImage(this.sprite,this.tileSize*3,0,this.tileSize,this.tileSize,j*this.tileSize,i*this.tileSize,this.tileSize,this.tileSize);
                     break;
+                case 10:
+                    context.drawImage(this.sprite,this.tileSize*3,0,this.tileSize,this.tileSize,j*this.tileSize,i*this.tileSize,this.tileSize,this.tileSize);
+                    break;                    
                 default:
                     break;
             }

@@ -8,7 +8,7 @@ function CollisionDetector(map, player, monsters)
     
 }
 
-
+//kollar efter kollisioner spelare/block
 CollisionDetector.prototype.detectWallCollision = function()
 {
     //ta reda på vilken ruta i banans tileset som spelaren befinner sig i
@@ -56,6 +56,7 @@ CollisionDetector.prototype.detectWallCollision = function()
     }
 }
 
+//letar efter kollisioner mellan block/monster
 CollisionDetector.prototype.detectMonsterWallCollision = function()
 {
     var map = this.map;
@@ -75,59 +76,91 @@ CollisionDetector.prototype.detectMonsterWallCollision = function()
         monsterColR = Math.floor((monster.posX+monster.width) / map.tileSize);    
     
         //gravitation
-        monster.posY += 8;
+        if(monster.type === 1 || monster.type === 2 )
+        {
+            monster.posY += 10;
+        }
         
         //om ett monster går utanför banan
-        if(map.mapArray[monsterRow][monsterColL] === undefined || map.mapArray[monsterRow][monsterColR] === undefined) //&& (monsterColL <= 0 || monsterColR >= map.cols)
+        if(monsterColL < 0 || monsterColR > map.cols - 1)
         {
             monsters.splice(monsterIndex,1); // tar bort monster från array
             monster = null; //låter garbage collectorn äta upp monstret
-            return; //avbryter collision detection
         }
         
-        //krock med vägg
-        if ((monster.direction === 0 && map.mapArray[monsterRow][monsterColR] === 8) || (monster.direction === 1 && map.mapArray[monsterRow][monsterColL] === 8))
+        
+        else
         {
+            //krock med vägg (direction = vänster-höger)
+            if (monster.direction === 0 && map.mapArray[monsterRow][monsterColR] > 0 && map.mapArray[monsterRow][monsterColR] < 10 )
+            {
+                
+                //monster vänder om de stöter på en vägg
+                if(monster.direction === 0)
+                {
+                    monster.direction = 1;
+                }
+                else if(monster.direction === 1)
+                {
+                    monster.direction = 0;
+                }
+            }
             
-            //monster vänder om de stöter på en vägg
-            if(monster.direction === 0)
+            //krock med vägg (direction = höger-vänster)
+            if(monster.direction === 1 && map.mapArray[monsterRow][monsterColL] > 0 && map.mapArray[monsterRow][monsterColL] < 10 )
             {
-                monster.direction = 1;
+                
+                //monster vänder om de stöter på en vägg
+                if(monster.direction === 0)
+                {
+                    monster.direction = 1;
+                }
+                else if(monster.direction === 1)
+                {
+                    monster.direction = 0;
+                }
             }
-            else if(monster.direction === 1)
+            
+            
+            //finns nåt under?
+            if((map.mapArray[monsterRow+1][monsterColL] > 0 || map.mapArray[monsterRow+1][monsterColR] > 0) )
             {
-                monster.direction = 0;
+                monster.posY = monsterRow * map.tileSize + map.tileSize - monster.height;
             }
-        }
-        
-           
-        //finns nåt under?
-        else if((map.mapArray[monsterRow+1][monsterColL] > 0 || map.mapArray[monsterRow+1][monsterColR] > 0) || (monster.direction === 0 && map.mapArray[monsterRow][monsterColR] === 9) || (monster.direction === 1 && map.mapArray[monsterRow][monsterColL] === 9) )
-        {
-            monster.posY = monsterRow * map.tileSize + map.tileSize - monster.height;
-        }
-        
+            
+            //monster ska kunna gå igenom oförstörbara väggar utan att falla om det inte finns nåt under
+            else if((monster.direction === 0 && map.mapArray[monsterRow][monsterColR] === 10) || (monster.direction === 1 && map.mapArray[monsterRow][monsterColL] === 10)) 
+            {
+                monster.posY = monsterRow * map.tileSize + map.tileSize - monster.height;
+            }
+        }    
         monsterIndex++;
         
         
     });
 }
 
+//letar efter kollisioner mellan spelare och monster
 CollisionDetector.prototype.detectMonsterCollision = function()
 {
     var player = this.player;
     
+    var isDead = false;
+    
+    //kollar varje monster för sig
     this.monsters.forEach(function(monster)
     {
         if(
-            ((player.posX > monster.posX && player.posX < monster.posX+monster.width) || (player.posX + player.side > monster.posX && player.posX + player.side < monster.posX+monster.width)) &&
-            ((player.posY > monster.posY && player.posY < monster.posY+monster.height) || (player.posY + player.side > monster.posY && player.posY + player.side < monster.posY+monster.height))
+            ((player.posX >= monster.posX && player.posX <= monster.posX+monster.width) || (player.posX + player.side >= monster.posX && player.posX + player.side <= monster.posX+monster.width)) &&
+            ((player.posY >= monster.posY && player.posY <= monster.posY+monster.height) || (player.posY + player.side >= monster.posY && player.posY + player.side <= monster.posY+monster.height))
         )
         {
-            alert("You're DEAD, FUCKAAAAAH!");
+            isDead = true;
         }
         
+        
     })
+     return isDead;
     
 }
 
