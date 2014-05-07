@@ -4,6 +4,7 @@ function Game(data,canvas,context)
     this.data = data;
     this.canvas = canvas;
     this.context = context;
+    this.socket = io.connect();
     
     this.map = new Map(this.data.map, canvas);
     
@@ -15,7 +16,9 @@ function Game(data,canvas,context)
 Game.prototype.gameInit = function()
 {
     
-    var socket = io.connect();
+    var socket = this.socket;
+    
+    socket.emit("gameIsOn");
     
     var canvas = this.canvas;
     var context = this.context;
@@ -38,7 +41,6 @@ Game.prototype.gameInit = function()
     var keys = []; //här sparas de tangenter som trycks ner med en boolean som bestämmer om de fortfarande är nertryckta
     
     //så här många pixlar/frameTime springer spelare.
-    var runningSpeed = 3;
 
     //trycker på tangent
     document.addEventListener('keydown', function(event) {
@@ -87,12 +89,12 @@ Game.prototype.gameInit = function()
         
         if(keys[65])//A
         {
-            player.xSpeed = -runningSpeed;
+            player.xSpeed = -player.runningSpeed;
         }
 
         else if(keys[68])//D
         {
-            player.xSpeed = runningSpeed;  
+            player.xSpeed = player.runningSpeed;  
             
         }
         else //om varken A/D är nedtryckta
@@ -130,10 +132,6 @@ Game.prototype.gameInit = function()
         cd.detectWallCollision();
         cd.detectMonsterWallCollision();
         
-
-        
-
-
 
         //rita bana och karaktär på nytt
         renderer(map,player,monsters);
@@ -293,11 +291,102 @@ function changeBlock(hitBlock)
     }
 }
 
-//metod som skapar en ruta med instruktioner
-Game.prototype.getInstructions = function()
+//Visa huvudmenyn
+Game.prototype.gameMenu = function()
 {
-    var boxWidth = 600;
-    var boxHeight = 800;
+    
+    var canvas = this.canvas;
+    var context = this.context;
+    var game = this;
+    
+    var fontSize = 18;
+    var buttonWidth = 300;
+    var buttonHeight = 60;
+
+    var gap = 100;
+    
+    var mainmenu = true;
+    
+    //singleplayer knappen
+    context.fillStyle = "#DDDDDD";
+    context.fillRect(canvas.width/2 - buttonWidth/2 , canvas.height/2 - buttonHeight/2, buttonWidth, buttonHeight);
+    
+    context.fillStyle = "black";
+    context.font = fontSize+"px Arial";
+    context.textAlign = "center";
+    context.fillText("Singleplayer", canvas.width/2  , canvas.height/2+fontSize/2);
+    
+    
+    //multiplayer knappen
+    context.fillStyle = "#DDDDDD";
+    context.fillRect(canvas.width/2 - buttonWidth/2 , canvas.height/2 - buttonHeight/2 + gap+buttonHeight, buttonWidth, buttonHeight);
+    
+    context.fillStyle = "black";
+    context.font = fontSize+"px Arial";
+    context.fillText("Multiplayer", canvas.width/2  , canvas.height/2 + gap + buttonHeight + fontSize/2);
+    
+    //funktion som körs när användaren interagerar med spelmenyn
+    function menuFunction(e)
+        {
+            var mouseX = e.x - canvas.offsetLeft;
+            var mouseY = e.y - canvas.offsetTop;
+            
+            if(mainmenu && mouseX >= canvas.width/2 - buttonWidth/2 && mouseX <= canvas.width/2 + buttonWidth/2 && mouseY >= canvas.height/2 - buttonHeight/2 && mouseY <= canvas.height/2 + buttonHeight/2)
+            {
+                canvas.removeEventListener("click",menuFunction,false);
+                game.getInstructions("sp");
+            }
+            else if(mainmenu && mouseX >= canvas.width/2 - buttonWidth/2 && mouseX <= canvas.width/2 + buttonWidth/2 && mouseY >= canvas.height/2 - buttonHeight/2 + gap + buttonHeight && mouseY <= canvas.height/2 - buttonHeight/2 + gap + buttonHeight*2)
+            {
+                mainmenu = false;
+                
+                //ta bort tidigare meny
+                context.clearRect(0,0,canvas.width,canvas.height);
+                
+                //multiplayer online
+                context.fillStyle = "#DDDDDD";
+                context.fillRect(canvas.width/2 - buttonWidth/2 , canvas.height/2 - buttonHeight/2, buttonWidth, buttonHeight);
+                
+                context.fillStyle = "black";
+                context.font = fontSize+"px Arial";
+                context.textAlign = "center";
+                context.fillText("Play with stranger", canvas.width/2  , canvas.height/2+fontSize/2);
+                
+                
+                //multiplayer knappen
+                context.fillStyle = "#DDDDDD";
+                context.fillRect(canvas.width/2 - buttonWidth/2 , canvas.height/2 - buttonHeight/2 + gap+buttonHeight, buttonWidth, buttonHeight);
+                
+                context.fillStyle = "black";
+                context.font = fontSize+"px Arial";
+                context.fillText("Play with friend(Share keyboard)", canvas.width/2  , canvas.height/2 + gap + buttonHeight + fontSize/2);
+                
+            }
+            
+            else if(!mainmenu && mouseX >= canvas.width/2 - buttonWidth/2 && mouseX <= canvas.width/2 + buttonWidth/2 && mouseY >= canvas.height/2 - buttonHeight/2 && mouseY <= canvas.height/2 + buttonHeight/2)
+            {
+                canvas.removeEventListener("click",menuFunction,false);
+                alert("online mp")
+            }
+             else if(!mainmenu && mouseX >= canvas.width/2 - buttonWidth/2 && mouseX <= canvas.width/2 + buttonWidth/2 && mouseY >= canvas.height/2 - buttonHeight/2 + gap + buttonHeight && mouseY <= canvas.height/2 - buttonHeight/2 + gap + buttonHeight*2)
+            {
+                canvas.removeEventListener("click",menuFunction,false);
+                alert("splitscreen mp")
+            }
+        }
+    
+    //event listeners till knapparna.
+    this.canvas.addEventListener("click",menuFunction,false);
+    
+}
+
+//metod som skapar en ruta med instruktioner
+Game.prototype.getInstructions = function(mode)
+{
+    var game = this;
+    
+    var boxWidth = 300;
+    var boxHeight = 400;
     
     var fontSize = 20;
     
@@ -306,7 +395,26 @@ Game.prototype.getInstructions = function()
     
     this.context.fillStyle = "black";
     this.context.font= fontSize+"px Arial";
-    this.context.fillText("Hello World!", this.canvas.width/2 - boxWidth/2 , this.canvas.height/2 - boxHeight/2 + fontSize);
+    this.context.fillText("Hello World!", this.canvas.width/2 , this.canvas.height/2 - boxHeight/2 + fontSize);
+    
+    //funktion som körs när spelaren klickar på enter
+    function start(event)
+    {
+            if(event.keyCode == 13)
+            {
+                document.removeEventListener('keydown',start,false)
+                //säger till servern att spelet startar.
+                
+                game.gameInit();//startar spelet.
+
+            }
+        
+        
+    }
+    
+    //Klicka på Enter för att ta bort 
+    document.addEventListener('keydown', start, false)
+    
 }
 
 //funktion som körs när man dör

@@ -13,6 +13,8 @@ function Player(posX, posY)
     this.xSpeed = 0;
     this.ySpeed = 0;
     
+    this.runningSpeed = 5;
+    
     //mitt i ett hopp?
     this.jumpState = 0;
     

@@ -29,7 +29,7 @@ function Monster(type,floor,direction,map)
         this.posX = map.tileSize * map.cols - (this.width+1); 
     }
     
-    this.posY = floor * 40;
+    this.posY = this.floor * 64;
     
 }
 
@@ -105,29 +105,30 @@ function Troll(type,floor,direction,map)
     this.height = 24;
     this.width = 19;
     
-    this.speed = 3;
+    this.speed = 2;
     
 }
 Troll.prototype = new Monster();
 
 Troll.prototype.renderTroll = function(context,player)
 {
-    var discoverPlayer = false;
-    
     //Om ett troll märker att en spelare är på samma level så blir det argt.
     if(player.posY <= this.posY && player.posY >= this.posY - this.map.tileSize * 3 && player.posX > this.posX)
     {
-        discoverPlayer = true;
-        this.speed = this.speed * 2;
+        this.speed = 4;
         
         this.direction = 0;
     }
     else if(player.posY <= this.posY && player.posY >= this.posY - this.map.tileSize * 3 && player.posX < this.posX)
     {
-        discoverPlayer = true;
-        this.speed = this.speed * 2;
+        this.speed = 4;
         
         this.direction = 1;        
+    }
+    
+    else
+    {
+        this.speed = 2;    
     }
    
     //vänster-höger
@@ -153,12 +154,6 @@ Troll.prototype.renderTroll = function(context,player)
     this.currentSprite++;
     if(this.currentSprite > 3){this.currentSprite = 0};//börjar om animationen
 
-    //återställer hastigheten
-    if(discoverPlayer)
-    {
-        this.speed = this.speed / 2;
-    }
-    
 }
 
 

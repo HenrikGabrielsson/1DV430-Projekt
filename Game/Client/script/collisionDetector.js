@@ -75,7 +75,7 @@ CollisionDetector.prototype.detectMonsterWallCollision = function()
         monsterColL = Math.floor(monster.posX / map.tileSize);
         monsterColR = Math.floor((monster.posX+monster.width) / map.tileSize);    
     
-        //gravitation
+        //gravitation (fladdermöss märker inte av sånt trams)
         if(monster.type === 1 || monster.type === 2 )
         {
             monster.posY += 10;
@@ -91,36 +91,22 @@ CollisionDetector.prototype.detectMonsterWallCollision = function()
         
         else
         {
-            //krock med vägg (direction = vänster-höger)
-            if (monster.direction === 0 && map.mapArray[monsterRow][monsterColR] > 0 && map.mapArray[monsterRow][monsterColR] < 10 )
+            //om monstret går in i en vägg
+            if ((map.mapArray[monsterRow][monsterColR] > 0 && map.mapArray[monsterRow][monsterColR] < 10) || (map.mapArray[monsterRow][monsterColL] > 0 && map.mapArray[monsterRow][monsterColL] < 10)  )
             {
                 
                 //monster vänder om de stöter på en vägg
                 if(monster.direction === 0)
                 {
+                    monster.posX -= monster.speed;
                     monster.direction = 1;
                 }
                 else if(monster.direction === 1)
                 {
+                    monster.posX += monster.speed;
                     monster.direction = 0;
                 }
             }
-            
-            //krock med vägg (direction = höger-vänster)
-            if(monster.direction === 1 && map.mapArray[monsterRow][monsterColL] > 0 && map.mapArray[monsterRow][monsterColL] < 10 )
-            {
-                
-                //monster vänder om de stöter på en vägg
-                if(monster.direction === 0)
-                {
-                    monster.direction = 1;
-                }
-                else if(monster.direction === 1)
-                {
-                    monster.direction = 0;
-                }
-            }
-            
             
             //finns nåt under?
             if((map.mapArray[monsterRow+1][monsterColL] > 0 || map.mapArray[monsterRow+1][monsterColR] > 0) )
@@ -144,7 +130,6 @@ CollisionDetector.prototype.detectMonsterWallCollision = function()
 CollisionDetector.prototype.detectMonsterCollision = function()
 {
     var player = this.player;
-    
     var isDead = false;
     
     //kollar varje monster för sig
