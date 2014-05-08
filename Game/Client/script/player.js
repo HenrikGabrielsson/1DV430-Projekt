@@ -1,4 +1,9 @@
-//konstruktor, tar emot startposition
+/**
+ *  Konstruktor för Player-objektet
+ * 
+ * @param   posX    horisontell position
+ * @param   posY    vertikal position
+ */
 function Player(posX, posY)
 {
 
@@ -26,7 +31,11 @@ function Player(posX, posY)
     
 }
 
-
+/**
+ * Ritar spelaren.
+ * 
+ * @param   context     Där som spelaren ritas  
+ */
 //rita spelare
 Player.prototype.renderPlayer = function(context)
 {   
@@ -34,7 +43,12 @@ Player.prototype.renderPlayer = function(context)
     context.fillRect(this.posX,this.posY, this.side,this.side)
 };
 
-
+/**
+ * Anropas när spelaren slår. Kollar ifall någor block eller fiende har träffats av slaget.
+ * 
+ * @param   map         Banan som spelaren slår sönder block på
+ * @param   monsters    Array med alla monster. Behövs för att se om någon blev slagen.
+ */
 Player.prototype.hitting = function(map,monsters)
 {
 
@@ -88,7 +102,12 @@ Player.prototype.hitting = function(map,monsters)
     }    
 }
 
-
+/**
+ * Om ett block blivit träffat så bestämmer denna funktion vad som ska hända med det.
+ * 
+ * @param   hitBlock    Blocket som träffades av ett slag och ska kollas av funktionen
+ * @return  blockets nya typ.
+ */
 //ändrar ett block på banan efter ett slag
 function changeBlock(hitBlock)
 {

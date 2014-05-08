@@ -1,4 +1,11 @@
-//konstruktorfunktion som skapar kartan
+/**
+ * Konstruktor till Map-objektet. Tar emot ett seed och skapar då en bana.
+ * Läser in sprites rill de olika blocken.
+ * Sätter storleken på canvas.
+ * 
+ * @param   seed    data som bestämmer hur banan ska se ut.
+ * @param   canvas  canvas-elementet där banan ska ritas.
+ */
 function Map (seed, canvas)
 {
     this.seed = seed;
@@ -17,10 +24,20 @@ function Map (seed, canvas)
     canvas.height= this.tileSize * this.rows;
 }
 
+
+
+/**
+ * Funktion som tar emot ett seed och skapar sedan ett tileset för banan. Alltså en 
+ * multidimensionell array med data om vilken typ av block som ska finnas på varje 
+ * tile.
+ * 
+ * @param   seed    "kod" som bestämmer banans utseende
+ * @return          En multidimensionell array som 
+ */
 //Den här funktionen tar emot ett seed och skapar en bana (en tvådimensionell array).
 Map.prototype.createMap = function(seed)
 {
-    var mapArray = []; //här sparas banan
+    var mapArray = [];
 
     var rows = 76;
     var cols = 40;
@@ -92,6 +109,12 @@ Map.prototype.createMap = function(seed)
     
 }
 
+/**
+ * Ritar ut banan, efter den kod som skapas i createMap
+ * 
+ * @param   context     Där som banan ritas.
+ * 
+ */
 //Funktion som ritar banan. tar emot mapArray(tileset som beskriver vad som ska ritas) och canvas + context
 Map.prototype.renderMap = function(context)
 {

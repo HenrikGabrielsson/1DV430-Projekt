@@ -1,5 +1,11 @@
 
-//konstruktor
+/**
+ * Konstruktor för objekt som letar efter kollisioner.
+ * 
+ * @param   map         banan där kollisioner kan inträffa
+ * @param   player      spelaren som kan kollidera med monster eller block
+ * @param   monsters    array med monster som kan kollidera med spelare eller block
+ */
 function CollisionDetector(map, player, monsters)
 {
     this.map = map;
@@ -8,7 +14,9 @@ function CollisionDetector(map, player, monsters)
     
 }
 
-//kollar efter kollisioner spelare/block
+/**
+ * Letar efter kollisioner mellan spelare och block
+ */
 CollisionDetector.prototype.detectWallCollision = function()
 {
     //ta reda på vilken ruta i banans tileset som spelaren befinner sig i
@@ -50,7 +58,9 @@ CollisionDetector.prototype.detectWallCollision = function()
     }
 }
 
-//letar efter kollisioner mellan block/monster
+/**
+ * Letar efter kollisioner mellan monster och block. kollar varje monster för sig
+ */
 CollisionDetector.prototype.detectMonsterWallCollision = function()
 {
     var map = this.map;
@@ -125,7 +135,9 @@ CollisionDetector.prototype.detectMonsterWallCollision = function()
         
     });
 }
-
+/**
+ * Letar efter kollisioner mellan monster och spelare. Kollar varje monster för sig.
+ */
 //letar efter kollisioner mellan spelare och monster
 CollisionDetector.prototype.detectMonsterCollision = function()
 {

@@ -1,5 +1,12 @@
 
-//Monster-konstruktor
+/**
+ * Konstruktor för Monster. De olika monstren ärver härifrån och anropas av andra konstruktorer.
+ * 
+ * @param   type        innehåller siffra som identiferar monstrets typ, 0 = bat, 1 = troll, 2 = falling rock
+ * @param   floor       bestämmer vart fienden ska starta.
+ * @param   direction   riktning som monstret  börjar att färdas i.
+ * @param   map         banan där monstren ska vandra.
+ */
 function Monster(type,floor,direction,map)
 {
     this.type = type;
@@ -38,7 +45,14 @@ function Monster(type,floor,direction,map)
 
 
 
-
+/**
+ * Konstruktor för fladdermöss. Subclass till Monster
+ * 
+ * @param   type        innehåller siffra som identiferar monstrets typ, 0 = bat, 1 = troll, 2 = falling rock
+ * @param   floor       bestämmer vart fienden ska starta.
+ * @param   direction   riktning som monstret  börjar att färdas i.
+ * @param   map         banan där monstren ska vandra.
+ */
 
 //Fladdermus-konstruktor
 function Bat(type,floor,direction, map)
@@ -48,9 +62,13 @@ function Bat(type,floor,direction, map)
     this.width = 16;
     this.height = 10;
 }
-
 Bat.prototype = new Monster();
 
+/**
+ * funktion som flyttar på fladdermusen och ritar den sedan på banan
+ * 
+ * @param   context     Där fladdermusen ska ritas
+ */
 Bat.prototype.renderBat = function(context)
 {
     
@@ -79,7 +97,14 @@ Bat.prototype.renderBat = function(context)
 
 
 
-//Troll-konstruktor
+/**
+ * Konstruktor för troll. Subclass till Monster
+ * 
+ * @param   type        innehåller siffra som identiferar monstrets typ, 0 = bat, 1 = troll, 2 = falling rock
+ * @param   floor       bestämmer vart fienden ska starta.
+ * @param   direction   riktning som monstret  börjar att färdas i.
+ * @param   map         banan där monstren ska vandra.
+ */
 function Troll(type,floor,direction,map)
 {
     Monster.call(this,type,floor,direction,map);
@@ -91,6 +116,12 @@ function Troll(type,floor,direction,map)
 }
 Troll.prototype = new Monster();
 
+/**
+ * funktion som flyttar på trollet och ritar den sedan på banan
+ * 
+ * @param   context     Där trollet ska ritas
+ * @param   player      Spelare. Trollet jagar spelare som är i närheten.
+ */
 Troll.prototype.renderTroll = function(context,player)
 {
     this.posY += 10; //gravitation
@@ -144,7 +175,14 @@ Troll.prototype.renderTroll = function(context,player)
 
 
 
-//Fallande sten
+/**
+ * Konstruktor för stenar. Subclass till Monster
+ * 
+ * @param   type        innehåller siffra som identiferar monstrets typ, 0 = bat, 1 = troll, 2 = falling rock
+ * @param   floor       bestämmer vart fienden ska starta.
+ * @param   direction   riktning som monstret  börjar att färdas i.
+ * @param   map         banan där monstren ska vandra.
+ */
 function FallingRock(type,floor,direction,map)
 {
     Monster.call(this,type,floor,direction,map);
@@ -160,7 +198,11 @@ function FallingRock(type,floor,direction,map)
 }
 FallingRock.prototype = new Monster();
 
-//Rita fallande sten
+/**
+ * funktion som flyttar på den fallande stenen och ritar den sedan på banan
+ * 
+ * @param   context     Där stenen ska ritas
+ */
 FallingRock.prototype.renderFallingRock = function(context)
 {
     this.posY += 10 - this.bounceState; //gravitation
@@ -170,8 +212,7 @@ FallingRock.prototype.renderFallingRock = function(context)
     {
         this.bounceState--;
     }
-    
-    
+
     //rita på banan
     context.fillStyle = "#0000FF";
     context.fillRect(this.posX, this.posY, this.width, this.height);

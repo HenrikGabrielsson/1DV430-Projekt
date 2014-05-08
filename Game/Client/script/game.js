@@ -1,4 +1,10 @@
-
+/**
+ * Konstruktor för Game-objektet
+ * 
+ * @param   data    Innehåller seed till banan som ska skapas
+ * @param   canvas  Referens till canvas-elementet
+ * @param   context Canvas-elementets context(2d);
+ */
 function Game(data,canvas,context)
 {
     this.data = data;
@@ -12,6 +18,10 @@ function Game(data,canvas,context)
     this.monsters = [];
 }
 
+/**
+ * gameInit deklarerar flera variabler som behövs för spelet och innehåller också spelloopen.
+ * 
+ */
 //Startar spelet
 Game.prototype.gameInit = function()
 {
@@ -152,11 +162,11 @@ Game.prototype.gameInit = function()
             //om man vinner
             if(won)
             {
-                winLoop(map,player,monsters, canvas, context)
+                winLoop(canvas, context)
             }
             else if(dead)
             {
-                deathLoop(map,player,monsters, canvas, context)
+                deathLoop(canvas, context)
             }
         }
         
@@ -166,7 +176,15 @@ Game.prototype.gameInit = function()
 };
 
 
-
+/**
+ * När ett objekt har skapats av servern och skickats till spelet så anropas denna funktion.
+ * Den tar emot data från servern och skapar sedan ett monster genom att anropa en av flera 
+ * konstruktorer
+ * 
+ * @param   data        innehåller data om monstret som ska skapas
+ * @param   monsters    arrayen som innehåller alla monster. nya monster pushas hit
+ * @param   map         kartan som används i denna game-instance
+ */
 var monsterNumber = 0;
 Game.prototype.spawnMonster = function(data, monsters, map)
 {
@@ -194,7 +212,13 @@ Game.prototype.spawnMonster = function(data, monsters, map)
     }
 }
 
-
+/**
+ * Funktion som anropar andra funktioner som ritar spelare, monster och bana
+ * 
+ * @param   map         banan som ska ritas
+ * @param   player      spelaren som ska ritas
+ * @param   monsters    array med alla monster   
+ */
 //funktion som anropar funktioner för att rita objekt i spelet.
 Game.prototype.renderer = function(map,player,monsters)
 {
@@ -240,7 +264,10 @@ Game.prototype.renderer = function(map,player,monsters)
 }
 
 
-
+/**
+ * Ritar menyer i början av spelet och gör dem interaktiva genom att 
+ * lyssna på olika events
+ */
 //Visa huvudmenyn
 Game.prototype.gameMenu = function()
 {
@@ -330,6 +357,13 @@ Game.prototype.gameMenu = function()
     
 }
 
+
+/**
+ * Skapar en ruta med instruktioner åt användaren.
+ * Vad som står i rutan beror på spelläge(mp eller sp)
+ * 
+ * @param   mode    spelläge som texten ska vara anpassad för
+ */
 //metod som skapar en ruta med instruktioner
 Game.prototype.getInstructions = function(mode)
 {
@@ -366,12 +400,19 @@ Game.prototype.getInstructions = function(mode)
     document.addEventListener('keydown', start, false)
     
 }
-
+/**
+ * Loop som körs för spelare som dör. Visar ett meddelande och skickar tillbaka 
+ * spelaren till huvudmenyn.
+ * 
+ * @param   canvas  canvas-elementet
+ * @param   context canvas-elementets context
+ */
 //funktion som körs när man dör
-Game.prototype.deathLoop = function(map,player,monsters, canvas,context)
+Game.prototype.deathLoop = function(canvas,context)
 {
     var boxWidth = 600;
     var boxHeight = 800;
+    
     
     var fontSize = 50;
     
@@ -383,7 +424,16 @@ Game.prototype.deathLoop = function(map,player,monsters, canvas,context)
     context.fillText("Du dog jättemycket!", canvas.width/2 - boxWidth/2 , canvas.height/2 - boxHeight/2 + fontSize);
 }
 
-Game.prototype.winLoop = function(map,player,monsters, canvas,context)
+
+
+/**
+ * Loop som körs för spelare som vinner. Visar ett meddelande och skickar tillbaka 
+ * spelaren till huvudmenyn.
+ * 
+ * @param   canvas  canvas-elementet
+ * @param   context canvas-elementets context
+ */
+Game.prototype.winLoop = function(canvas,context)
 {
     var boxWidth = 600;
     var boxHeight = 800;

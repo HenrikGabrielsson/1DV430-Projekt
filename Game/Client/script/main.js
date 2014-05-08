@@ -1,3 +1,9 @@
+/**
+ * Funktion som startar spelet genom att fråga servern efter en bana. Sedan skapar den 
+ * ett nytt spelobjekt och visar menyn
+ * 
+ */
+
 var init = function(){
     
     var socket = io.connect();
