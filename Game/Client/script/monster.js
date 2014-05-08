@@ -17,44 +17,24 @@ function Monster(type,floor,direction,map)
     this.monsterSprites = new Image();
     this.monsterSprites.src="pics/monsterTileSet5.png";
     
+    this.posY = this.floor * 64; //this.floor * map.tileSize men det fungerar inte just här. anledning: javascript
     
-    //positionering
-    this.posX;
-    if(this.direction === 0) //vänster - höger
+    if(this.type !== 2) //startposition, inte för fallande stenar 
     {
-        this.posX = map.tileSize;
-    }
-    else if(this.direction === 1)//höger - vänster 
-    {
-        this.posX = map.tileSize * map.cols - (this.width+1); 
-    }
-    
-    this.posY = this.floor * 64;
-    
-}
-
-//rita monstret på banan
-Monster.prototype.renderMonster = function(context, player)
-{
-
-    //rita på banan
-    context.fillStyle = "#FF0000";
-    context.fillRect(this.posX, this.posY, this.width, this.height);
-    
-    
-    //uppdatera monstrets position
-    if(this.direction === 0)
-    {
-        this.posX += this.speed;
-    }
-    else
-    {
-        this.posX -= this.speed;
+        //positionering
+        this.posX;
+        if(this.direction === 0) //vänster - höger
+        {
+            this.posX = map.tileSize;
+        }
+        else if(this.direction === 1)//höger - vänster 
+        {
+            this.posX = map.tileSize * map.cols - (this.width+1); 
+        }
     }
     
     
 }
-
 
 
 
@@ -73,6 +53,7 @@ Bat.prototype = new Monster();
 
 Bat.prototype.renderBat = function(context)
 {
+    
     //vänster-höger
     if(this.direction === 0)
     {
@@ -112,6 +93,8 @@ Troll.prototype = new Monster();
 
 Troll.prototype.renderTroll = function(context,player)
 {
+    this.posY += 10; //gravitation
+    
     //Om ett troll märker att en spelare är på samma level så blir det argt.
     if(player.posY <= this.posY && player.posY >= this.posY - this.map.tileSize * 3 && player.posX > this.posX)
     {
@@ -161,16 +144,42 @@ Troll.prototype.renderTroll = function(context,player)
 
 
 
-
-
-
-//Sandworm
-function Sandworm(type,floor,direction,map)
+//Fallande sten
+function FallingRock(type,floor,direction,map)
 {
     Monster.call(this,type,floor,direction,map);
-    this.speed = 5;
+    this.width = 60;
+    this.height = 60;
+    
+    this.bounceState = 0;
+    
+    this.speed = 0;
+    
+    this.posX = Math.floor(floor/2 * map.tileSize);
+    this.posY = 0;
 }
-Sandworm.prototype = new Monster();
+FallingRock.prototype = new Monster();
+
+//Rita fallande sten
+FallingRock.prototype.renderFallingRock = function(context)
+{
+    this.posY += 10 - this.bounceState; //gravitation
+
+
+    if(this.bounceState > 0)
+    {
+        this.bounceState--;
+    }
+    
+    
+    //rita på banan
+    context.fillStyle = "#0000FF";
+    context.fillRect(this.posX, this.posY, this.width, this.height);
+}
+
+
+
+
 
 
 

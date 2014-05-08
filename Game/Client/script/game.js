@@ -68,8 +68,13 @@ Game.prototype.gameInit = function()
         
         
         //Styrning av karaktär och slag
-        if(keys[87] && (map.mapArray[playerRow+1][playerColL] > 0 || map.mapArray[playerRow+1][playerColR] > 0 ) && player.jumpState === 0 )//W och står på en plattform
+        
+        //hopp
+        //W och står på en plattform
+        if(keys[87] && (map.mapArray[playerRow+1][playerColL] > 0 || map.mapArray[playerRow+1][playerColR] > 0 ) && player.jumpState === 0 )
         {
+            player.direction = 2;
+            
             player.ySpeed = 0; //återställer
             player.jumpState = player.side * 0.9; 
             player.ySpeed -= player.jumpState;
@@ -89,24 +94,24 @@ Game.prototype.gameInit = function()
         
         if(keys[65])//A
         {
-            player.xSpeed = -player.runningSpeed;
+            player.direction = 1;
+            player.posX -= player.runningSpeed;
         }
 
         else if(keys[68])//D
         {
-            player.xSpeed = player.runningSpeed;  
+            
+            player.direction = 0;
+            player.posX += player.runningSpeed;  
             
         }
-        else //om varken A/D är nedtryckta
-        {
-            player.xSpeed = 0;
-        }
+
         
         //slag
         if(keys[16] && player.hitState === 0) //Shift
         {
-            hitBlock(player,map);
-            player.hitState = 15;   
+            player.hitting(map,monsters);
+            player.hitState = 30;   
         }  
         //Hindrar spelaren från att hålla in slå-knappen och krossa allt.
         else if(player.hitState !== 0)
@@ -116,11 +121,10 @@ Game.prototype.gameInit = function()
         
         //gravity
         player.ySpeed += 10;
-        
-        //ändra spelarens position
-        player.moveX();
-        player.moveY();
 
+        //flytta spelare i höjdled 
+        player.posY += player.ySpeed;
+        
 
         //nytt monster spawnar
         socket.on("monster", function(data)
@@ -168,7 +172,6 @@ Game.prototype.spawnMonster = function(data, monsters, map)
 {
     var monster;
 
-    
     //Varje monster ska bara visa sig en gång.
     if(data.monsterNumber == monsterNumber)
     {
@@ -185,14 +188,14 @@ Game.prototype.spawnMonster = function(data, monsters, map)
         }
         else if(data.monsterType === 2)
         {
-            monster = new Sandworm(data.monsterType, data.monsterFloor, data.monsterDirection, map);
+            monster = new FallingRock(data.monsterType, data.monsterFloor, data.monsterDirection, map);
         }
         monsters.push(monster);
     }
 }
 
 
-//funktion som ritar både spelare och karta.
+//funktion som anropar funktioner för att rita objekt i spelet.
 Game.prototype.renderer = function(map,player,monsters)
 {
     //Canvas hämtas    
@@ -201,9 +204,10 @@ Game.prototype.renderer = function(map,player,monsters)
     
     //ta bort tidigare ritat på canvas
     context.clearRect(0,0,canvas.width,canvas.height);
+
+    //karta
+    map.renderMap(context);   
     
-    
- 
     //flytta och rita varje monster
     monsters.forEach(function(monster)
     {
@@ -218,78 +222,24 @@ Game.prototype.renderer = function(map,player,monsters)
         {
             monster.renderTroll(context, player);
         }
+        
+        //falling rock
         else if(monster.type === 2)
         {
-            monster.renderMonster(context,player)
+            monster.renderFallingRock(context);
         }
         
     });  
     
+    //spelare
     player.renderPlayer(context);     
 
 
-     map.renderMap(context);     
+  
     
 }
 
-//bestämmer vilket block som har slagits
-function hitBlock(player,map)
-{
-    
-    //ta reda på vilken ruta i banans tileset som spelaren befinner sig i
-    var playerRow = Math.floor(player.posY / map.tileSize);
-    var playerColL = Math.floor(player.posX / map.tileSize);
-    var playerColR = Math.floor((player.posX+player.side) / map.tileSize);    
-    
-    if(player.xSpeed > 0) //slag åt höger
-    {
-        map.mapArray[playerRow][playerColR+1] = changeBlock(map.mapArray[playerRow][playerColR+1]);
-    }
-    else if(player.xSpeed < 0 ) //slag åt vänster
-    {
-        map.mapArray[playerRow][playerColL-1] = changeBlock(map.mapArray[playerRow][playerColL-1]);
-    }
-    
-    else if(map.mapArray[playerRow-1][playerColL] > 0 || map.mapArray[playerRow-1][playerColR] > 0)//slag upp
-    {
-        if(map.mapArray[playerRow-1][playerColL] > 0)
-        {
-            map.mapArray[playerRow-1][playerColL] = changeBlock(map.mapArray[playerRow-1][playerColL]);
-        }
-        else 
-        {
-            map.mapArray[playerRow-1][playerColR] = changeBlock(map.mapArray[playerRow-1][playerColR]);
-        }
-        
-    }
-}
 
-//ändrar ett block på banan efter ett slag
-function changeBlock(hitBlock)
-{
-    switch(hitBlock)
-    {
-        //inget block och 1-slagsblock returnerar 0;
-        case 0:
-        case 6:
-        case 7:
-            return 0;
-        //tvåslagsblock och väggar blir ettslagsblock;
-        case 1:
-        case 2:
-        case 3:
-        case 4:
-        case 5:
-        case 8:
-            return 6;
-        //oslagbara block påverkas inte.
-        case 9:
-            return 9;
-        case 10:
-            return 10;
-            
-    }
-}
 
 //Visa huvudmenyn
 Game.prototype.gameMenu = function()
@@ -447,8 +397,6 @@ Game.prototype.winLoop = function(map,player,monsters, canvas,context)
     context.font= fontSize+"px Arial";
     context.fillText("Grattis! Du vann", canvas.width/2 - boxWidth/2 , canvas.height/2 - boxHeight/2 + fontSize);
 }
-
-
 
 
 

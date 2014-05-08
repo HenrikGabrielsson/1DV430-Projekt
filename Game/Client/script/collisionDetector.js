@@ -34,25 +34,19 @@ CollisionDetector.prototype.detectWallCollision = function()
     playerColR = Math.floor((this.player.posX+this.player.side) / this.map.tileSize);      
     
     
-    if(this.player.xSpeed !== 0)
+
+    //finns nåt till höger?
+    if(this.map.mapArray[playerRow][playerColR] > 0 && this.player.direction === 0)
     {
+        this.player.posX = playerColL * this.map.tileSize + (this.map.tileSize - this.player.side);
+        this.player.posX--;
+    }
+    
+    //finns nåt till vänster?
+    if(this.map.mapArray[playerRow][playerColL] > 0 && this.player.direction === 1)
+    {
+        this.player.posX = (playerColL+1) * this.map.tileSize;
         
-        //finns nåt till höger?
-        if(this.map.mapArray[playerRow][playerColR] > 0 && this.player.xSpeed > 0)
-        {
-            console.log("höger");
-            this.player.posX = playerColL * this.map.tileSize + (this.map.tileSize - this.player.side);
-            this.player.posX--;
-        }
-        
-        //finns nåt till vänster?
-        if(this.map.mapArray[playerRow][playerColL] > 0 && this.player.xSpeed < 0)
-        {
-            console.log("vänster")
-            this.player.xSpeed = 0;
-            this.player.posX = (playerColL+1) * this.map.tileSize;
-            
-        }
     }
 }
 
@@ -74,15 +68,9 @@ CollisionDetector.prototype.detectMonsterWallCollision = function()
         monsterRow = Math.floor(monster.posY / map.tileSize);
         monsterColL = Math.floor(monster.posX / map.tileSize);
         monsterColR = Math.floor((monster.posX+monster.width) / map.tileSize);    
-    
-        //gravitation (fladdermöss märker inte av sånt trams)
-        if(monster.type === 1 || monster.type === 2 )
-        {
-            monster.posY += 10;
-        }
-        
+
         //om ett monster går utanför banan
-        if(monsterColL < 0 || monsterColR > map.cols - 1)
+        if(monster.posX < 0 || monster.posX + monster.width > map.tileSize*map.cols || monster.posY < 0 || monster.posY+monster.height > map.tileSize * map.rows)
         {
             monsters.splice(monsterIndex,1); // tar bort monster från array
             monster = null; //låter garbage collectorn äta upp monstret
@@ -108,18 +96,30 @@ CollisionDetector.prototype.detectMonsterWallCollision = function()
                 }
             }
             
-            //finns nåt under?
-            if((map.mapArray[monsterRow+1][monsterColL] > 0 || map.mapArray[monsterRow+1][monsterColR] > 0) )
-            {
-                monster.posY = monsterRow * map.tileSize + map.tileSize - monster.height;
-            }
             
-            //monster ska kunna gå igenom oförstörbara väggar utan att falla om det inte finns nåt under
-            else if((monster.direction === 0 && map.mapArray[monsterRow][monsterColR] === 10) || (monster.direction === 1 && map.mapArray[monsterRow][monsterColL] === 10)) 
+            if(map.rows > monsterRow+1)
             {
-                monster.posY = monsterRow * map.tileSize + map.tileSize - monster.height;
+                //finns nåt under? troll kan gå på sånt...
+                if(monster.type === 1 && (map.mapArray[monsterRow+1][monsterColL] > 0 || map.mapArray[monsterRow+1][monsterColR] > 0))
+                {
+                    monster.posY = monsterRow * map.tileSize + map.tileSize - monster.height;
+                }
+    
+                
+                //stenblock kan inte gå så bra men dom studsar upp lite om de stöter på ett hinder
+                else if(monster.type === 2 && monster.bounceState === 0 && ((map.mapArray[monsterRow+1][monsterColL] > 0 && map.mapArray[monsterRow+1][monsterColL] < 10) || (map.mapArray[monsterRow+1][monsterColR] > 0 && map.mapArray[monsterRow+1][monsterColR] < 10))  )    
+                {
+                    monster.bounceState = 15;
+                }
+                
+                //monster ska kunna gå igenom oförstörbara väggar utan att falla om det inte finns nåt under
+                else if(monster.type != 2 && (monster.direction === 0 && map.mapArray[monsterRow][monsterColR] === 10) || (monster.direction === 1 && map.mapArray[monsterRow][monsterColL] === 10)) 
+                {
+                    monster.posY = monsterRow * map.tileSize + map.tileSize - monster.height;
+                }
             }
-        }    
+    
+        }
         monsterIndex++;
         
         
@@ -148,9 +148,3 @@ CollisionDetector.prototype.detectMonsterCollision = function()
      return isDead;
     
 }
-
-
-
-
-
-
