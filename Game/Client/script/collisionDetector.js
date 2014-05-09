@@ -19,13 +19,15 @@ function CollisionDetector(map, player, monsters)
  */
 CollisionDetector.prototype.detectWallCollision = function()
 {
+
+
     //ta reda på vilken ruta i banans tileset som spelaren befinner sig i
     var playerRow = Math.floor(this.player.posY / this.map.tileSize);
     var playerColL = Math.floor(this.player.posX / this.map.tileSize);
     var playerColR = Math.floor((this.player.posX+this.player.side) / this.map.tileSize);
 
     //finns nåt över?
-    if(this.map.mapArray[playerRow][playerColL] > 0 || this.map.mapArray[playerRow][playerColR] > 0)
+    if(this.map.mapArray[playerRow][playerColL] > 0 || this.map.mapArray[playerRow][playerColR] > 0 && this.player.jumpState > 0)
     {
         this.player.posY = (playerRow + 1) * this.map.tileSize;
     }
@@ -33,14 +35,15 @@ CollisionDetector.prototype.detectWallCollision = function()
     //finns nåt under?
     if((this.map.mapArray[playerRow+1][playerColL] > 0 || this.map.mapArray[playerRow+1][playerColR] > 0) && this.player.ySpeed >= 0)
     {
+        
         this.player.posY = playerRow * this.map.tileSize + this.map.tileSize - this.player.side;
     }
 
-    
+
+
     playerRow = Math.floor(this.player.posY / this.map.tileSize);
     playerColL = Math.floor(this.player.posX / this.map.tileSize);
     playerColR = Math.floor((this.player.posX+this.player.side) / this.map.tileSize);      
-    
     
 
     //finns nåt till höger?
@@ -56,6 +59,9 @@ CollisionDetector.prototype.detectWallCollision = function()
         this.player.posX = (playerColL+1) * this.map.tileSize;
         
     }
+
+    
+
 }
 
 /**
@@ -114,7 +120,6 @@ CollisionDetector.prototype.detectMonsterWallCollision = function()
                 {
                     monster.posY = monsterRow * map.tileSize + map.tileSize - monster.height;
                 }
-    
                 
                 //stenblock kan inte gå så bra men dom studsar upp lite om de stöter på ett hinder
                 else if(monster.type === 2 && monster.bounceState === 0 && ((map.mapArray[monsterRow+1][monsterColL] > 0 && map.mapArray[monsterRow+1][monsterColL] < 10) || (map.mapArray[monsterRow+1][monsterColR] > 0 && map.mapArray[monsterRow+1][monsterColR] < 10))  )    

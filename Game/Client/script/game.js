@@ -104,16 +104,31 @@ Game.prototype.gameInit = function()
         
         if(keys[65])//A
         {
-            player.direction = 1;
-            player.posX -= player.runningSpeed;
+            if(map.mapArray[playerRow][Math.floor((player.posX - player.runningSpeed) / map.tileSize)] === 0)
+            {
+                player.direction = 1;
+                player.posX -= player.runningSpeed;
+            }
+            else
+            {
+                player.direction = 1;
+                player.posX = playerColL * map.tileSize;
+            }
         }
 
         else if(keys[68])//D
         {
-            
-            player.direction = 0;
-            player.posX += player.runningSpeed;  
-            
+            if(map.mapArray[playerRow][Math.floor((player.posX + player.side + player.runningSpeed) / map.tileSize)] === 0)
+            {
+                player.direction = 0;
+                player.posX += player.runningSpeed;  
+            }
+            else
+            {
+                player.direction = 0;
+                player.posX = playerColL * map.tileSize + (map.tileSize - player.side-1); 
+                
+            }
         }
 
         
@@ -170,6 +185,7 @@ Game.prototype.gameInit = function()
             }
         }
         
+        console.log(player.direction)
         
     }, frameTime);
     

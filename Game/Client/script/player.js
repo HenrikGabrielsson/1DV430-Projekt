@@ -58,6 +58,7 @@ Player.prototype.hitting = function(map,monsters)
     var playerColR = Math.floor((this.posX+this.side) / map.tileSize);    
     
     var player = this;
+    var reach = 20;//hur långt spelaren når med sitt vapen
     
     var monsterIndex = 0;
     
@@ -67,7 +68,7 @@ Player.prototype.hitting = function(map,monsters)
         monsters.forEach(function(monster)
         {
             //kollar om något monster är inom räckhåll för att bli ihjälslagen
-            if(monster.posY >= player.posY && monster.posY <= player.posY+player.side && monster.posX >= player.posX && monster.posX <= player.posX + player.side + 64 )
+            if(monster.posY >= player.posY && monster.posY <= player.posY+player.side && monster.posX >= player.posX && monster.posX <= player.posX + player.side + reach )
             {
                 monsters.splice(monsterIndex,1); // tar bort monster från array
                 monster = null;
@@ -85,7 +86,7 @@ Player.prototype.hitting = function(map,monsters)
         monsters.forEach(function(monster)
         {
             //kollar om något monster är inom räckhåll för att bli ihjälslagen
-            if(monster.posY >= player.posY && monster.posY <= player.posY+player.side && monster.posX <= player.posX && monster.posX >= player.posX - 64 )
+            if(monster.posY >= player.posY && monster.posY <= player.posY+player.side && monster.posX <= player.posX && monster.posX >= player.posX - reach )
             {
                 monsters.splice(monsterIndex,1); // tar bort monster från array
                 monsters.splice()

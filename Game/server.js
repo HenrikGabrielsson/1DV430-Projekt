@@ -23,7 +23,6 @@ var fileServer = new ns.Server('./Game/Client', {cache: 10});
 function handler (req, res) {
     
     req.addListener('end', function () {
-        console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" + res)
         fileServer.serve(req, res); //skicka filer
 
     }).resume();
