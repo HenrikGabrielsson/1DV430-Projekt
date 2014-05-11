@@ -4,26 +4,47 @@ var io = require('socket.io').listen(app); //socket för kommunikation med klien
 
 app.listen(8080); //port 8080 används på c9. 
 
+
 //Game/Client är mappen där alla publika filer ligger
 var fileServer = new ns.Server('./Game/Client', {cache: 10}); 
 
+
+/**
+ * 
+ * När http-requests kommer in från en klient så skickas de 
+ * efterfrågade filerna från den här funktionen 
+ * 
+ * 
+ * @param   req     det som efterfrågas.
+ * @param   res     det som ska skickas tillbaka  
+ * 
+ */
 //När en klient ansluter körs denna funktion.
 function handler (req, res) {
     
     req.addListener('end', function () {
-
         fileServer.serve(req, res); //skicka filer
 
     }).resume();
 }
-  
-
+ 
+/**
+ * När en klient ansluter till servern så körs eventet connection.
+ * Sedan lyssnar den efter att klienten frågar efter en karta som ska skickas.
+ * När klienten meddelar att den är redo så börjar servern också skicka fiender.
+ * 
+ * Dessa genereras av servern då två klienter vid ett multiplayer-spel behöver
+ * få exakt samma bana och fiender genererade till sig för att spelet ska vara 
+ * i synk.
+ * 
+ */
 //här bestäms det vad som ska göras när ett meddelande skickas från en klient
 io.sockets.on('connection', function(socket){
     
     
     socket.on('sendMap', function(data){
         
+
         //kollar det som togs emot(speltyp) och skickar sedan ett seed till klienten/klienterna.
         var seed;
         
@@ -43,14 +64,14 @@ io.sockets.on('connection', function(socket){
     {
         //ger varje monster ett unikt id för att undvika dupliceringar
         var monsterNumber = 0;
-    
+        
         //skickar ett monster 
         setInterval(function()
         {
             socket.emit("monster", 
             {
                 monsterNumber: monsterNumber, //monsterid som ska kunna jämföras med
-                monsterType: Math.floor(Math.random()*3), //Monstertyp
+                monsterType: 2,//Math.floor(Math.random()*3), //Monstertyp
                 monsterFloor: Math.floor(Math.random()*81), //Monstrets våning på banan
                 monsterDirection: Math.floor(Math.random()*2) //Monstrets riktning(höger/vänster)
             });
@@ -61,7 +82,13 @@ io.sockets.on('connection', function(socket){
 });
 
 
-
+/**
+ * Funktion som skapar ett 'seed'. Detta kan sedan tolkas av 
+ * en funktion på klientsidan som skapar en bana av koden som skickas härifrån
+ * 
+ * @param   gamemode    Typen av spel. Multiplayer och Singleplayer banor behöver olika typer.
+ * @return              en array av tecken som kan bygga en bana när den tolkas av klienten
+ */
 //Denna funktion skapar en array som bestämmer hur banan ska se ut (en tilemap)
 function mapSeedMaker (gameMode) {
     var seed = [];
@@ -112,7 +139,6 @@ function mapSeedMaker (gameMode) {
                 seed[i] = tileType;
             }
                 
-            
         }
         else
         {
@@ -122,4 +148,3 @@ function mapSeedMaker (gameMode) {
 
     return seed;
 }
-
