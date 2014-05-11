@@ -58,7 +58,7 @@ Player.prototype.hitting = function(map,monsters)
     var playerColR = Math.floor((this.posX+this.side) / map.tileSize);    
     
     var player = this;
-    var reach = 20;//hur långt spelaren når med sitt vapen
+    var reach = 60;//hur långt spelaren når med sitt vapen
     
     var monsterIndex = 0;
     
@@ -72,15 +72,11 @@ Player.prototype.hitting = function(map,monsters)
             {
                 monsters.splice(monsterIndex,1); // tar bort monster från array
                 monster = null;
-<<<<<<< HEAD
-=======
-                console.log(monsters[monsterIndex]);
->>>>>>> 0cb78d6cd940d392b6045cc5efe5d40455ea781b
             }
             monsterIndex++;
         })
         //nån vägg att slå sönder?
-        map.mapArray[playerRow][playerColR] = changeBlock(map.mapArray[playerRow][playerColR]);
+        map.mapArray[playerRow][Math.floor((this.posX+this.side+reach) / map.tileSize)] = changeBlock(map.mapArray[playerRow][Math.floor((this.posX+this.side+reach) / map.tileSize)]);
     }
     
     else if(this.direction === 1 ) //slag åt vänster
@@ -92,16 +88,16 @@ Player.prototype.hitting = function(map,monsters)
             if(monster.posY >= player.posY && monster.posY <= player.posY+player.side && monster.posX <= player.posX && monster.posX >= player.posX - reach )
             {
                 monsters.splice(monsterIndex,1); // tar bort monster från array
-                monsters.splice()
+                monsters = null;
             }
             monsterIndex++;
         })
-        map.mapArray[playerRow][playerColL] = changeBlock(map.mapArray[playerRow][playerColL]);
+        map.mapArray[playerRow][Math.floor((this.posX - reach) / map.tileSize)] = changeBlock(map.mapArray[playerRow][Math.floor((this.posX - reach) / map.tileSize)]);
     }
     
     else if(this.direction === 2)//slag upp
     {
-        map.mapArray[playerRow-1][playerColL] = changeBlock(map.mapArray[playerRow-1][playerColL]);
+        map.mapArray[Math.floor((this.posY - reach) / map.tileSize)][playerColL] = changeBlock(map.mapArray[Math.floor((this.posY - reach) / map.tileSize)][playerColL]);
 
     }    
 }

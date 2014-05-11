@@ -185,10 +185,6 @@ Game.prototype.gameInit = function()
             }
         }
         
-<<<<<<< HEAD
-=======
-        console.log(player.direction)
->>>>>>> 0cb78d6cd940d392b6045cc5efe5d40455ea781b
         
     }, frameTime);
     
@@ -247,10 +243,8 @@ Game.prototype.renderer = function(map,player,monsters)
     
     //ta bort tidigare ritat på canvas
     context.clearRect(0,0,canvas.width,canvas.height);
-
-    //karta
-    map.renderMap(context);   
-    
+  
+   
     //flytta och rita varje monster
     monsters.forEach(function(monster)
     {
@@ -277,7 +271,8 @@ Game.prototype.renderer = function(map,player,monsters)
     //spelare
     player.renderPlayer(context);     
 
-
+    //karta
+    map.renderMap(context); 
   
     
 }
