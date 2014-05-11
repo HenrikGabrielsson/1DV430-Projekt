@@ -13,7 +13,10 @@ var init = function(){
         //hämtar in canvas-elementet. context = 2d
         var canvas = document.getElementById("gamecanvas");
         var context = canvas.getContext("2d");
+<<<<<<< HEAD
         
+=======
+>>>>>>> 0cb78d6cd940d392b6045cc5efe5d40455ea781b
 
         //skapar ett spel-objekt
         var game = new Game(data,canvas,context);

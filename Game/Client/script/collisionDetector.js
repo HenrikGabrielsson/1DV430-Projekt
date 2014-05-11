@@ -99,6 +99,10 @@ CollisionDetector.prototype.detectMonsterWallCollision = function()
             //om monstret går in i en vägg
             if ((map.mapArray[monsterRow][monsterColR] > 0 && map.mapArray[monsterRow][monsterColR] < 10) || (map.mapArray[monsterRow][monsterColL] > 0 && map.mapArray[monsterRow][monsterColL] < 10)  )
             {
+<<<<<<< HEAD
+=======
+                
+>>>>>>> 0cb78d6cd940d392b6045cc5efe5d40455ea781b
                 //monster vänder om de stöter på en vägg
                 if(monster.direction === 0)
                 {
@@ -115,8 +119,13 @@ CollisionDetector.prototype.detectMonsterWallCollision = function()
             
             if(map.rows > monsterRow+1)
             {
+<<<<<<< HEAD
                 //finns nåt under? troll kan gå på sånt. Troll kan också gå rakt fram i en oförstörbar vägg, även om det inte finns nåt under.
                 if(monster.type === 1 && ((map.mapArray[monsterRow+1][monsterColL] > 0 || map.mapArray[monsterRow+1][monsterColR] > 0) ||(monster.direction === 0 && map.mapArray[monsterRow][monsterColR] === 10) || (monster.direction === 1 && map.mapArray[monsterRow][monsterColL] === 10)))
+=======
+                //finns nåt under? troll kan gå på sånt...
+                if(monster.type === 1 && (map.mapArray[monsterRow+1][monsterColL] > 0 || map.mapArray[monsterRow+1][monsterColR] > 0))
+>>>>>>> 0cb78d6cd940d392b6045cc5efe5d40455ea781b
                 {
                     monster.posY = monsterRow * map.tileSize + map.tileSize - monster.height;
                 }
@@ -126,7 +135,16 @@ CollisionDetector.prototype.detectMonsterWallCollision = function()
                 {
                     monster.bounceState = 15;
                 }
+<<<<<<< HEAD
 
+=======
+                
+                //monster ska kunna gå igenom oförstörbara väggar utan att falla om det inte finns nåt under
+                else if(monster.type != 2 && (monster.direction === 0 && map.mapArray[monsterRow][monsterColR] === 10) || (monster.direction === 1 && map.mapArray[monsterRow][monsterColL] === 10)) 
+                {
+                    monster.posY = monsterRow * map.tileSize + map.tileSize - monster.height;
+                }
+>>>>>>> 0cb78d6cd940d392b6045cc5efe5d40455ea781b
             }
     
         }

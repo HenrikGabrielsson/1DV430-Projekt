@@ -185,6 +185,10 @@ Game.prototype.gameInit = function()
             }
         }
         
+<<<<<<< HEAD
+=======
+        console.log(player.direction)
+>>>>>>> 0cb78d6cd940d392b6045cc5efe5d40455ea781b
         
     }, frameTime);
     

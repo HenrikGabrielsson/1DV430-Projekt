@@ -72,6 +72,10 @@ Player.prototype.hitting = function(map,monsters)
             {
                 monsters.splice(monsterIndex,1); // tar bort monster från array
                 monster = null;
+<<<<<<< HEAD
+=======
+                console.log(monsters[monsterIndex]);
+>>>>>>> 0cb78d6cd940d392b6045cc5efe5d40455ea781b
             }
             monsterIndex++;
         })

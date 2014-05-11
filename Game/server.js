@@ -64,7 +64,11 @@ io.sockets.on('connection', function(socket){
     {
         //ger varje monster ett unikt id för att undvika dupliceringar
         var monsterNumber = 0;
+<<<<<<< HEAD
         
+=======
+        console.log("GAME");
+>>>>>>> 0cb78d6cd940d392b6045cc5efe5d40455ea781b
         //skickar ett monster 
         setInterval(function()
         {
