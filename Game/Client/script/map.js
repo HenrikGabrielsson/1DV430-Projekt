@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Konstruktor till Map-objektet. Tar emot ett seed och skapar då en bana.
  * Läser in sprites rill de olika blocken.
  * Sätter storleken på canvas.
@@ -118,7 +118,7 @@ Map.prototype.createMap = function(seed)
  * @param   canvasTop  Skickar nummer som berättar vilken pixel på banan som canvasen är på.
  * 
  */
-Map.prototype.renderMap = function(context,canvasTop)
+Map.prototype.renderMap = function(context,canvasTop,canvasLeft)
 {
     for (var i = Math.floor(canvasTop / this.tileSize); i < this.rows; i++) //rader
     {
@@ -137,28 +137,28 @@ Map.prototype.renderMap = function(context,canvasTop)
                 case 3:
                 case 4:
                 case 5:
-                    context.drawImage(this.sprite,0,0,this.tileSize,this.tileSize,j*this.tileSize,i*this.tileSize-canvasTop,this.tileSize,this.tileSize);
+                    context.drawImage(this.sprite,0,0,this.tileSize,this.tileSize,j*this.tileSize-canvasLeft,i*this.tileSize-canvasTop,this.tileSize,this.tileSize);
                     break;
                 //6-7: rutor som kräver ett slag för att krossas
                 case 6:
                 case 7:
-                    context.drawImage(this.sprite,this.tileSize,0,this.tileSize,this.tileSize,j*this.tileSize,i*this.tileSize-canvasTop,this.tileSize,this.tileSize);
+                    context.drawImage(this.sprite,this.tileSize,0,this.tileSize,this.tileSize,j*this.tileSize-canvasLeft,i*this.tileSize-canvasTop,this.tileSize,this.tileSize);
                     break;
                 case 8: //vägg
                     if(this.mapArray[i-1][j])
                     {
-                        context.drawImage(this.sprite,0,0,this.tileSize,this.tileSize,j*this.tileSize,i*this.tileSize-canvasTop,this.tileSize,this.tileSize);
+                        context.drawImage(this.sprite,0,0,this.tileSize,this.tileSize,j*this.tileSize-canvasLeft,i*this.tileSize-canvasTop,this.tileSize,this.tileSize);
                     }
                     else
                     {
-                        context.drawImage(this.sprite,this.tileSize*2,0,this.tileSize,this.tileSize,j*this.tileSize,i*this.tileSize-canvasTop,this.tileSize,this.tileSize);
+                        context.drawImage(this.sprite,this.tileSize*2,0,this.tileSize,this.tileSize,j*this.tileSize-canvasLeft,i*this.tileSize-canvasTop,this.tileSize,this.tileSize);
                     }
                     break;
                 case 9: //oförstörbar
-                    context.drawImage(this.sprite,this.tileSize*3,0,this.tileSize,this.tileSize,j*this.tileSize,i*this.tileSize-canvasTop,this.tileSize,this.tileSize);
+                    context.drawImage(this.sprite,this.tileSize*3,0,this.tileSize,this.tileSize,j*this.tileSize-canvasLeft,i*this.tileSize-canvasTop,this.tileSize,this.tileSize);
                     break;
                 case 10:
-                    context.drawImage(this.sprite,this.tileSize*3,0,this.tileSize,this.tileSize,j*this.tileSize,i*this.tileSize-canvasTop,this.tileSize,this.tileSize);
+                    context.drawImage(this.sprite,this.tileSize*3,0,this.tileSize,this.tileSize,j*this.tileSize-canvasLeft,i*this.tileSize-canvasTop,this.tileSize,this.tileSize);
                     break;                    
                 default:
                     break;

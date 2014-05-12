@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{2ab5dcad-3d5e-4ab9-828b-805b7f7e82a9}</ProjectGuid>
+    <ProjectGuid>{7593771b-9c92-49c0-a43f-1d83b709ae56}</ProjectGuid>
     <ProjectHome />
     <ProjectView>ShowAllFiles</ProjectView>
     <StartupFile>Game\server.js</StartupFile>
@@ -16,6 +16,7 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
   <ItemGroup>
+    <Content Include=".git\ms-persist.xml" />
     <Compile Include="Game\server.js" />
     <Content Include="Game\Client\index.html" />
     <Content Include="Game\Client\pics\.png" />
@@ -30,6 +31,7 @@
     <Content Include="Game\Client\style\game.css" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include=".git" />
     <Folder Include="Game" />
     <Folder Include="Game\Client" />
     <Folder Include="Game\Client\pics" />

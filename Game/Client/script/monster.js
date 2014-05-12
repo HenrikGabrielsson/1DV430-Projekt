@@ -69,21 +69,21 @@ Bat.prototype = new Monster();
  * 
  * @param   context     Där fladdermusen ska ritas
  */
-Bat.prototype.renderBat = function(context, canvasTop)
+Bat.prototype.renderBat = function(context, canvasTop, canvasLeft)
 {
     
     //vänster-höger
     if(this.direction === 0)
     {
         this.posX += this.speed;
-        context.drawImage(this.monsterSprites, (this.currentSprite*this.width)+(this.width*2), 24, this.width, this.height, this.posX, this.posY - canvasTop, this.width, this.height);
+        context.drawImage(this.monsterSprites, (this.currentSprite*this.width)+(this.width*2), 24, this.width, this.height, this.posX-canvasLeft, this.posY - canvasTop, this.width, this.height);
     }
     
     //höger-vänster
     else
     {
         this.posX -= this.speed;
-        context.drawImage(this.monsterSprites, (this.currentSprite*this.width), 24, this.width, this.height, this.posX, this.posY - canvasTop, this.width, this.height);
+        context.drawImage(this.monsterSprites, (this.currentSprite*this.width), 24, this.width, this.height, this.posX-canvasLeft, this.posY - canvasTop, this.width, this.height);
     }
     this.currentSprite++;
     if(this.currentSprite > 1){this.currentSprite = 0};//börjar om animationen
@@ -122,7 +122,7 @@ Troll.prototype = new Monster();
  * @param   context     Där trollet ska ritas
  * @param   player      Spelare. Trollet jagar spelare som är i närheten.
  */
-Troll.prototype.renderTroll = function(context,player, canvasTop)
+Troll.prototype.renderTroll = function(context,player, canvasTop, canvasLeft)
 {
     this.posY += 10; //gravitation
     
@@ -152,7 +152,7 @@ Troll.prototype.renderTroll = function(context,player, canvasTop)
         this.posX += this.speed;
 
         //hämta rätt sprite
-        context.drawImage(this.monsterSprites, (this.currentSprite*this.width)+(this.width*4), 0, this.width, this.height, this.posX, this.posY - canvasTop, this.width, this.height);
+        context.drawImage(this.monsterSprites, (this.currentSprite*this.width)+(this.width*4), 0, this.width, this.height, this.posX-canvasLeft, this.posY - canvasTop, this.width, this.height);
         
     }
     
@@ -162,7 +162,7 @@ Troll.prototype.renderTroll = function(context,player, canvasTop)
         this.posX -= this.speed;
         
         //hämta rätt sprite
-        context.drawImage(this.monsterSprites, this.currentSprite*this.width, 0, this.width, this.height, this.posX, this.posY - canvasTop, this.width, this.height);
+        context.drawImage(this.monsterSprites, this.currentSprite*this.width, 0, this.width, this.height, this.posX-canvasLeft, this.posY - canvasTop, this.width, this.height);
         
     }
     this.currentSprite++;
@@ -203,7 +203,7 @@ FallingRock.prototype = new Monster();
  * 
  * @param   context     Där stenen ska ritas
  */
-FallingRock.prototype.renderFallingRock = function(context, canvasTop)
+FallingRock.prototype.renderFallingRock = function(context, canvasTop, canvasLeft)
 {
     this.posY += 10 - this.bounceState; //gravitation
 
@@ -215,7 +215,7 @@ FallingRock.prototype.renderFallingRock = function(context, canvasTop)
 
     //rita på banan
     context.fillStyle = "#0000FF";
-    context.fillRect(this.posX, this.posY - canvasTop, this.width, this.height);
+    context.fillRect(this.posX-canvasLeft, this.posY - canvasTop, this.width, this.height);
 }
 
 

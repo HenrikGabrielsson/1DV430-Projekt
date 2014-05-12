@@ -246,6 +246,8 @@ Game.prototype.renderer = function(map, player, monsters, currentPos)
     var canvasTop = (map.tileSize * map.rows) - (canvas.height+currentPos);    
     var canvasCenter = canvas.width/2;
 
+    var canvasLeft = player.posX - canvasCenter;
+
     //ta bort tidigare ritat på canvas
     context.clearRect(0,0,canvas.width,canvas.height);
   
@@ -257,25 +259,25 @@ Game.prototype.renderer = function(map, player, monsters, currentPos)
         //fladdermus
         if(monster.type === 0)
         {
-            monster.renderBat(context, canvasTop); 
+            monster.renderBat(context, canvasTop, canvasLeft); 
         }
         
         //troll
         else if (monster.type === 1)
         {
-            monster.renderTroll(context, player, canvasTop);
+            monster.renderTroll(context, player, canvasTop, canvasLeft);
         }
         
         //falling rock
         else if(monster.type === 2)
         {
-            monster.renderFallingRock(context, canvasTop);
+            monster.renderFallingRock(context, canvasTop, canvasLeft);
         }
         
     });  
     
     //karta
-    map.renderMap(context, canvasTop); 
+    map.renderMap(context, canvasTop, canvasLeft); 
   
     
 }
