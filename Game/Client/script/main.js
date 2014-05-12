@@ -13,12 +13,15 @@ var init = function(){
         //hämtar in canvas-elementet. context = 2d
         var canvas = document.getElementById("gamecanvas");
         var context = canvas.getContext("2d");
+
+        canvas.height = 600;
+        canvas.width = 900;
         
 
         //skapar ett spel-objekt
         var game = new Game(data,canvas,context);
-        game.gameMenu();
-
+        //game.gameMenu();
+        game.gameInit();
     });
     
 };

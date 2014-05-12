@@ -37,10 +37,17 @@ function Player(posX, posY)
  * @param   context     Där som spelaren ritas  
  */
 //rita spelare
-Player.prototype.renderPlayer = function(context)
-{   
+Player.prototype.renderPlayer = function(context, canvasTop, canvasCenter)
+{
+    alert(canvasCenter);
+    //Spelaren placeras alltid i mitten av canvasen(horisontalt)
+    var playerCanvasPosition = canvasCenter - this.side/2;     
+            
+    
     context.fillStyle = "#0000FF";
-    context.fillRect(this.posX,this.posY, this.side,this.side)
+    context.fillRect(playerCanvasPosition,this.posY - canvasTop, this.side,this.side);
+
+    return "test";
 };
 
 /**
@@ -70,6 +77,7 @@ Player.prototype.hitting = function(map,monsters)
             //kollar om något monster är inom räckhåll för att bli ihjälslagen
             if(monster.posY >= player.posY && monster.posY <= player.posY+player.side && monster.posX >= player.posX && monster.posX <= player.posX + player.side + reach )
             {
+                alert()
                 monsters.splice(monsterIndex,1); // tar bort monster från array
                 monster = null;
             }

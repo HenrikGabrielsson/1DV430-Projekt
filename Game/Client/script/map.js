@@ -19,9 +19,11 @@ function Map (seed, canvas)
     this.sprite = new Image();
     this.sprite.src = "pics/tileset.png";
     
+    this.canvas = canvas;
+
     //hur stor ska canvas vara
-    canvas.width = this.tileSize * this.cols;
-    canvas.height= this.tileSize * this.rows;
+    //canvas.width = this.tileSize * this.cols;
+    //canvas.height= this.tileSize * this.rows;
 }
 
 
@@ -113,13 +115,12 @@ Map.prototype.createMap = function(seed)
  * Ritar ut banan, efter den kod som skapas i createMap
  * 
  * @param   context     Där som banan ritas.
+ * @param   canvasTop  Skickar nummer som berättar vilken pixel på banan som canvasen är på.
  * 
  */
-//Funktion som ritar banan. tar emot mapArray(tileset som beskriver vad som ska ritas) och canvas + context
-Map.prototype.renderMap = function(context)
+Map.prototype.renderMap = function(context,canvasTop)
 {
-    
-    for (var i = 0; i < this.rows; i++) //rader
+    for (var i = Math.floor(canvasTop / this.tileSize); i < this.rows; i++) //rader
     {
         for (var j = 0; j < this.cols; j++) //kolumner
         {
@@ -136,28 +137,28 @@ Map.prototype.renderMap = function(context)
                 case 3:
                 case 4:
                 case 5:
-                    context.drawImage(this.sprite,0,0,this.tileSize,this.tileSize,j*this.tileSize,i*this.tileSize,this.tileSize,this.tileSize);
+                    context.drawImage(this.sprite,0,0,this.tileSize,this.tileSize,j*this.tileSize,i*this.tileSize-canvasTop,this.tileSize,this.tileSize);
                     break;
                 //6-7: rutor som kräver ett slag för att krossas
                 case 6:
                 case 7:
-                    context.drawImage(this.sprite,this.tileSize,0,this.tileSize,this.tileSize,j*this.tileSize,i*this.tileSize,this.tileSize,this.tileSize);
+                    context.drawImage(this.sprite,this.tileSize,0,this.tileSize,this.tileSize,j*this.tileSize,i*this.tileSize-canvasTop,this.tileSize,this.tileSize);
                     break;
                 case 8: //vägg
                     if(this.mapArray[i-1][j])
                     {
-                        context.drawImage(this.sprite,0,0,this.tileSize,this.tileSize,j*this.tileSize,i*this.tileSize,this.tileSize,this.tileSize);
+                        context.drawImage(this.sprite,0,0,this.tileSize,this.tileSize,j*this.tileSize,i*this.tileSize-canvasTop,this.tileSize,this.tileSize);
                     }
                     else
                     {
-                        context.drawImage(this.sprite,this.tileSize*2,0,this.tileSize,this.tileSize,j*this.tileSize,i*this.tileSize,this.tileSize,this.tileSize);
+                        context.drawImage(this.sprite,this.tileSize*2,0,this.tileSize,this.tileSize,j*this.tileSize,i*this.tileSize-canvasTop,this.tileSize,this.tileSize);
                     }
                     break;
                 case 9: //oförstörbar
-                    context.drawImage(this.sprite,this.tileSize*3,0,this.tileSize,this.tileSize,j*this.tileSize,i*this.tileSize,this.tileSize,this.tileSize);
+                    context.drawImage(this.sprite,this.tileSize*3,0,this.tileSize,this.tileSize,j*this.tileSize,i*this.tileSize-canvasTop,this.tileSize,this.tileSize);
                     break;
                 case 10:
-                    context.drawImage(this.sprite,this.tileSize*3,0,this.tileSize,this.tileSize,j*this.tileSize,i*this.tileSize,this.tileSize,this.tileSize);
+                    context.drawImage(this.sprite,this.tileSize*3,0,this.tileSize,this.tileSize,j*this.tileSize,i*this.tileSize-canvasTop,this.tileSize,this.tileSize);
                     break;                    
                 default:
                     break;

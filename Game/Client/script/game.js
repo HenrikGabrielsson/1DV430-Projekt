@@ -36,6 +36,7 @@ Game.prototype.gameInit = function()
     var map = this.map;
     var monsters = this.monsters;
     
+    var frameCounter = 0;
     
     var spawnMonster = this.spawnMonster;
     var renderer = this.renderer;
@@ -163,7 +164,7 @@ Game.prototype.gameInit = function()
         
 
         //rita bana och karaktär på nytt
-        renderer(map,player,monsters);
+        renderer(map,player,monsters, frameCounter);
         
         //kolla om några monster slagit ihjäl spelare.
         var dead = cd.detectMonsterCollision();
@@ -185,7 +186,7 @@ Game.prototype.gameInit = function()
             }
         }
         
-        
+        frameCounter++;
     }, frameTime);
     
 };
@@ -235,44 +236,46 @@ Game.prototype.spawnMonster = function(data, monsters, map)
  * @param   monsters    array med alla monster   
  */
 //funktion som anropar funktioner för att rita objekt i spelet.
-Game.prototype.renderer = function(map,player,monsters)
+Game.prototype.renderer = function(map, player, monsters, currentPos)
 {
     //Canvas hämtas    
     var canvas = document.getElementById("gamecanvas");
     var context = canvas.getContext("2d");  
-    
+
+    //Toppen, center och vänsterkanten av canvasen. Behövas för att bestämma vad som ska renderas och var. 
+    var canvasTop = (map.tileSize * map.rows) - (canvas.height+currentPos);    
+    var canvasCenter = canvas.width/2;
+
     //ta bort tidigare ritat på canvas
     context.clearRect(0,0,canvas.width,canvas.height);
   
-   
+    player.renderPlayer(context, canvasTop, canvasCenter);    
+    
     //flytta och rita varje monster
     monsters.forEach(function(monster)
     {
         //fladdermus
         if(monster.type === 0)
         {
-            monster.renderBat(context); 
+            monster.renderBat(context, canvasTop); 
         }
         
         //troll
         else if (monster.type === 1)
         {
-            monster.renderTroll(context, player);
+            monster.renderTroll(context, player, canvasTop);
         }
         
         //falling rock
         else if(monster.type === 2)
         {
-            monster.renderFallingRock(context);
+            monster.renderFallingRock(context, canvasTop);
         }
         
     });  
     
-    //spelare
-    player.renderPlayer(context);     
-
     //karta
-    map.renderMap(context); 
+    map.renderMap(context, canvasTop); 
   
     
 }
