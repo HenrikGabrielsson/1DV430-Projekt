@@ -126,7 +126,6 @@ Troll.prototype = new Monster();
  */
 Troll.prototype.renderTroll = function(context,player, canvasTop, canvasLeft)
 {
-    this.posY += 10; //gravitation
     
     //Om ett troll märker att en spelare är på samma level så blir det argt.
     if(player.posY <= this.posY && player.posY >= this.posY - this.map.tileSize * 3 && player.posX > this.posX)
@@ -210,7 +209,7 @@ FallingRock.prototype = new Monster();
  */
 FallingRock.prototype.renderFallingRock = function(context, canvasTop, canvasLeft)
 {
-    this.posY += 10 - this.bounceState; //gravitation
+    this.posY - this.bounceState; //gravitation
 
 
     if(this.bounceState > 0)
