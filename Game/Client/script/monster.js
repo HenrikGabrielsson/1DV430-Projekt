@@ -17,12 +17,14 @@ function Monster(type,floor,direction,map)
     
     this.map = map;
     
-    this.width = 20;
-    this.height = 20;
+    this.width;
+    this.height;
     this.speed;
     
     this.monsterSprites = new Image();
     this.monsterSprites.src="pics/monsterTileSet5.png";
+    this.fallingRock = new Image();
+    this.fallingRock.src="pics/fallingRock.jpg";
     
     this.posY = this.floor * 64; //this.floor * map.tileSize men det fungerar inte just här. anledning: javascript
     
@@ -59,8 +61,8 @@ function Bat(type,floor,direction, map)
 {
     Monster.call(this,type,floor,direction,map);
     this.speed = 7;
-    this.width = 16;
-    this.height = 10;
+    this.width = 32;
+    this.height = 24;
 }
 Bat.prototype = new Monster();
 
@@ -108,8 +110,8 @@ Bat.prototype.renderBat = function(context, canvasTop, canvasLeft)
 function Troll(type,floor,direction,map)
 {
     Monster.call(this,type,floor,direction,map);
-    this.height = 24;
-    this.width = 19;
+    this.height = 40;
+    this.width = 40;
     
     this.speed = 2;
     
@@ -152,8 +154,9 @@ Troll.prototype.renderTroll = function(context,player, canvasTop, canvasLeft)
         this.posX += this.speed;
 
         //hämta rätt sprite
-        context.drawImage(this.monsterSprites, (this.currentSprite*this.width)+(this.width*4), 0, this.width, this.height, this.posX-canvasLeft, this.posY - canvasTop, this.width, this.height);
-        
+        //context.drawImage(this.monsterSprites, (this.currentSprite*this.width)+(this.width*4), 0, this.width, this.height, this.posX-canvasLeft, this.posY - canvasTop, this.width, this.height);
+        context.fillStyle = "blue";
+        context.fillRect(this.posX-canvasLeft, this.posY - canvasTop, this.width, this.height);
     }
     
     //höger-vänster
@@ -162,7 +165,9 @@ Troll.prototype.renderTroll = function(context,player, canvasTop, canvasLeft)
         this.posX -= this.speed;
         
         //hämta rätt sprite
-        context.drawImage(this.monsterSprites, this.currentSprite*this.width, 0, this.width, this.height, this.posX-canvasLeft, this.posY - canvasTop, this.width, this.height);
+        //context.drawImage(this.monsterSprites, this.currentSprite*this.width, 0, this.width, this.height, this.posX-canvasLeft, this.posY - canvasTop, this.width, this.height);
+        context.fillStyle = "blue";
+        context.fillRect( this.posX-canvasLeft, this.posY - canvasTop, this.width, this.height);
         
     }
     this.currentSprite++;
@@ -215,7 +220,7 @@ FallingRock.prototype.renderFallingRock = function(context, canvasTop, canvasLef
 
     //rita på banan
     context.fillStyle = "#0000FF";
-    context.fillRect(this.posX-canvasLeft, this.posY - canvasTop, this.width, this.height);
+    context.drawImage(this.fallingRock, this.posX-canvasLeft, this.posY - canvasTop, 60, 60 );
 }
 
 

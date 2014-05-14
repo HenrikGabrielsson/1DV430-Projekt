@@ -14,7 +14,8 @@ function Player(posX, posY)
     this.direction = 0;
     
     //sidlängd i pixlar
-    this.side = 40;
+    this.height = 40;
+    this.width = 22;
     
     //hastighet (vertikal)
     this.ySpeed = 0;
@@ -26,7 +27,12 @@ function Player(posX, posY)
     
     //slag
     this.hitState = 0;
+
+    //Om denna är sann så är spelaren död...
+    this.isDead = false;
     
+    this.playerSprite = new Image();
+    this.playerSprite.src = "pics/playerSprite.png";
 
     
 }
@@ -39,13 +45,12 @@ function Player(posX, posY)
 //rita spelare
 Player.prototype.renderPlayer = function(context, canvasTop, canvasCenter)
 {
-    alert(canvasCenter);
     //Spelaren placeras alltid i mitten av canvasen(horisontalt)
-    var playerCanvasPosition = canvasCenter - this.side/2;     
+    var playerCanvasPosition = canvasCenter - this.width/2;     
             
     
     context.fillStyle = "#0000FF";
-    context.fillRect(playerCanvasPosition,this.posY - canvasTop, this.side,this.side);
+    context.drawImage(this.playerSprite, playerCanvasPosition, this.posY - canvasTop, 22, 40);
 
     return "test";
 };
@@ -62,7 +67,7 @@ Player.prototype.hitting = function(map,monsters)
     //ta reda på vilken ruta i banans tileset som spelaren befinner sig i
     var playerRow = Math.floor(this.posY / map.tileSize);
     var playerColL = Math.floor(this.posX / map.tileSize);
-    var playerColR = Math.floor((this.posX+this.side) / map.tileSize);    
+    var playerColR = Math.floor((this.posX+this.width) / map.tileSize);    
     
     var player = this;
     var reach = 60;//hur långt spelaren når med sitt vapen
@@ -75,7 +80,7 @@ Player.prototype.hitting = function(map,monsters)
         monsters.forEach(function(monster)
         {
             //kollar om något monster är inom räckhåll för att bli ihjälslagen
-            if(monster.posY >= player.posY && monster.posY <= player.posY+player.side && monster.posX >= player.posX && monster.posX <= player.posX + player.side + reach )
+            if(monster.posY >= player.posY && monster.posY <= player.posY+player.height && monster.posX >= player.posX && monster.posX <= player.posX + player.width + reach )
             {
                 alert()
                 monsters.splice(monsterIndex,1); // tar bort monster från array
@@ -84,7 +89,7 @@ Player.prototype.hitting = function(map,monsters)
             monsterIndex++;
         })
         //nån vägg att slå sönder?
-        map.mapArray[playerRow][Math.floor((this.posX+this.side+reach) / map.tileSize)] = changeBlock(map.mapArray[playerRow][Math.floor((this.posX+this.side+reach) / map.tileSize)]);
+        map.mapArray[playerRow][Math.floor((this.posX+this.width+reach) / map.tileSize)] = changeBlock(map.mapArray[playerRow][Math.floor((this.posX+this.width+reach) / map.tileSize)]);
     }
     
     else if(this.direction === 1 ) //slag åt vänster
@@ -93,7 +98,7 @@ Player.prototype.hitting = function(map,monsters)
         monsters.forEach(function(monster)
         {
             //kollar om något monster är inom räckhåll för att bli ihjälslagen
-            if(monster.posY >= player.posY && monster.posY <= player.posY+player.side && monster.posX <= player.posX && monster.posX >= player.posX - reach )
+            if(monster.posY >= player.posY && monster.posY <= player.posY+player.height && monster.posX <= player.posX && monster.posX >= player.posX - reach )
             {
                 monsters.splice(monsterIndex,1); // tar bort monster från array
                 monsters = null;

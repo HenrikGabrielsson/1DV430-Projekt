@@ -24,7 +24,7 @@ CollisionDetector.prototype.detectWallCollision = function()
     //ta reda på vilken ruta i banans tileset som spelaren befinner sig i
     var playerRow = Math.floor(this.player.posY / this.map.tileSize);
     var playerColL = Math.floor(this.player.posX / this.map.tileSize);
-    var playerColR = Math.floor((this.player.posX+this.player.side) / this.map.tileSize);
+    var playerColR = Math.floor((this.player.posX+this.player.width) / this.map.tileSize);
 
     //finns nåt över?
     if(this.map.mapArray[playerRow][playerColL] > 0 || this.map.mapArray[playerRow][playerColR] > 0 && this.player.jumpState > 0)
@@ -37,20 +37,20 @@ CollisionDetector.prototype.detectWallCollision = function()
     if((this.map.mapArray[playerRow+1][playerColL] > 0 || this.map.mapArray[playerRow+1][playerColR] > 0) && this.player.ySpeed >= 0)
     {
         
-        this.player.posY = playerRow * this.map.tileSize + this.map.tileSize - this.player.side;
+        this.player.posY = playerRow * this.map.tileSize + this.map.tileSize - this.player.height;
     }
 
 
 
     playerRow = Math.floor(this.player.posY / this.map.tileSize);
     playerColL = Math.floor(this.player.posX / this.map.tileSize);
-    playerColR = Math.floor((this.player.posX+this.player.side) / this.map.tileSize);      
+    playerColR = Math.floor((this.player.posX+this.player.width) / this.map.tileSize);      
     
 
     //finns nåt till höger?
     if(this.map.mapArray[playerRow][playerColR] > 0 && this.player.direction === 0)
     {
-        this.player.posX = playerColL * this.map.tileSize + (this.map.tileSize - this.player.side);
+        this.player.posX = playerColL * this.map.tileSize + (this.map.tileSize - this.player.width);
         this.player.posX--;
     }
     
@@ -138,25 +138,21 @@ CollisionDetector.prototype.detectMonsterWallCollision = function()
 /**
  * Letar efter kollisioner mellan monster och spelare. Kollar varje monster för sig.
  */
-//letar efter kollisioner mellan spelare och monster
 CollisionDetector.prototype.detectMonsterCollision = function()
 {
     var player = this.player;
-    var isDead = false;
     
     //kollar varje monster för sig
     this.monsters.forEach(function(monster)
     {
         if(
-            ((player.posX >= monster.posX && player.posX <= monster.posX+monster.width) || (player.posX + player.side >= monster.posX && player.posX + player.side <= monster.posX+monster.width)) &&
-            ((player.posY >= monster.posY && player.posY <= monster.posY+monster.height) || (player.posY + player.side >= monster.posY && player.posY + player.side <= monster.posY+monster.height))
+            ((player.posX >= monster.posX && player.posX <= monster.posX+monster.width) || (player.posX + player.width >= monster.posX && player.posX + player.width <= monster.posX+monster.width)) &&
+            ((player.posY >= monster.posY && player.posY <= monster.posY+monster.height) || (player.posY + player.height >= monster.posY && player.posY + player.height <= monster.posY+monster.height))
         )
         {
-            isDead = true;
+            player.isDead = true; //spelaren dör.
         }
         
-        
     })
-     return isDead;
     
 }

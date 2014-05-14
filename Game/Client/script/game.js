@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Konstruktor för Game-objektet
  * 
  * @param   data    Innehåller seed till banan som ska skapas
@@ -75,7 +75,7 @@ Game.prototype.gameInit = function()
         //ta reda på vilken ruta i banans tileset som spelaren befinner sig i
         var playerRow = Math.floor(player.posY / map.tileSize);
         var playerColL = Math.floor(player.posX / map.tileSize);
-        var playerColR = Math.floor((player.posX+player.side) / map.tileSize);
+        var playerColR = Math.floor((player.posX+player.width) / map.tileSize);
         
         
         //Styrning av karaktär och slag
@@ -87,7 +87,7 @@ Game.prototype.gameInit = function()
             player.direction = 2;
             
             player.ySpeed = 0; //återställer
-            player.jumpState = player.side * 0.9; 
+            player.jumpState = player.height * 0.9; 
             player.ySpeed -= player.jumpState;
             player.jumpState--;
         }
@@ -119,7 +119,7 @@ Game.prototype.gameInit = function()
 
         else if(keys[68])//D
         {
-            if(map.mapArray[playerRow][Math.floor((player.posX + player.side + player.runningSpeed) / map.tileSize)] === 0)
+            if(map.mapArray[playerRow][Math.floor((player.posX + player.width + player.runningSpeed) / map.tileSize)] === 0)
             {
                 player.direction = 0;
                 player.posX += player.runningSpeed;  
@@ -127,7 +127,7 @@ Game.prototype.gameInit = function()
             else
             {
                 player.direction = 0;
-                player.posX = playerColL * map.tileSize + (map.tileSize - player.side-1); 
+                player.posX = playerColL * map.tileSize + (map.tileSize - player.width-1); 
                 
             }
         }
@@ -161,13 +161,14 @@ Game.prototype.gameInit = function()
         //kollision med väggar eller monster
         cd.detectWallCollision();
         cd.detectMonsterWallCollision();
-        
+        cd.detectMonsterCollision();
 
         //rita bana och karaktär på nytt
         renderer(map,player,monsters, frameCounter);
         
         //kolla om några monster slagit ihjäl spelare.
-        var dead = cd.detectMonsterCollision();
+        var dead = player.isDead;
+
         var won = (playerRow === 3 && (map.mapArray[playerRow+1][playerColL] > 0 || map.mapArray[playerRow+1][playerColR] > 0 ));
         
         //spelloopen stängs av ifall spelaren dör
@@ -236,8 +237,21 @@ Game.prototype.spawnMonster = function(data, monsters, map)
  * @param   monsters    array med alla monster   
  */
 //funktion som anropar funktioner för att rita objekt i spelet.
-Game.prototype.renderer = function(map, player, monsters, currentPos)
+Game.prototype.renderer = function(map, player, monsters, frameTime)
 {
+    //canvasen börjar inte flytta banan nedåt på 2 sekunder efter att spelet startat
+    var currentPos;
+    if(frameTime < 120)
+    {
+        currentPos = 0;
+    }
+    else 
+    {
+        currentPos = frameTime-120;
+    }
+
+
+
     //Canvas hämtas    
     var canvas = document.getElementById("gamecanvas");
     var context = canvas.getContext("2d");  
@@ -245,8 +259,7 @@ Game.prototype.renderer = function(map, player, monsters, currentPos)
     //Toppen, center och vänsterkanten av canvasen. Behövas för att bestämma vad som ska renderas och var. 
     var canvasTop = (map.tileSize * map.rows) - (canvas.height+currentPos);    
     var canvasCenter = canvas.width/2;
-
-    var canvasLeft = player.posX - canvasCenter;
+    var canvasLeft = player.posX - (canvasCenter-player.width/2);
 
     //ta bort tidigare ritat på canvas
     context.clearRect(0,0,canvas.width,canvas.height);
@@ -279,6 +292,11 @@ Game.prototype.renderer = function(map, player, monsters, currentPos)
     //karta
     map.renderMap(context, canvasTop, canvasLeft); 
   
+    //kollar om spelaren dör (av brist på livslust för att dom nådde botten av fönstret)
+    if(player.posY + player.height/2 > canvasTop + canvas.height)
+    {
+        player.isDead = true;        
+    }
     
 }
 
@@ -429,8 +447,8 @@ Game.prototype.getInstructions = function(mode)
 //funktion som körs när man dör
 Game.prototype.deathLoop = function(canvas,context)
 {
-    var boxWidth = 600;
-    var boxHeight = 800;
+    var boxWidth = canvas.width/2;
+    var boxHeight = canvas.height/2;
     
     
     var fontSize = 50;
@@ -454,8 +472,8 @@ Game.prototype.deathLoop = function(canvas,context)
  */
 Game.prototype.winLoop = function(canvas,context)
 {
-    var boxWidth = 600;
-    var boxHeight = 800;
+    var boxWidth = canvas.width/2;
+    var boxHeight = canvas.height/2;
     
     var fontSize = 50;
     
