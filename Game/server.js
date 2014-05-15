@@ -41,24 +41,31 @@ function handler (req, res) {
 //här bestäms det vad som ska göras när ett meddelande skickas från en klient
 io.sockets.on('connection', function(socket){
     
-    
+    var seed;
     socket.on('sendMap', function(data){
-        
 
         //kollar det som togs emot(speltyp) och skickar sedan ett seed till klienten/klienterna.
-        var seed;
         
-        if(data.gameMode == 'sp') //singleplayer
+        
+        if(data.gameMode === 'sp') //singleplayer
         {
             seed = mapSeedMaker('sp');
         }
-        else if(data.gameMode == 'mp') //multiplayer
+        else if(data.gameMode === 'mp') //multiplayer
         {
             seed = mapSeedMaker('mp');
         }
-        socket.emit("map", {map: seed} );
+        socket.emit("map", {map: seed, gameMode: data.gameMode} );
         
     });
+
+    socket.on('requestMoreMap', function()
+    {
+        seed = mapSeedMaker('mp'); 
+
+        socket.emit("moreMap", {map: seed, gameMode: data.gameMode} );
+
+    })
     
     socket.on("gameIsOn", function()
     {
@@ -77,7 +84,7 @@ io.sockets.on('connection', function(socket){
             });
             monsterNumber++;
         },1000);
-    })    
+    })   
 
 });
 
@@ -104,8 +111,19 @@ function mapSeedMaker (gameMode) {
     8: Ruta med en vägg under sig. Väggar går att slå sönder med två slag.
     9: Oförstörbar ruta.
     */
+    var seedLength;
 
-    for (var i = 0; i < 390; i++) //390 är exakt så många tiles som behöver randomizas
+    if(gameMode === "sp")
+    {
+        seedLength = 390;
+    }
+
+    if(gameMode === "mp")
+    {
+        seedLength = 400;
+    }
+
+    for (var i = 0; i < seedLength; i++) 
     {
         //ett nummber (0-9) bestämmer en tiletype. 
         if(i != 356)
@@ -147,4 +165,5 @@ function mapSeedMaker (gameMode) {
     }        
 
     return seed;
+    
 }

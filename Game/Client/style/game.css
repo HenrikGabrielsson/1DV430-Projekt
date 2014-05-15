@@ -3,8 +3,16 @@ body
     background-color:#FFFFFF;
 }
 
+#container
+{
+    margin:auto;
+    width:900px;
+}
+
 #gamecanvas
 {
-    border:1px solid black;
     background-image:url('../pics/background.jpg');
+    width:900px;
+    height:600px;
 }
+

@@ -7,12 +7,12 @@
  */
 function Game(data,canvas,context)
 {
-    this.data = data;
     this.canvas = canvas;
     this.context = context;
     this.socket = io.connect();
-    
-    this.map = new Map(this.data.map, canvas);
+    this.gameMode = data.gameMode;
+
+    this.map = new Map(data, canvas);
     
     //alla monster sparas här     
     this.monsters = [];
@@ -25,7 +25,9 @@ function Game(data,canvas,context)
 //Startar spelet
 Game.prototype.gameInit = function()
 {
-    
+ 
+    var gameMode = this.gameMode;
+       
     var socket = this.socket;
     
     socket.emit("gameIsOn");
@@ -78,14 +80,26 @@ Game.prototype.gameInit = function()
 
         //rita bana och karaktär på nytt
         renderer(map,player,monsters, frameCounter);
-        
-        //kolla om några monster slagit ihjäl spelare.
-        var dead = player.isDead;
 
-        var won = (playerRow === 3 && (map.mapArray[playerRow+1][playerColL] > 0 || map.mapArray[playerRow+1][playerColR] > 0 ));
-        
+        if(gameMode === "sp") //vid sp så vinner man när man når toppen
+        {
+            var won = (playerRow === 3 && (map.mapArray[playerRow+1][playerColL] > 0 || map.mapArray[playerRow+1][playerColR] > 0 ));
+        }
+
+        else if(gameMode === "mp" && frameCounter % 1000 === 0 && frameCounter !== 0) //vid mp så behövs det mer bana att gå på ovanför
+        {
+            socket.emit("requestMoreMap");
+        }
+
+        socket.on("moreMap", function(){
+                    alert(frameCounter);
+        })
+
+
+
+
         //spelloopen stängs av ifall spelaren dör
-        if(dead || won )
+        if(player.isDead || won )
         {
             clearInterval(gameLoop);
             
@@ -94,12 +108,14 @@ Game.prototype.gameInit = function()
             {
                 winLoop(canvas, context)
             }
-            else if(dead)
+            else if(player.isDead)
             {
                 deathLoop(canvas, context)
             }
         }
         
+        console.log(frameCounter);
+
         frameCounter++;
     }, frameTime);
     
@@ -141,6 +157,7 @@ Game.prototype.spawnMonster = function(data, monsters, map)
         monsters.push(monster);
     }
 }
+
 
 /**
  * Funktion som anropar andra funktioner som ritar spelare, monster och bana
@@ -210,100 +227,6 @@ Game.prototype.renderer = function(map, player, monsters, frameTime)
     {
         player.isDead = true;        
     }
-}
-
-
-/**
- * Ritar menyer i början av spelet och gör dem interaktiva genom att 
- * lyssna på olika events
- */
-//Visa huvudmenyn
-Game.prototype.gameMenu = function()
-{
-    
-    var canvas = this.canvas;
-    var context = this.context;
-    var game = this;
-    
-    var fontSize = 18;
-    var buttonWidth = 300;
-    var buttonHeight = 60;
-
-    var gap = 100;
-    
-    var mainmenu = true;
-    
-    //singleplayer knappen
-    context.fillStyle = "#DDDDDD";
-    context.fillRect(canvas.width/2 - buttonWidth/2 , canvas.height/2 - buttonHeight/2, buttonWidth, buttonHeight);
-    
-    context.fillStyle = "black";
-    context.font = fontSize+"px Arial";
-    context.textAlign = "center";
-    context.fillText("Singleplayer", canvas.width/2  , canvas.height/2+fontSize/2);
-    
-    
-    //multiplayer knappen
-    context.fillStyle = "#DDDDDD";
-    context.fillRect(canvas.width/2 - buttonWidth/2 , canvas.height/2 - buttonHeight/2 + gap+buttonHeight, buttonWidth, buttonHeight);
-    
-    context.fillStyle = "black";
-    context.font = fontSize+"px Arial";
-    context.fillText("Multiplayer", canvas.width/2  , canvas.height/2 + gap + buttonHeight + fontSize/2);
-    
-    //funktion som körs när användaren interagerar med spelmenyn
-    function menuFunction(e)
-        {
-            var mouseX = e.x - canvas.offsetLeft;
-            var mouseY = e.y - canvas.offsetTop;
-            
-            if(mainmenu && mouseX >= canvas.width/2 - buttonWidth/2 && mouseX <= canvas.width/2 + buttonWidth/2 && mouseY >= canvas.height/2 - buttonHeight/2 && mouseY <= canvas.height/2 + buttonHeight/2)
-            {
-                canvas.removeEventListener("click",menuFunction,false);
-                game.getInstructions("sp");
-            }
-            else if(mainmenu && mouseX >= canvas.width/2 - buttonWidth/2 && mouseX <= canvas.width/2 + buttonWidth/2 && mouseY >= canvas.height/2 - buttonHeight/2 + gap + buttonHeight && mouseY <= canvas.height/2 - buttonHeight/2 + gap + buttonHeight*2)
-            {
-                mainmenu = false;
-                
-                //ta bort tidigare meny
-                context.clearRect(0,0,canvas.width,canvas.height);
-                
-                //multiplayer online
-                context.fillStyle = "#DDDDDD";
-                context.fillRect(canvas.width/2 - buttonWidth/2 , canvas.height/2 - buttonHeight/2, buttonWidth, buttonHeight);
-                
-                context.fillStyle = "black";
-                context.font = fontSize+"px Arial";
-                context.textAlign = "center";
-                context.fillText("Play with stranger", canvas.width/2  , canvas.height/2+fontSize/2);
-                
-                
-                //multiplayer knappen
-                context.fillStyle = "#DDDDDD";
-                context.fillRect(canvas.width/2 - buttonWidth/2 , canvas.height/2 - buttonHeight/2 + gap+buttonHeight, buttonWidth, buttonHeight);
-                
-                context.fillStyle = "black";
-                context.font = fontSize+"px Arial";
-                context.fillText("Play with friend(Share keyboard)", canvas.width/2  , canvas.height/2 + gap + buttonHeight + fontSize/2);
-                
-            }
-            
-            else if(!mainmenu && mouseX >= canvas.width/2 - buttonWidth/2 && mouseX <= canvas.width/2 + buttonWidth/2 && mouseY >= canvas.height/2 - buttonHeight/2 && mouseY <= canvas.height/2 + buttonHeight/2)
-            {
-                canvas.removeEventListener("click",menuFunction,false);
-                alert("online mp")
-            }
-             else if(!mainmenu && mouseX >= canvas.width/2 - buttonWidth/2 && mouseX <= canvas.width/2 + buttonWidth/2 && mouseY >= canvas.height/2 - buttonHeight/2 + gap + buttonHeight && mouseY <= canvas.height/2 - buttonHeight/2 + gap + buttonHeight*2)
-            {
-                canvas.removeEventListener("click",menuFunction,false);
-                alert("splitscreen mp")
-            }
-        }
-    
-    //event listeners till knapparna.
-    this.canvas.addEventListener("click",menuFunction,false);
-    
 }
 
 
