@@ -1,6 +1,7 @@
 body
 {
-    background-color:#FFFFFF;
+    background-image:url('tile.jpg');
+    background-color:black;
 }
 
 #container
@@ -14,5 +15,10 @@ body
     background-image:url('../pics/cave.jpg');
     width:900px;
     height:600px;
+}
+
+h1
+{
+    display:none;
 }
 
