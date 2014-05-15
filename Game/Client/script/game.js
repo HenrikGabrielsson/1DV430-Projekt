@@ -30,7 +30,7 @@ Game.prototype.gameInit = function()
        
     var socket = this.socket;
     
-    socket.emit("gameIsOn");
+    socket.emit("gameIsOn", {gameMode:gameMode});
     
     var canvas = this.canvas;
     var context = this.context;
@@ -55,6 +55,8 @@ Game.prototype.gameInit = function()
 
     //så här ofta ska spel-loopen köras
     var frameTime = 1000/60;
+
+    var mapPieces = 0;
     
     //Spel-loopen
     var gameLoop = setInterval(function()
@@ -73,7 +75,20 @@ Game.prototype.gameInit = function()
         {
             spawnMonster(data, monsters, map);
         });        
-        
+
+        //med jämna mellanrum tar spelet emot mer av banan från servern.
+        if(gameMode === "mp" )
+        {
+            socket.on("moreMap", function(data){
+                if(mapPieces === data.count)
+                {
+                    map.addMoreMap(data.map, player, monsters);
+                    mapPieces++;
+                }
+            })
+        }
+
+
         //kollision med väggar eller monster
         cd.detectMonsterWallCollision();
         cd.detectMonsterCollision();
@@ -86,15 +101,7 @@ Game.prototype.gameInit = function()
             var won = (playerRow === 3 && (map.mapArray[playerRow+1][playerColL] > 0 || map.mapArray[playerRow+1][playerColR] > 0 ));
         }
 
-        else if(gameMode === "mp" && frameCounter % 1000 === 0 && frameCounter !== 0) //vid mp så behövs det mer bana att gå på ovanför
-        {
-            socket.emit("requestMoreMap");
-        }
-
-        socket.on("moreMap", function(){
-                    alert(frameCounter);
-        })
-
+     
 
 
 
@@ -113,13 +120,15 @@ Game.prototype.gameInit = function()
                 deathLoop(canvas, context)
             }
         }
-        
-        console.log(frameCounter);
 
         frameCounter++;
     }, frameTime);
     
 };
+
+
+
+
 
 
 /**
@@ -180,13 +189,11 @@ Game.prototype.renderer = function(map, player, monsters, frameTime)
         currentPos = frameTime-120;
     }
 
-
-
     //Canvas hämtas    
     var canvas = document.getElementById("gamecanvas");
     var context = canvas.getContext("2d");  
 
-    //Toppen, center och vänsterkanten av canvasen. Behövas för att bestämma vad som ska renderas och var. 
+    //Toppen, center och vänsterkanten av canvasen. Behövs för att bestämma vad som ska renderas och var. 
     var canvasTop = (map.tileSize * map.rows) - (canvas.height+currentPos);    
     var canvasCenter = canvas.width/2;
     var canvasLeft = player.posX - (canvasCenter-player.width/2);

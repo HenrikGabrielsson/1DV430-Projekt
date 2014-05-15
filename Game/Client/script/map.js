@@ -47,19 +47,22 @@ function Map (data,canvas)
  * multidimensionell array med data om vilken typ av block som ska finnas på varje 
  * tile.
  * 
- * @param   seed    "kod" som bestämmer banans utseende
+ * @param   seed            "kod" som bestämmer banans utseende
+ * @param   startPlatform   Bool. Bestämmer om en "startplattform" ska skapas. 
  * @return          En multidimensionell array som 
  */
 //Den här funktionen tar emot ett seed och skapar en bana (en tvådimensionell array).
-Map.prototype.createMap = function(seed)
+Map.prototype.createMap = function(seed, startPlatform)
 {
     var mapArray = [];
+
+    if(startPlatform === undefined){startPlatform = true}
 
     //singleplayer-bana
     if(this.gameMode === "sp")
     {
-        var rows = this.rows-5;
-        var cols = this.cols;
+        var rows = 76;
+        var cols = 40;
 
         var seedIndex = 0; //index i seedet
         for (var i = 0; i <= rows; i++)//rader 
@@ -130,8 +133,18 @@ Map.prototype.createMap = function(seed)
     //multiplayer-bana
     else if(this.gameMode === "mp")
     {
-        var rows = this.rows;
-        var cols = this.cols;
+
+        var rows;
+        if(startPlatform)
+        {
+            var rows = 41;
+        }
+        else
+        {
+            var rows = 40;
+        }
+        
+        var cols = 40;
 
         var seedIndex = 0;
 
@@ -140,9 +153,15 @@ Map.prototype.createMap = function(seed)
             mapArray[i] = [];
             for(var j = 0; j < cols;j++) //kolumner
             {
-                if(j === 0 || j === cols-1 || i === rows-1) //oförstörbara tiles omringar banan. ingen får fly...
+                if(j === 0 || j === cols-1) //oförstörbara tiles omringar banan. ingen får fly...
                 {
                     mapArray[i][j] = 10;
+                }
+
+                //Oförstörbara rutor under spelarens startposition. kan väljas bort
+                else if(i === rows-1 && startPlatform)
+                {
+                    mapArray[i][j] = 10; 
                 }
 
                 else if(i % 4 === 0) //plattformar ska finnas på var 4:e rad.
@@ -171,6 +190,7 @@ Map.prototype.createMap = function(seed)
     
 }
 
+
 /**
  * Ritar ut banan, efter den kod som skapas i createMap
  * 
@@ -180,6 +200,8 @@ Map.prototype.createMap = function(seed)
  */
 Map.prototype.renderMap = function(context,canvasTop,canvasLeft)
 {
+    console.log(this.rows * this.tileSize);
+
     for (var i = Math.floor(canvasTop / this.tileSize); i < this.rows; i++) //rader
     {
         for (var j = 0; j < this.cols; j++) //kolumner
@@ -225,4 +247,27 @@ Map.prototype.renderMap = function(context,canvasTop,canvasLeft)
             }
         }    
     }   
+}
+
+Map.prototype.addMoreMap = function(seed, player, monsters)
+{
+    console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+    //gammal och ny array
+    var oldArray = this.mapArray;
+    var newArray = this.createMap(seed, false);
+
+    this.rows += 40;
+
+    //slå ihop...
+    this.mapArray = newArray.concat(oldArray);
+
+    //uppdaterar spelare och monsters y-position då de inte får flyttas på banan
+    player.posY += 40 * this.tileSize; 
+
+    var tileSize = this.tileSize;
+
+    monsters.forEach(function(monster)
+    {
+        monster.posY += 40 * tileSize;
+    });
 }

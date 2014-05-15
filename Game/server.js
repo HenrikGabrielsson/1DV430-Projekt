@@ -2,7 +2,7 @@ var ns = require('node-static'); //för att serva filer till klienten
 var app = require('http').createServer(handler); 
 var io = require('socket.io').listen(app); //socket för kommunikation med klienten
 
-app.listen(8080); //port 8080 används på c9. 
+app.listen(8080); //lyssna genom denna port.
 
 
 //Game/Client är mappen där alla publika filer ligger
@@ -41,6 +41,7 @@ function handler (req, res) {
 //här bestäms det vad som ska göras när ett meddelande skickas från en klient
 io.sockets.on('connection', function(socket){
     
+
     var seed;
     socket.on('sendMap', function(data){
 
@@ -56,22 +57,25 @@ io.sockets.on('connection', function(socket){
             seed = mapSeedMaker('mp');
         }
         socket.emit("map", {map: seed, gameMode: data.gameMode} );
+
         
     });
-
-    socket.on('requestMoreMap', function()
-    {
-        seed = mapSeedMaker('mp'); 
-
-        socket.emit("moreMap", {map: seed, gameMode: data.gameMode} );
-
-    })
     
-    socket.on("gameIsOn", function()
+    socket.on("gameIsOn", function(data)
     {
         //ger varje monster ett unikt id för att undvika dupliceringar
         var monsterNumber = 0;
-        
+        var mapPiece = 0;
+
+        setInterval(function()
+        {
+            seed = mapSeedMaker("mp");
+            socket.emit("moreMap", {map: seed, count: mapPiece});
+
+            mapPiece++;
+
+        }, 20000)
+
         //skickar ett monster 
         setInterval(function()
         {
@@ -82,8 +86,14 @@ io.sockets.on('connection', function(socket){
                 monsterFloor: Math.floor(Math.random()*81), //Monstrets våning på banan
                 monsterDirection: Math.floor(Math.random()*2) //Monstrets riktning(höger/vänster)
             });
+
+            
+            
+
             monsterNumber++;
         },1000);
+
+
     })   
 
 });

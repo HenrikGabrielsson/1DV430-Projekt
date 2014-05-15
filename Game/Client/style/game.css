@@ -11,7 +11,7 @@ body
 
 #gamecanvas
 {
-    background-image:url('../pics/background.jpg');
+    background-image:url('../pics/cave.jpg');
     width:900px;
     height:600px;
 }
