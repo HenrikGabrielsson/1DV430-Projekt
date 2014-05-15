@@ -176,9 +176,6 @@ Troll.prototype.renderTroll = function(context,player, canvasTop, canvasLeft)
 
 
 
-
-
-
 /**
  * Konstruktor för stenar. Subclass till Monster
  * 
@@ -192,8 +189,6 @@ function FallingRock(type,floor,direction,map)
     Monster.call(this,type,floor,direction,map);
     this.width = 60;
     this.height = 60;
-    
-    this.bounceState = 0;
     
     this.speed = 0;
     
@@ -209,14 +204,6 @@ FallingRock.prototype = new Monster();
  */
 FallingRock.prototype.renderFallingRock = function(context, canvasTop, canvasLeft)
 {
-    this.posY - this.bounceState; //gravitation
-
-
-    if(this.bounceState > 0)
-    {
-        this.bounceState--;
-    }
-
     //rita på banan
     context.fillStyle = "#0000FF";
     context.drawImage(this.fallingRock, this.posX-canvasLeft, this.posY - canvasTop, 60, 60 );

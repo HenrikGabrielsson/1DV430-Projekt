@@ -6,14 +6,28 @@
  * @param   seed    data som bestämmer hur banan ska se ut.
  * @param   canvas  canvas-elementet där banan ska ritas.
  */
-function Map (seed, canvas)
+function Map (data,canvas)
 {
-    this.seed = seed;
+    //hämtar banan som servern genererade och spelläge.
+    this.seed = data.map;
+    this.gameMode = data.gameMode;
+
+    if(this.gameMode === "sp")
+    {
+        this.rows = 81; 
+    }
+    else if(this.gameMode ==="mp")
+    {
+        this.rows = 41;
+    }
+    this.cols = 40; 
+
     this.mapArray = this.createMap(this.seed);
+
     
     //banans höjd och bredd i tiles
-    this.rows = 81; 
-    this.cols = 40;
+
+
     this.tileSize = 64;
     
     this.sprite = new Image();
@@ -41,72 +55,118 @@ Map.prototype.createMap = function(seed)
 {
     var mapArray = [];
 
-    var rows = 76;
-    var cols = 40;
-
-    var seedIndex = 0; //index i seedet
-    for (var i = 0; i <= rows; i++)//rader 
+    //singleplayer-bana
+    if(this.gameMode === "sp")
     {
-        mapArray[i] = [];
-        
-        
-        for (var j = 0; j < cols; j++) //kolumner
-        {
-            if(j === 0 || j === 39 || i === rows) //oförstörbara tiles omringar banan. ingen får fly...
-            {
-                mapArray[i][j] = 10;
-            }
+        var rows = this.rows-5;
+        var cols = this.cols;
 
-            else if(i % 4 === 0 && ((j > cols/2 - ((i/4) + 2)) && (j < cols/2 + ((i/4) + 2))  )) //plattformar ska finnas på var 4:e rad. De ökar med 2 rutor varje gång.
+        var seedIndex = 0; //index i seedet
+        for (var i = 0; i <= rows; i++)//rader 
+        {
+            mapArray[i] = [];
+           
+            for (var j = 0; j < cols; j++) //kolumner
             {
-                //De översta våningarna ska alltid vara likadana och behöver inte använda seedet för att genereras .
-                if(i === 0 || i === 4)
+
+                if(j === 0 || j === cols-1 || i === rows) //oförstörbara tiles omringar banan. ingen får fly...
                 {
-                    mapArray[i][j] = 1;
+                    mapArray[i][j] = 10;
+                }
+
+                else if(i % 4 === 0 && ((j > cols/2 - ((i/4) + 2)) && (j < cols/2 + ((i/4) + 2))  )) //plattformar ska finnas på var 4:e rad. De ökar med 2 rutor varje gång.
+                {
+                    //De översta våningarna ska alltid vara likadana och behöver inte använda seedet för att genereras .
+                    if(i === 0 || i === 4)
+                    {
+                        mapArray[i][j] = 1;
+                    }
+                    else
+                    {
+                    mapArray[i][j] = seed[seedIndex]; //lägger in numret i rätt fält.
+                    seedIndex++;        
+                    }
+                }
+                //man ska inte kunna gå utanför "pyramiden" så allt där blir oslagbara rutor.
+                else if(    (j < cols/2 - ((i/4) + 2)) || (j > cols/2 + ((i/4) + 2)) )
+                {
+                    mapArray[i][j] = 10;
+                }
+                else //annars tomrum
+                {
+                    if(i > 0 && mapArray[i-1][j] === 8) //om rutan ovan visar att det ska finnas en vägg här så fortsätter väggen neråt.
+                    {
+                        mapArray[i][j] = 8;    
+                    }
+                    else
+                    {
+                        mapArray[i][j] = 0;
+                    }
+                }           
+            }
+        }
+        //lägger till lite utrymme över översta plattformen
+        for(var k = 0;k<4;k++)
+        {
+            mapArray.unshift([]);
+            for(var l = 0; l<cols; l++)
+            {
+                if(l < 17 || l > 21)
+                {
+                   mapArray[0].unshift(10); 
                 }
                 else
                 {
-                mapArray[i][j] = seed[seedIndex]; //lägger in numret i rätt fält.
-                seedIndex++;        
+                    mapArray[0].unshift(0);
                 }
             }
-            //man ska inte kunna gå utanför "pyramiden" så allt där blir oslagbara rutor.
-            else if(    (j < cols/2 - ((i/4) + 2)) || (j > cols/2 + ((i/4) + 2)) )
-            {
-                mapArray[i][j] = 10;
-            }
-            else //annars tomrum
-            {
-                if(i > 0 && mapArray[i-1][j] === 8) //om rutan ovan visar att det ska finnas en vägg här så fortsätter väggen neråt.
-                {
-                    mapArray[i][j] = 8;    
-                }
-                else
-                {
-                    mapArray[i][j] = 0;
-                }
-            }
-            
         }
-    
+
     }
-    
-    //lägger till lite utrymme över översta plattformen
-    for(var k = 0;k<4;k++)
+
+
+
+
+    //multiplayer-bana
+    else if(this.gameMode === "mp")
     {
-        mapArray.unshift([]);
-        for(var l = 0; l<cols; l++)
+        var rows = this.rows;
+        var cols = this.cols;
+
+        var seedIndex = 0;
+
+        for(var i = 0; i < rows;i++) //rader
         {
-            if(l < 17 || l > 21)
+            mapArray[i] = [];
+            for(var j = 0; j < cols;j++) //kolumner
             {
-               mapArray[0].unshift(10); 
+                if(j === 0 || j === cols-1 || i === rows-1) //oförstörbara tiles omringar banan. ingen får fly...
+                {
+                    mapArray[i][j] = 10;
+                }
+
+                else if(i % 4 === 0) //plattformar ska finnas på var 4:e rad.
+                {
+                    mapArray[i][j] = seed[seedIndex]; //lägger in numret i rätt fält.
+                    seedIndex++;              
+                }
+                else //annars tomrum
+                {
+                    if(i > 0 && mapArray[i-1][j] === 8) //om rutan ovan visar att det ska finnas en vägg här så fortsätter väggen neråt.
+                    {
+                        mapArray[i][j] = 8;    
+                    }
+                    else
+                    {
+                        mapArray[i][j] = 0;
+                    }
+                } 
             }
-            else
-            {
-                mapArray[0].unshift(0);
-            }
-        }
+
+   
+        }       
     }
+
     return mapArray;
     
 }

@@ -12,6 +12,9 @@ function Player(posX, posY)
     this.posY = posY;
     
     this.direction = 0;
+    //0 = vänster-höger
+    //1 = höger-vänster
+    //2 = uppåt
     
     //sidlängd i pixlar
     this.height = 40;

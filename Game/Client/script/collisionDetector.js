@@ -102,6 +102,8 @@ CollisionDetector.prototype.checkForXCollision = function()
 
 }
 
+
+
 /**
  * Letar efter kollisioner mellan monster och block. kollar varje monster för sig
  */
@@ -115,8 +117,9 @@ CollisionDetector.prototype.detectMonsterWallCollision = function()
     var monsterColR;
     
     var monsterIndex = 0; 
-    this.monsters.forEach(function(monster)
+    this.monsters.forEach(function(monster) //varje monster för sig
     {
+        //gravitation om man inte är fladdermus
         if(monster.type !== 0)
         {
             monster.posY += 10;
@@ -155,16 +158,11 @@ CollisionDetector.prototype.detectMonsterWallCollision = function()
             
             if(map.rows > monsterRow+1)
             {
+
                 //finns nåt under? troll kan gå på sånt. Troll kan också gå rakt fram i en oförstörbar vägg, även om det inte finns nåt under.
                 if(monster.type === 1 && ((map.mapArray[monsterRow+1][monsterColL] > 0 || map.mapArray[monsterRow+1][monsterColR] > 0) ||(monster.direction === 0 && map.mapArray[monsterRow][monsterColR] === 10) || (monster.direction === 1 && map.mapArray[monsterRow][monsterColL] === 10)))
                 {
                     monster.posY = monsterRow * map.tileSize + map.tileSize - monster.height;
-                }
-                
-                //stenblock kan inte gå så bra men dom studsar upp lite om de stöter på ett hinder
-                else if(monster.type === 2 && monster.bounceState === 0 && ((map.mapArray[monsterRow+1][monsterColL] > 0 && map.mapArray[monsterRow+1][monsterColL] < 10) || (map.mapArray[monsterRow+1][monsterColR] > 0 && map.mapArray[monsterRow+1][monsterColR] < 10))  )    
-                {
-                    monster.bounceState = 15;
                 }
 
             }
@@ -175,6 +173,8 @@ CollisionDetector.prototype.detectMonsterWallCollision = function()
         
     });
 }
+
+
 /**
  * Letar efter kollisioner mellan monster och spelare. Kollar varje monster för sig.
  */
@@ -256,7 +256,6 @@ CollisionDetector.prototype.hitting = function()
             //kollar om något monster är inom räckhåll för att bli ihjälslagen
             if(monster.posY >= player.posY && monster.posY <= player.posY+player.height && monster.posX >= player.posX && monster.posX <= player.posX + player.width + reach )
             {
-                alert()
                 monsters.splice(monsterIndex,1); // tar bort monster från array
                 monster = null;
             }
@@ -282,10 +281,8 @@ CollisionDetector.prototype.hitting = function()
         map.mapArray[playerRow][Math.floor((player.posX - reach) / map.tileSize)] = changeBlock(map.mapArray[playerRow][Math.floor((player.posX - reach) / map.tileSize)]);
     }
     
-    if(player.jumpState > 0)//slag upp
+    else if(player.jumpState > 0)//slag upp
     {
-        alert(map.mapArray);
-        alert(Math.floor((player.posY - reach) / map.tileSize));
         Math.floor((player.posX + player.width/2) / map.tileSize);
 
         map.mapArray[Math.floor((player.posY - reach) / map.tileSize)][Math.floor((player.posX + player.width/2) / map.tileSize)] = changeBlock(map.mapArray[Math.floor((player.posY - reach) / map.tileSize)][Math.floor((player.posX + player.width/2) / map.tileSize)]);
