@@ -56,7 +56,12 @@ Game.prototype.gameInit = function()
     //så här ofta ska spel-loopen köras
     var frameTime = 1000/60;
 
+    //variabler som används för att hålla reda på vilket nummer monsterArrayen och den nya leveldatan har.
+    //Annars kan datan tas emot flera gånger, och det blir problem.
     var mapPieces = 0;
+    var monsterNumber = 0;
+
+    var waitingMonsters = [];
     
     //Spel-loopen
     var gameLoop = setInterval(function()
@@ -70,11 +75,23 @@ Game.prototype.gameInit = function()
         playerAction(keys, player, cd);
 
 
-        //nytt monster spawnar
-        socket.on("monster", function(data)
+        //nya monster spawnar
+        socket.on("monsters", function(data)
         {
-            spawnMonster(data, monsters, map);
-        });        
+            if(data.monsterNumber === monsterNumber)
+            {
+                //lägger till de nya monstren i array där alla monster sparas.
+                waitingMonsters = waitingMonsters.concat(data.monsterArray);
+                monsterNumber++;
+            }
+        }); 
+
+        //spawnar 2 monster i sekunden
+        if(frameCounter % 30 === 0 && waitingMonsters.length > 0 )
+        {
+            spawnMonster(waitingMonsters.shift(), monsters, map); //det första monstret i arrayen tas bort därifrån och spawnar.
+        }
+               
 
         //med jämna mellanrum tar spelet emot mer av banan från servern.
         if(gameMode === "mp" )
@@ -140,31 +157,23 @@ Game.prototype.gameInit = function()
  * @param   monsters    arrayen som innehåller alla monster. nya monster pushas hit
  * @param   map         kartan som används i denna game-instance
  */
-var monsterNumber = 0;
-Game.prototype.spawnMonster = function(data, monsters, map)
-{
-    var monster;
 
-    //Varje monster ska bara visa sig en gång.
-    if(data.monsterNumber == monsterNumber)
+Game.prototype.spawnMonster = function(monster, monsters, map)
+{
+    //skapar ett nytt monster
+    if(monster.monsterType === 0)
     {
-        monsterNumber++; //nästa monster, tack!
-        
-        //skapar ett nytt monster
-        if(data.monsterType === 0)
-        {
-            monster = new Bat(data.monsterType, data.monsterFloor, data.monsterDirection, map);
-        }
-        else if(data.monsterType === 1)
-        {
-            monster = new Troll(data.monsterType, data.monsterFloor, data.monsterDirection, map);
-        }
-        else if(data.monsterType === 2)
-        {
-            monster = new FallingRock(data.monsterType, data.monsterFloor, data.monsterDirection, map);
-        }
-        monsters.push(monster);
+        monster = new Bat(monster.monsterType, monster.monsterFloor, monster.monsterDirection, map);
     }
+    else if(monster.monsterType === 1)
+    {
+        monster = new Troll(monster.monsterType, monster.monsterFloor, monster.monsterDirection, map);
+    }
+    else if(monster.monsterType === 2)
+    {
+        monster = new FallingRock(monster.monsterType, monster.monsterFloor, monster.monsterDirection, map);
+    }
+    monsters.push(monster);
 }
 
 
@@ -197,6 +206,12 @@ Game.prototype.renderer = function(map, player, monsters, frameTime)
     var canvasTop = (map.tileSize * map.rows) - (canvas.height+currentPos);    
     var canvasCenter = canvas.width/2;
     var canvasLeft = player.posX - (canvasCenter-player.width/2);
+
+    //när canvastop når toppen så stannar bilden
+    if(canvasTop <= 0)
+    {
+        canvasTop = 0;
+    }
 
     //ta bort tidigare ritat på canvas
     context.clearRect(0,0,canvas.width,canvas.height);

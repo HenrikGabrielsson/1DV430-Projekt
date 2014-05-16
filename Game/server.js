@@ -76,22 +76,28 @@ io.sockets.on('connection', function(socket){
 
         }, 20000)
 
+
+        var monsterArray = [];
+
         //skickar ett monster 
         setInterval(function()
         {
-            socket.emit("monster", 
+            
+            //skapa array med monster(json-objekt);
+            for(var i = 0; i < 10; i++)
             {
-                monsterNumber: monsterNumber, //monsterid som ska kunna jämföras med
-                monsterType: Math.floor(Math.random()*3), //Monstertyp
-                monsterFloor: Math.floor(Math.random()*81), //Monstrets våning på banan
-                monsterDirection: Math.floor(Math.random()*2) //Monstrets riktning(höger/vänster)
-            });
-
-            
-            
+                monsterArray.push
+                ({
+                    monsterNumber: monsterNumber, //monsterid som ska kunna jämföras med
+                    monsterType: Math.floor(Math.random()*3), //Monstertyp
+                    monsterFloor: Math.floor(Math.random()*81), //Monstrets våning på banan
+                    monsterDirection: Math.floor(Math.random()*2) //Monstrets riktning(höger/vänster)
+                })
+            }
+            socket.emit("monsters", {monsterArray: monsterArray, monsterNumber: monsterNumber});
 
             monsterNumber++;
-        },1000);
+        },4000);
 
 
     })   
