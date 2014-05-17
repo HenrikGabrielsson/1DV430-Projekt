@@ -75,36 +75,6 @@ Game.prototype.gameInit = function()
         playerAction(keys, player, cd);
 
 
-        //nya monster spawnar
-        socket.on("monsters", function(data)
-        {
-            if(data.monsterNumber === monsterNumber)
-            {
-                //lägger till de nya monstren i array där alla monster sparas.
-                waitingMonsters = waitingMonsters.concat(data.monsterArray);
-                monsterNumber++;
-            }
-        }); 
-
-        //spawnar 2 monster i sekunden
-        if(frameCounter % 30 === 0 && waitingMonsters.length > 0 )
-        {
-            spawnMonster(waitingMonsters.shift(), monsters, map); //det första monstret i arrayen tas bort därifrån och spawnar.
-        }
-               
-
-        //med jämna mellanrum tar spelet emot mer av banan från servern.
-        if(gameMode === "mp" )
-        {
-            socket.on("moreMap", function(data){
-                if(mapPieces === data.count)
-                {
-                    map.addMoreMap(data.map, player, monsters);
-                    mapPieces++;
-                }
-            })
-        }
-
 
         //kollision med väggar eller monster
         cd.detectMonsterWallCollision();
@@ -118,8 +88,38 @@ Game.prototype.gameInit = function()
             var won = (playerRow === 3 && (map.mapArray[playerRow+1][playerColL] > 0 || map.mapArray[playerRow+1][playerColR] > 0 ));
         }
 
-     
 
+
+        //nya monster spawnar
+        socket.on("monsters", function(data)
+        {
+            if(data.monsterNumber === monsterNumber)
+            {
+                //lägger till de nya monstren i array där alla monster sparas.
+                waitingMonsters = waitingMonsters.concat(data.monsterArray);
+                monsterNumber++;
+            }
+        });                
+
+
+        //med jämna mellanrum tar spelet emot mer av banan från servern.
+        if(gameMode === "mp" )
+        {
+            socket.on("moreMap", function(data){
+                if(mapPieces === data.count)
+                {
+                    map.addMoreMap(data.map, player, monsters);
+                    mapPieces++;
+                }
+            })
+        }
+
+     
+        //spawnar 2 monster i sekunden
+        if(frameCounter % 30 === 0 && waitingMonsters.length > 0 )
+        {
+            spawnMonster(waitingMonsters.shift(), monsters, map, player.posY); //det första monstret i arrayen tas bort därifrån och spawnar.
+        }
 
 
         //spelloopen stängs av ifall spelaren dör
@@ -158,16 +158,19 @@ Game.prototype.gameInit = function()
  * @param   map         kartan som används i denna game-instance
  */
 
-Game.prototype.spawnMonster = function(monster, monsters, map)
+Game.prototype.spawnMonster = function(monster, monsters, map, playerY)
 {
+    //bestämmer vilken våning som monstren ska spawnas på. För bats och trolls
+    var monsterFloor = Math.floor((playerY - (monster.monsterFloor/4) * map.tileSize) / map.tileSize);
+
     //skapar ett nytt monster
     if(monster.monsterType === 0)
     {
-        monster = new Bat(monster.monsterType, monster.monsterFloor, monster.monsterDirection, map);
+        monster = new Bat(monster.monsterType, monsterFloor, monster.monsterDirection, map);
     }
     else if(monster.monsterType === 1)
     {
-        monster = new Troll(monster.monsterType, monster.monsterFloor, monster.monsterDirection, map);
+        monster = new Troll(monster.monsterType, monsterFloor, monster.monsterDirection, map);
     }
     else if(monster.monsterType === 2)
     {

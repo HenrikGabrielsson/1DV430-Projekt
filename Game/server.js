@@ -90,7 +90,7 @@ io.sockets.on('connection', function(socket){
                 ({
                     monsterNumber: monsterNumber, //monsterid som ska kunna jämföras med
                     monsterType: Math.floor(Math.random()*3), //Monstertyp
-                    monsterFloor: Math.floor(Math.random()*81), //Monstrets våning på banan
+                    monsterFloor: Math.floor(Math.random()*41), //Monstrets våning på banan
                     monsterDirection: Math.floor(Math.random()*2) //Monstrets riktning(höger/vänster)
                 })
             }

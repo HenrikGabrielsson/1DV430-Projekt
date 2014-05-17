@@ -192,7 +192,7 @@ function FallingRock(type,floor,direction,map)
     
     this.speed = 0;
     
-    this.posX = Math.floor(floor/2 * map.tileSize);
+    this.posX = floor * map.tileSize;
     this.posY = 1;
 }
 FallingRock.prototype = new Monster();

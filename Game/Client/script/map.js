@@ -200,7 +200,6 @@ Map.prototype.createMap = function(seed, startPlatform)
  */
 Map.prototype.renderMap = function(context,canvasTop,canvasLeft)
 {
-    console.log(this.rows * this.tileSize);
 
     for (var i = Math.floor(canvasTop / this.tileSize); i < this.rows; i++) //rader
     {
