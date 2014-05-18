@@ -34,11 +34,12 @@ function Monster(type,floor,direction,map)
         this.posX;
         if(this.direction === 0) //vänster - höger
         {
-            this.posX = map.tileSize;
+            this.posX = 1;
         }
         else if(this.direction === 1)//höger - vänster 
         {
-            this.posX = map.tileSize * map.cols - (this.width+1); 
+            this.posX = map.tileSize * map.cols - this.width; 
+            
         }
     }
     
@@ -109,9 +110,12 @@ Bat.prototype.renderBat = function(context, canvasTop, canvasLeft)
  */
 function Troll(type,floor,direction,map)
 {
-    Monster.call(this,type,floor,direction,map);
+
     this.height = 40;
     this.width = 40;
+
+    Monster.call(this,type,floor,direction,map);
+
     
     this.speed = 2;
     

@@ -37,7 +37,7 @@ CollisionDetector.prototype.checkForYCollision = function(jump)
     }
     else if(this.player.jumpState > 0)
     {
-
+        this.player.direction = 2;   
         this.player.posY -= this.player.jumpState;
         this.player.jumpState --;
     }

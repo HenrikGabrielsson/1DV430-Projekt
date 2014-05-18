@@ -31,10 +31,10 @@ function Player(posX, posY)
     //Om denna är sann så är spelaren död...
     this.isDead = false;
     
-    //this.playerSprite = new Image();
-    //this.playerSprite.src = "pics/playerSprite.png";
-    this.player = new Image();
-    this.player.src = "pics/player.png";
+    //sprite
+    this.playerSprite = new Image();
+    this.playerSprite.src = "pics/playerSprite.png";
+    this.currentSprite = 0;
 
     
 }
@@ -51,8 +51,33 @@ Player.prototype.renderPlayer = function(context, canvasTop, canvasCenter)
     var playerCanvasPosition = canvasCenter - this.width/2;     
             
     
-    context.fillStyle = "#0000FF";
-    context.drawImage(this.player, playerCanvasPosition, this.posY - canvasTop, 22, 40);
+    if(this.direction === 0)
+    {
+        context.drawImage(this.playerSprite, this.width * this.currentSprite, 0, this.width, this.height, playerCanvasPosition, this.posY - canvasTop, 22, 40);
+
+        this.currentSprite++;
+
+        if(this.currentSprite > 3)
+        {
+            this.currentSprite = 0;
+        }
+    }
+    else if(this.direction === 1)
+    {
+        context.drawImage(this.playerSprite, this.width * this.currentSprite + this.width * 4, 0, this.width, this.height, playerCanvasPosition, this.posY - canvasTop, 22, 40);
+
+        this.currentSprite++;
+
+        if(this.currentSprite > 3)
+        {
+            this.currentSprite = 0;
+        }
+    }
+    else if(this.direction === 2)
+    {
+        this.currentSprite = 0;
+        context.drawImage(this.playerSprite, this.width * this.currentSprite, 0, this.width, this.height, playerCanvasPosition, this.posY - canvasTop, 22, 40);
+    }
 
     return "test";
 };
