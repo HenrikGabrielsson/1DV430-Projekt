@@ -18,7 +18,7 @@ var init = function(){
     gameMenu(canvas,context, socket);
 
     socket.on('map', function(data){
-
+    
         //skapar ett spel-objekt
         var game = new Game(data,canvas,context);
 
@@ -73,7 +73,7 @@ function gameMenu(canvas, context, socket)
             {
                 canvas.removeEventListener("click",menuFunction,false);
                 
-                socket.emit('sendMap', {gameMode:"sp"}); //skicka single-player-bana
+                socket.emit('startGame', {gameMode:"sp"}); //skicka single-player-bana
                 return;
             }
             else if(mainmenu && mouseX >= canvas.width/2 - buttonWidth/2 && mouseX <= canvas.width/2 + buttonWidth/2 && mouseY >= canvas.height/2 - buttonHeight/2 + gap + buttonHeight && mouseY <= canvas.height/2 - buttonHeight/2 + gap + buttonHeight*2)
@@ -107,7 +107,7 @@ function gameMenu(canvas, context, socket)
             {
                 canvas.removeEventListener("click",menuFunction,false);
 
-                socket.emit('sendMap', {gameMode:"mp"}); //skicka multi-player-bana
+                socket.emit('startGame', {gameMode:"mp"}); //skicka multi-player-bana
             }
 
             else if(!mainmenu && mouseX >= canvas.width/2 - buttonWidth/2 && mouseX <= canvas.width/2 + buttonWidth/2 && mouseY >= canvas.height/2 - buttonHeight/2 + gap + buttonHeight && mouseY <= canvas.height/2 - buttonHeight/2 + gap + buttonHeight*2)

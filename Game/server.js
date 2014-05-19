@@ -2,7 +2,7 @@ var ns = require('node-static'); //för att serva filer till klienten
 var app = require('http').createServer(handler); 
 var io = require('socket.io').listen(app); //socket för kommunikation med klienten
 
-app.listen(8080); //lyssna genom denna port.
+app.listen(process.env.PORT); //lyssna genom denna port.
 
 
 //Game/Client är mappen där alla publika filer ligger
@@ -27,6 +27,10 @@ function handler (req, res) {
 
     }).resume();
 }
+
+//array som sparar spelare som vill spela mp.
+var mpPlayers = [];
+
  
 /**
  * När en klient ansluter till servern så körs eventet connection.
@@ -43,7 +47,7 @@ io.sockets.on('connection', function(socket){
     
 
     var seed;
-    socket.on('sendMap', function(data){
+    socket.on('startGame', function(data){
 
         //kollar det som togs emot(speltyp) och skickar sedan ett seed till klienten/klienterna.
         
@@ -51,15 +55,44 @@ io.sockets.on('connection', function(socket){
         if(data.gameMode === 'sp') //singleplayer
         {
             seed = mapSeedMaker('sp');
+            socket.emit("map", {map: seed, gameMode: data.gameMode} );
         }
+        
         else if(data.gameMode === 'mp') //multiplayer
         {
-            seed = mapSeedMaker('mp');
+            mpPlayers.push(socket); //sparar spelaren i en socket.
+            
+            //om det finns mer än 1 spelare som vill spela mp
+            //så plockas de två första ut ur arrayen(first in, first out) 
+            //och läggs i ett eget 'room'. De får samma bana skickade till sig
+            if(mpPlayers.length > 1)
+            {
+                mpPlayers.shift().join('testroom');
+                mpPlayers.shift().join('testroom');
+                
+                seed = mapSeedMaker('mp');
+                io.sockets.in('testroom').emit("map", {map: seed, gameMode: data.gameMode, room: 'testroom'} );
+                
+            }
+            
         }
-        socket.emit("map", {map: seed, gameMode: data.gameMode} );
-
         
     });
+    
+    //skickar data till motståndare så att den kan uppdateras även där.
+    socket.on("playerUpdate", function(data)
+    {
+        //data.x = x-position
+        //data.y = y-position
+        //data.direction = hållet spelaren kollar åt
+        //data.isHitting = bool. Slår spelaren?
+        //data.room = vilket spelrum spelaren är i
+        
+        //skicka data till motståndare
+        socket.broadcast.to(data.room).emit("opponent", data);
+    })
+    
+    
     
     socket.on("gameIsOn", function(data)
     {
@@ -67,14 +100,18 @@ io.sockets.on('connection', function(socket){
         var monsterNumber = 0;
         var mapPiece = 0;
 
-        setInterval(function()
+        //vid mp skickas mer av banan kontinuerligt
+        if(data.gameMode === "mp")
         {
-            seed = mapSeedMaker("mp");
-            socket.emit("moreMap", {map: seed, count: mapPiece});
-
-            mapPiece++;
-
-        }, 20000)
+            setInterval(function()
+            {
+                seed = mapSeedMaker("mp");
+                socket.emit("moreMap", {map: seed, count: mapPiece});
+    
+                mapPiece++;
+    
+            }, 20000) // 20s
+        }
 
 
         var monsterArray = [];

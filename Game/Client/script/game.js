@@ -11,6 +11,8 @@ function Game(data,canvas,context)
     this.context = context;
     this.socket = io.connect();
     this.gameMode = data.gameMode;
+    
+    this.room = data.room;
 
     this.map = new Map(data, canvas);
     
@@ -31,7 +33,7 @@ Game.prototype.gameInit = function()
     var socket = this.socket;
     
     socket.emit("gameIsOn", {gameMode:gameMode});
-    
+        
     var canvas = this.canvas;
     var context = this.context;
     
@@ -47,6 +49,12 @@ Game.prototype.gameInit = function()
     
     //skapa spelare och ange startposition
     var player = new Player(map.tileSize * 5,(map.rows-2) * map.tileSize);
+
+    if(gameMode === "mp")
+    {
+        var room = this.room;
+        var opponent = new Player(map.tileSize * 5,(map.rows-2) * map.tileSize);
+    }
     
     var cd = new CollisionDetector(map, player, monsters);
     
@@ -81,7 +89,7 @@ Game.prototype.gameInit = function()
         cd.detectMonsterCollision();
 
         //rita bana och karaktär på nytt
-        renderer(map,player,monsters, frameCounter);
+        renderer(map,player,monsters, frameCounter, opponent);
 
         if(gameMode === "sp") //vid sp så vinner man när man når toppen
         {
@@ -112,7 +120,21 @@ Game.prototype.gameInit = function()
                     mapPieces++;
                 }
             })
+            
+            //Skickar data om spelaren till servern så att detta kan delas med motståndaren.
+            socket.emit("playerUpdate", {x:player.posX, y:player.posY, direction: player.direction, isHitting: player.hitState == 30, room: room});
         }
+        
+        //uppdatera motståndare
+        socket.on("opponent", function(data)
+        {
+            opponent.posX = data.x;
+            opponent.posY = data.y;
+            opponent.direction = data.direction;
+            
+        })
+        
+        
 
      
         //spawnar 2 monster i sekunden
@@ -120,7 +142,6 @@ Game.prototype.gameInit = function()
         {
             spawnMonster(waitingMonsters.shift(), monsters, map, player.posY); //det första monstret i arrayen tas bort därifrån och spawnar.
         }
-
 
         //spelloopen stängs av ifall spelaren dör
         if(player.isDead || won )
@@ -140,6 +161,8 @@ Game.prototype.gameInit = function()
 
         frameCounter++;
     }, frameTime);
+
+    
     
 };
 
@@ -188,7 +211,7 @@ Game.prototype.spawnMonster = function(monster, monsters, map, playerY)
  * @param   monsters    array med alla monster   
  */
 //funktion som anropar funktioner för att rita objekt i spelet.
-Game.prototype.renderer = function(map, player, monsters, frameTime)
+Game.prototype.renderer = function(map, player, monsters, frameTime, opponent)
 {
     //canvasen börjar inte flytta banan nedåt på 2 sekunder efter att spelet startat
     var currentPos;
@@ -220,6 +243,7 @@ Game.prototype.renderer = function(map, player, monsters, frameTime)
     context.clearRect(0,0,canvas.width,canvas.height);
   
     player.renderPlayer(context, canvasTop, canvasCenter);    
+    opponent.renderPlayer(context, canvasTop, canvasCenter);
     
     //flytta och rita varje monster
     monsters.forEach(function(monster)
