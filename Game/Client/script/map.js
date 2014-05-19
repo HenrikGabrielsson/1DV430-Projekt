@@ -56,6 +56,7 @@ Map.prototype.createMap = function(seed, startPlatform)
 {
     var mapArray = [];
 
+    //default: true
     if(startPlatform === undefined){startPlatform = true}
 
     //singleplayer-bana

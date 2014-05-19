@@ -87,6 +87,7 @@ io.sockets.on('connection', function(socket){
         //data.direction = hållet spelaren kollar åt
         //data.isHitting = bool. Slår spelaren?
         //data.room = vilket spelrum spelaren är i
+        //data.isDead = bool. Är motspelaren död?
         
         //skicka data till motståndare
         socket.broadcast.to(data.room).emit("opponent", data);

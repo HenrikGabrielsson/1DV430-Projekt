@@ -4,12 +4,15 @@
  * @param   posX    horisontell position
  * @param   posY    vertikal position
  */
-function Player(posX, posY)
+function Player(posX, posY, isOpponent)
 {
 
     //position
     this.posX = posX;
     this.posY = posY;
+
+    //en motståndare i ett mp-omgång över nätet.
+    this.isOpponent = isOpponent;
     
     this.direction = 0;
     //0 = vänster-höger
@@ -42,18 +45,30 @@ function Player(posX, posY)
 /**
  * Ritar spelaren.
  * 
- * @param   context     Där som spelaren ritas  
+ * @param   context         Där som spelaren ritas  
+ * @param   canvasTop       Pixel där toppen av canvasen är.
+ * @param   canvasCenter    canvensen mitpunkt (y-led)
+ * @param   canvasLeft      Pixel där vänsterkanten av canvasen är.
  */
 //rita spelare
-Player.prototype.renderPlayer = function(context, canvasTop, canvasCenter)
+Player.prototype.renderPlayer = function(context, canvasTop, canvasCenter, canvasLeft)
 {
-    //Spelaren placeras alltid i mitten av canvasen(horisontalt)
-    var playerCanvasPosition = canvasCenter - this.width/2;     
-            
+
+    //Spelaren placeras i mitten av canvasen(horisontalt). En motståndare placeras ut normalt på banan.
+    var canvasPosX;
+    
+    if(this.isOpponent)
+    {
+        canvasPosX = this.posX - canvasLeft;
+    }         
+    else
+    {
+        canvasPosX = canvasCenter - this.width/2; 
+    }
     
     if(this.direction === 0)
     {
-        context.drawImage(this.playerSprite, this.width * this.currentSprite, 0, this.width, this.height, playerCanvasPosition, this.posY - canvasTop, 22, 40);
+        context.drawImage(this.playerSprite, this.width * this.currentSprite, 0, this.width, this.height, canvasPosX, this.posY - canvasTop, 22, 40);
 
         this.currentSprite++;
 
@@ -64,7 +79,7 @@ Player.prototype.renderPlayer = function(context, canvasTop, canvasCenter)
     }
     else if(this.direction === 1)
     {
-        context.drawImage(this.playerSprite, this.width * this.currentSprite + this.width * 4, 0, this.width, this.height, playerCanvasPosition, this.posY - canvasTop, 22, 40);
+        context.drawImage(this.playerSprite, this.width * this.currentSprite + this.width * 4, 0, this.width, this.height, canvasPosX, this.posY - canvasTop, 22, 40);
 
         this.currentSprite++;
 
@@ -76,7 +91,7 @@ Player.prototype.renderPlayer = function(context, canvasTop, canvasCenter)
     else if(this.direction === 2)
     {
         this.currentSprite = 0;
-        context.drawImage(this.playerSprite, this.width * this.currentSprite, 0, this.width, this.height, playerCanvasPosition, this.posY - canvasTop, 22, 40);
+        context.drawImage(this.playerSprite, this.width * this.currentSprite, 0, this.width, this.height, canvasPosX, this.posY - canvasTop, 22, 40);
     }
 
     return "test";

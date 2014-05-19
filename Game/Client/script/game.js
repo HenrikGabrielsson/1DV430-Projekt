@@ -11,6 +11,7 @@ function Game(data,canvas,context)
     this.context = context;
     this.socket = io.connect();
     this.gameMode = data.gameMode;
+
     
     this.room = data.room;
 
@@ -48,12 +49,12 @@ Game.prototype.gameInit = function()
     var winLoop = this.winLoop;
     
     //skapa spelare och ange startposition
-    var player = new Player(map.tileSize * 5,(map.rows-2) * map.tileSize);
+    var player = new Player(map.tileSize * 5,(map.rows-2) * map.tileSize, false);
 
     if(gameMode === "mp")
     {
         var room = this.room;
-        var opponent = new Player(map.tileSize * 5,(map.rows-2) * map.tileSize);
+        var opponent = new Player(map.tileSize * 5,(map.rows-2) * map.tileSize, true);
     }
     
     var cd = new CollisionDetector(map, player, monsters);
@@ -88,14 +89,15 @@ Game.prototype.gameInit = function()
         cd.detectMonsterWallCollision();
         cd.detectMonsterCollision();
 
+        console.log("loop" + gameMode);
+
         //rita bana och karaktär på nytt
-        renderer(map,player,monsters, frameCounter, opponent);
+        renderer(map,player,monsters, frameCounter, gameMode, opponent);
 
         if(gameMode === "sp") //vid sp så vinner man när man når toppen
         {
             var won = (playerRow === 3 && (map.mapArray[playerRow+1][playerColL] > 0 || map.mapArray[playerRow+1][playerColR] > 0 ));
         }
-
 
 
         //nya monster spawnar
@@ -122,7 +124,7 @@ Game.prototype.gameInit = function()
             })
             
             //Skickar data om spelaren till servern så att detta kan delas med motståndaren.
-            socket.emit("playerUpdate", {x:player.posX, y:player.posY, direction: player.direction, isHitting: player.hitState == 30, room: room});
+            socket.emit("playerUpdate", {x:player.posX, y:player.posY, direction: player.direction, isHitting: player.hitState == 30, isDead:player.isDead, room: room});
         }
         
         //uppdatera motståndare
@@ -131,6 +133,12 @@ Game.prototype.gameInit = function()
             opponent.posX = data.x;
             opponent.posY = data.y;
             opponent.direction = data.direction;
+            
+            
+            if(data.isDead)
+            {
+                winLoop(canvas.context);
+            }
             
         })
         
@@ -211,7 +219,7 @@ Game.prototype.spawnMonster = function(monster, monsters, map, playerY)
  * @param   monsters    array med alla monster   
  */
 //funktion som anropar funktioner för att rita objekt i spelet.
-Game.prototype.renderer = function(map, player, monsters, frameTime, opponent)
+Game.prototype.renderer = function(map, player, monsters, frameTime, gameMode, opponent)
 {
     //canvasen börjar inte flytta banan nedåt på 2 sekunder efter att spelet startat
     var currentPos;
@@ -243,7 +251,13 @@ Game.prototype.renderer = function(map, player, monsters, frameTime, opponent)
     context.clearRect(0,0,canvas.width,canvas.height);
   
     player.renderPlayer(context, canvasTop, canvasCenter);    
-    opponent.renderPlayer(context, canvasTop, canvasCenter);
+    
+    if(gameMode === "mp")
+    {
+        opponent.renderPlayer(context, canvasTop, canvasCenter, canvasLeft);   
+    }
+
+    
     
     //flytta och rita varje monster
     monsters.forEach(function(monster)
