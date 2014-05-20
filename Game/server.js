@@ -119,23 +119,34 @@ io.sockets.on('connection', function(socket){
         //vid mp skickas mer av banan kontinuerligt
         if(data.gameMode === "mp")
         {
-            setInterval(function()
-            {
-                seed = mapSeedMaker("mp");
-                socket.emit("moreMap", {map: seed, count: mapPiece});
-    
-                mapPiece++;
-    
-            }, 20000) // 20s
+            var mapInterval= setInterval( moreMap, 20000) // 20s
         }
 
+        
 
-        var monsterArray = [];
+        //skickar nya monster var 5:e sekund
+        var monsterInterval = setInterval(sendMonsters,5000);
 
-        //skickar nya monster
-        setInterval(function()
+        socket.on("gameOver", function()
         {
-            
+            clearInterval(monsterInterval);
+            clearInterval(mapInterval);
+        });
+
+        function moreMap()
+        {
+            var seed = mapSeedMaker("mp");
+            io.sockets.in(data.room).emit("moreMap", {map: seed, count: mapPiece});
+            mapPiece++;
+        };
+
+
+        
+        function sendMonsters()
+        {
+
+            var monsterArray = [];
+
             //skapa array med monster(json-objekt);
             for(var i = 0; i < 10; i++)
             {
@@ -147,13 +158,25 @@ io.sockets.on('connection', function(socket){
                     monsterDirection: Math.floor(Math.random()*2) //Monstrets riktning(höger/vänster)
                 })
             }
-            socket.emit("monsters", {monsterArray: monsterArray, monsterNumber: monsterNumber});
+
+            if(data.gameMode === "sp")
+            {
+                socket.emit("monsters", {monsterArray: monsterArray, monsterNumber: monsterNumber});
+            }
+            else if(data.gameMode === "mp")
+            {
+                io.sockets.in(data.room).emit("monsters", {monsterArray: monsterArray, monsterNumber: monsterNumber});
+            }
 
             monsterNumber++;
-        },4000);
+        }    
     })  
 
 });
+
+
+
+
 
 
 /**

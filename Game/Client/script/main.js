@@ -22,7 +22,6 @@ var init = function(){
         //skapar ett spel-objekt
         var game = new Game(data,canvas,context);
 
-        game.getInstructions();
         game.gameInit();
     });
     

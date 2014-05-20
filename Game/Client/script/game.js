@@ -33,7 +33,7 @@ Game.prototype.gameInit = function()
        
     var socket = this.socket;
     
-    socket.emit("gameIsOn", {gameMode:gameMode});
+    socket.emit("gameIsOn", {gameMode:gameMode, room: this.room});
         
     var canvas = this.canvas;
     var context = this.context;
@@ -173,7 +173,7 @@ Game.prototype.gameInit = function()
         //spelloopen stängs av ifall spelaren dör
         if(player.isDead || won )
         {
-            
+            socket.emit("gameOver");
             clearInterval(gameLoop);
             
             //om man vinner
@@ -260,7 +260,9 @@ Game.prototype.renderer = function(map, player, monsters, frameTime, gameMode, o
 
     //Canvas hämtas    
     var canvas = document.getElementById("gamecanvas");
-    var context = canvas.getContext("2d");  
+    var context = canvas.getContext("2d"); 
+    
+     
 
     //Toppen, center och vänsterkanten av canvasen. Behövs för att bestämma vad som ska renderas och var. 
     var canvasTop = (map.tileSize * map.rows) - (canvas.height+currentPos);    
@@ -318,48 +320,6 @@ Game.prototype.renderer = function(map, player, monsters, frameTime, gameMode, o
     }
 }
 
-
-/**
- * Skapar en ruta med instruktioner åt användaren.
- * Vad som står i rutan beror på spelläge(mp eller sp)
- * 
- * @param   mode    spelläge som texten ska vara anpassad för
- */
-//metod som skapar en ruta med instruktioner
-Game.prototype.getInstructions = function(mode)
-{
-    var game = this;
-    
-    var boxWidth = 300;
-    var boxHeight = 400;
-    
-    var fontSize = 20;
-    
-    this.context.fillStyle = "#DDDDDD";
-    this.context.fillRect(this.canvas.width/2 - boxWidth/2 , this.canvas.height/2 - boxHeight/2, boxWidth, boxHeight);
-    
-    this.context.fillStyle = "black";
-    this.context.font= fontSize+"px Arial";
-    this.context.fillText("Hello World!", this.canvas.width/2 , this.canvas.height/2 - boxHeight/2 + fontSize);
-    
-    //funktion som körs när spelaren klickar på enter
-    function start(event)
-    {
-            if(event.keyCode == 13)
-            {
-                document.removeEventListener('keydown',start,false)
-                //säger till servern att spelet startar.
-                
-                game.gameInit();//startar spelet.
-
-            }
-               
-    }
-    
-    //Klicka på Enter för att ta bort 
-    document.addEventListener('keydown', start, false)
-    
-}
 /**
  * Loop som körs för spelare som dör. Visar ett meddelande och skickar tillbaka 
  * spelaren till huvudmenyn.
