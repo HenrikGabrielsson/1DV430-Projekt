@@ -200,15 +200,14 @@ CollisionDetector.prototype.detectMonsterCollision = function()
 
 
 /**
- * Anropas när spelaren slår. Kollar ifall någor block eller fiende har träffats av slaget.
+ * Anropas när en spelare slår. Kollar ifall någor block eller fiende har träffats av slaget.
  * 
- * @param   map         Banan som spelaren slår sönder block på
- * @param   monsters    Array med alla monster. Behövs för att se om någon blev slagen.
+ * @param   player      Spelaren som slår.
  */
-CollisionDetector.prototype.hitting = function()
+CollisionDetector.prototype.hitting = function(player)
 {
 
-    //när ett block träffas så byts de ut i denna lilla funktion
+    //när ett block träffas så byts de ut i denna funktion
     function changeBlock(hitBlock)
     {
         switch(hitBlock)
@@ -236,25 +235,27 @@ CollisionDetector.prototype.hitting = function()
 
     var monsters = this.monsters;
     var map = this.map;
-    var player = this.player;
-    var reach = 60;//hur långt spelaren når med sitt vapen
 
     //ta reda på vilken ruta i banans tileset som spelaren befinner sig i
     var playerRow = Math.floor(player.posY / map.tileSize);
     var playerColL = Math.floor(player.posX / map.tileSize);
     var playerColR = Math.floor((player.posX+player.width) / map.tileSize);    
-    
 
-    
     var monsterIndex = 0;
     
     if(player.direction === 0) //slag åt höger
     {
+
+        if(player.isOpponent && this.player.posY >= player.posY && this.player.posY <= player.posY+player.height && this.player.posX >= player.posX && this.player.posX <= player.posX + player.width + player.reach)
+        {
+            this.player.isDead = true;
+        }
+
         //slog spelaren ett monster?
         monsters.forEach(function(monster)
         {
             //kollar om något monster är inom räckhåll för att bli ihjälslagen
-            if(monster.posY >= player.posY && monster.posY <= player.posY+player.height && monster.posX >= player.posX && monster.posX <= player.posX + player.width + reach )
+            if(monster.posY >= player.posY && monster.posY <= player.posY+player.height && monster.posX >= player.posX && monster.posX <= player.posX + player.width + player.reach )
             {
                 monsters.splice(monsterIndex,1); // tar bort monster från array
                 monster = null;
@@ -262,30 +263,36 @@ CollisionDetector.prototype.hitting = function()
             monsterIndex++;
         })
         //nån vägg att slå sönder?
-        map.mapArray[playerRow][Math.floor((player.posX+player.width+reach) / map.tileSize)] = changeBlock(map.mapArray[playerRow][Math.floor((player.posX+player.width+reach) / map.tileSize)]);
+        map.mapArray[playerRow][Math.floor((player.posX+player.width+player.reach) / map.tileSize)] = changeBlock(map.mapArray[playerRow][Math.floor((player.posX+player.width+player.reach) / map.tileSize)]);
     }
     
     else if(player.direction === 1 ) //slag åt vänster
     {
+
+        if(player.isOpponent && this.player.posY >= player.posY && this.player.posY <= player.posY+player.height && this.player.posX <= player.posX && this.player.posX >= player.posX - player.reach )
+        {
+            this.player.isDead = true;
+        }
+
         //slog spelaren ett monster?
         monsters.forEach(function(monster)
         {
             //kollar om något monster är inom räckhåll för att bli ihjälslagen
-            if(monster.posY >= player.posY && monster.posY <= player.posY+player.height && monster.posX <= player.posX && monster.posX >= player.posX - reach )
+            if(monster.posY >= player.posY && monster.posY <= player.posY+player.height && monster.posX <= player.posX && monster.posX >= player.posX - player.reach )
             {
                 monsters.splice(monsterIndex,1); // tar bort monster från array
                 monsters = null;
             }
             monsterIndex++;
         })
-        map.mapArray[playerRow][Math.floor((player.posX - reach) / map.tileSize)] = changeBlock(map.mapArray[playerRow][Math.floor((player.posX - reach) / map.tileSize)]);
+        map.mapArray[playerRow][Math.floor((player.posX - player.reach) / map.tileSize)] = changeBlock(map.mapArray[playerRow][Math.floor((player.posX - player.reach) / map.tileSize)]);
     }
     
     else if(player.jumpState > 0)//slag upp
     {
         Math.floor((player.posX + player.width/2) / map.tileSize);
 
-        map.mapArray[Math.floor((player.posY - reach) / map.tileSize)][Math.floor((player.posX + player.width/2) / map.tileSize)] = changeBlock(map.mapArray[Math.floor((player.posY - reach) / map.tileSize)][Math.floor((player.posX + player.width/2) / map.tileSize)]);
+        map.mapArray[Math.floor((player.posY - player.reach) / map.tileSize)][Math.floor((player.posX + player.width/2) / map.tileSize)] = changeBlock(map.mapArray[Math.floor((player.posY - player.reach) / map.tileSize)][Math.floor((player.posX + player.width/2) / map.tileSize)]);
 
     }    
 }

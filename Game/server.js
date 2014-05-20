@@ -46,15 +46,12 @@ var mpPlayers = [];
 io.sockets.on('connection', function(socket){
     
 
-    var seed;
+    //en connection har valt ett spelläge och meddelar detta.
     socket.on('startGame', function(data){
 
-        //kollar det som togs emot(speltyp) och skickar sedan ett seed till klienten/klienterna.
-        
-        
         if(data.gameMode === 'sp') //singleplayer
         {
-            seed = mapSeedMaker('sp');
+            var seed = mapSeedMaker('sp');
             socket.emit("map", {map: seed, gameMode: data.gameMode} );
         }
         
@@ -67,17 +64,21 @@ io.sockets.on('connection', function(socket){
             //och läggs i ett eget 'room'. De får samma bana skickade till sig
             if(mpPlayers.length > 1)
             {
-                mpPlayers.shift().join('testroom');
-                mpPlayers.shift().join('testroom');
+                var roomName = Date.now(); //använder Date.now för att skapa ett 'unikt' namn för rummet.
+
+                mpPlayers.shift().join(roomName);
+                mpPlayers.shift().join(roomName);
                 
                 seed = mapSeedMaker('mp');
-                io.sockets.in('testroom').emit("map", {map: seed, gameMode: data.gameMode, room: 'testroom'} );
+                io.sockets.in(roomName).emit("map", {map: seed, gameMode: data.gameMode, room: roomName} );
                 
             }
-            
-        }
-        
+        }   
     });
+
+
+
+
     
     //skickar data till motståndare så att den kan uppdateras även där.
     socket.on("playerUpdate", function(data)
@@ -86,15 +87,29 @@ io.sockets.on('connection', function(socket){
         //data.y = y-position
         //data.direction = hållet spelaren kollar åt
         //data.isHitting = bool. Slår spelaren?
+        //data.jumpState = spelarens jumpstate
         //data.room = vilket spelrum spelaren är i
-        //data.isDead = bool. Är motspelaren död?
         
         //skicka data till motståndare
-        socket.broadcast.to(data.room).emit("opponent", data);
+        socket.broadcast.to(data.room).emit("opponent", {x:data.x, y: data.y, direction: data.direction, isHitting: data.isHitting, jumpState: data.jumpState});
     })
     
-    
-    
+    //En spelare har dött. motspelaren meddelas om att den har vunnit
+    socket.on("imDead", function(data)
+    {
+        socket.broadcast.to(data.room).emit("youWin");     
+    })
+
+    //man vinner om motspelaren lämnar rummet 
+    socket.on("disconnect", function()
+    {
+        var room = io.sockets.manager.roomClients[socket.id]; //ta reda på vilket rum spelaren är i.
+        socket.broadcast.to(room[0]).emit("youWin"); //skicka "youwin" till spelaren som är kvar i rummet.
+        
+        socket.leave(room[0]);
+
+    });
+
     socket.on("gameIsOn", function(data)
     {
         //ger varje monster ett unikt id för att undvika dupliceringar
@@ -117,7 +132,7 @@ io.sockets.on('connection', function(socket){
 
         var monsterArray = [];
 
-        //skickar ett monster 
+        //skickar nya monster
         setInterval(function()
         {
             
@@ -136,9 +151,7 @@ io.sockets.on('connection', function(socket){
 
             monsterNumber++;
         },4000);
-
-
-    })   
+    })  
 
 });
 

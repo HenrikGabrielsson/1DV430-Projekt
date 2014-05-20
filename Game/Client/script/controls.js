@@ -54,7 +54,7 @@ function playerAction(keys, player, cd)
         //slag
         if(keys[16] && player.hitState === 0) //Shift
         {
-            cd.hitting();
+            cd.hitting(player);
             player.hitState = 30;   
         }
           

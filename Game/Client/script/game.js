@@ -70,6 +70,8 @@ Game.prototype.gameInit = function()
     var mapPieces = 0;
     var monsterNumber = 0;
 
+    var won;
+
     var waitingMonsters = [];
     
     //Spel-loopen
@@ -89,16 +91,51 @@ Game.prototype.gameInit = function()
         cd.detectMonsterWallCollision();
         cd.detectMonsterCollision();
 
-        console.log("loop" + gameMode);
-
         //rita bana och karaktär på nytt
         renderer(map,player,monsters, frameCounter, gameMode, opponent);
 
         if(gameMode === "sp") //vid sp så vinner man när man når toppen
         {
-            var won = (playerRow === 3 && (map.mapArray[playerRow+1][playerColL] > 0 || map.mapArray[playerRow+1][playerColR] > 0 ));
+            won = (playerRow === 3 && (map.mapArray[playerRow+1][playerColL] > 0 || map.mapArray[playerRow+1][playerColR] > 0 ));
         }
 
+
+        //med jämna mellanrum tar spelet emot mer av banan från servern.
+        if(gameMode === "mp" )
+        {
+            socket.on("moreMap", function(data){
+                if(mapPieces === data.count)
+                {
+                    map.addMoreMap(data.map, player, monsters);
+                    mapPieces++;
+                }
+            })
+
+            //Servern meddelar att man vinner om motspelaren är död
+            socket.on("youWin", function()
+            {
+                won = true;
+            })
+            
+            //Skickar data om spelaren till servern så att detta kan delas med motståndaren.
+            socket.emit("playerUpdate", {x:player.posX, y:player.posY, direction: player.direction, isHitting: player.hitState == 30, jumpState: player.jumpState,room: room});
+        }
+        
+
+        //uppdatera motståndare
+        socket.on("opponent", function(data)
+        {
+            opponent.posX = data.x;
+            opponent.posY = data.y;
+            opponent.direction = data.direction;    
+            opponent.jumpState = data.jumpState;
+            
+            if(data.isHitting)
+            {
+                cd.hitting(opponent);
+            }  
+               
+        })
 
         //nya monster spawnar
         socket.on("monsters", function(data)
@@ -112,48 +149,31 @@ Game.prototype.gameInit = function()
         });                
 
 
-        //med jämna mellanrum tar spelet emot mer av banan från servern.
-        if(gameMode === "mp" )
-        {
-            socket.on("moreMap", function(data){
-                if(mapPieces === data.count)
-                {
-                    map.addMoreMap(data.map, player, monsters);
-                    mapPieces++;
-                }
-            })
-            
-            //Skickar data om spelaren till servern så att detta kan delas med motståndaren.
-            socket.emit("playerUpdate", {x:player.posX, y:player.posY, direction: player.direction, isHitting: player.hitState == 30, isDead:player.isDead, room: room});
-        }
-        
-        //uppdatera motståndare
-        socket.on("opponent", function(data)
-        {
-            opponent.posX = data.x;
-            opponent.posY = data.y;
-            opponent.direction = data.direction;
-            
-            
-            if(data.isDead)
-            {
-                winLoop(canvas.context);
-            }
-            
-        })
-        
-        
-
-     
         //spawnar 2 monster i sekunden
         if(frameCounter % 30 === 0 && waitingMonsters.length > 0 )
         {
-            spawnMonster(waitingMonsters.shift(), monsters, map, player.posY); //det första monstret i arrayen tas bort därifrån och spawnar.
+            if(gameMode === "sp")
+            {
+                spawnMonster(waitingMonsters.shift(), monsters, map, player.posY); //det första monstret i arrayen tas bort därifrån och spawnar.
+            }
+            else if(gameMode === "mp")
+            {
+                if(player.posY <= opponent.posY)
+                {
+                    spawnMonster(waitingMonsters.shift(), monsters, map, player.posY);
+                }
+                else if(opponent.posY < player.posY)
+                {
+                    spawnMonster(waitingMonsters.shift(), monsters, map, opponent.posY);
+                }
+            }
         }
+
 
         //spelloopen stängs av ifall spelaren dör
         if(player.isDead || won )
         {
+            
             clearInterval(gameLoop);
             
             //om man vinner
@@ -163,10 +183,16 @@ Game.prototype.gameInit = function()
             }
             else if(player.isDead)
             {
+                if(gameMode === "mp")
+                {
+                    socket.emit("imDead", {room: room});
+                }
+
                 deathLoop(canvas, context)
             }
         }
 
+        
         frameCounter++;
     }, frameTime);
 
