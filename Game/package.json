@@ -1,0 +1,14 @@
+{
+  "name": "caveclimber",
+  "version": "0.0.0",
+  "description": "a game",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "https://github.com/HenrikGabrielsson/1DV430-Projekt.git"
+  ],
+  "author": "henrik gabrielsson",
+  "license": "ISC"
+}

@@ -28,8 +28,7 @@ CollisionDetector.prototype.checkForYCollision = function(jump)
 
     if(jump && (this.map.mapArray[playerRow+1][playerColL] > 0 || this.map.mapArray[playerRow+1][playerColR] > 0 ) && this.player.jumpState === 0)
     {
-        
-        this.player.direction = 2;         
+              
         this.player.jumpState = this.player.height * 0.9; 
 
         this.player.posY -= this.player.jumpState;
@@ -37,7 +36,6 @@ CollisionDetector.prototype.checkForYCollision = function(jump)
     }
     else if(this.player.jumpState > 0)
     {
-        this.player.direction = 2;   
         this.player.posY -= this.player.jumpState;
         this.player.jumpState --;
     }
@@ -242,8 +240,16 @@ CollisionDetector.prototype.hitting = function(player)
     var playerColR = Math.floor((player.posX+player.width) / map.tileSize);    
 
     var monsterIndex = 0;
-    
-    if(player.direction === 0) //slag åt höger
+
+    if(player.jumpState > 0)//slag upp
+    {
+        Math.floor((player.posX + player.width/2) / map.tileSize);
+
+        map.mapArray[Math.floor((player.posY - player.reach) / map.tileSize)][Math.floor((player.posX + player.width/2) / map.tileSize)] = changeBlock(map.mapArray[Math.floor((player.posY - player.reach) / map.tileSize)][Math.floor((player.posX + player.width/2) / map.tileSize)]);
+
+    }     
+       
+    else if(player.direction === 0) //slag åt höger
     {
 
         if(player.isOpponent && this.player.posY >= player.posY && this.player.posY <= player.posY+player.height && this.player.posX >= player.posX && this.player.posX <= player.posX + player.width + player.reach)
@@ -287,12 +293,5 @@ CollisionDetector.prototype.hitting = function(player)
         })
         map.mapArray[playerRow][Math.floor((player.posX - player.reach) / map.tileSize)] = changeBlock(map.mapArray[playerRow][Math.floor((player.posX - player.reach) / map.tileSize)]);
     }
-    
-    else if(player.jumpState > 0)//slag upp
-    {
-        Math.floor((player.posX + player.width/2) / map.tileSize);
-
-        map.mapArray[Math.floor((player.posY - player.reach) / map.tileSize)][Math.floor((player.posX + player.width/2) / map.tileSize)] = changeBlock(map.mapArray[Math.floor((player.posY - player.reach) / map.tileSize)][Math.floor((player.posX + player.width/2) / map.tileSize)]);
-
-    }    
+   
 }

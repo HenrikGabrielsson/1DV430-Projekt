@@ -28,25 +28,22 @@ function playerAction(keys, player, cd)
        
         //hopp och kolla vertikala kollisioner 
         cd.checkForYCollision(keys[87]);
-
-        console.log(player.direction);
-
-
-
-        //horisontell rörelse      
-        if(!keys[65] && !keys[68])
-        {
-            player.direction = 2;
-        }
         
-        else if(keys[65])//A
-        {        
+        if(!keys[65] && !keys[68]) //karaktären står still
+        {
+            player.standingStill = true;
+        }
+
+        if(keys[65])//A
+        {    
+            player.standingStill = false;        
             player.direction = 1;
             cd.checkForXCollision();
         }
 
         else if(keys[68])//D
         {
+            player.standingStill = false; 
             player.direction = 0;
             cd.checkForXCollision();
         }

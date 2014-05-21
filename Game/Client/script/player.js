@@ -41,6 +41,8 @@ function Player(posX, posY, isOpponent)
     this.playerSprite.src = "pics/playerSprite.png";
     this.currentSprite = 0;
 
+    this.standingStill = true;
+
     
 }
 
@@ -68,7 +70,18 @@ Player.prototype.renderPlayer = function(context, canvasTop, canvasCenter, canva
         canvasPosX = canvasCenter - this.width/2; 
     }
     
-    if(this.direction === 0)
+
+    if((this.jumpState > 0 || this.standingStill) && this.direction === 1)
+    {
+        context.drawImage(this.playerSprite, this.width * 4, 0, this.width, this.height, canvasPosX, this.posY - canvasTop, 22, 40);        
+    }
+
+    else if((this.jumpState > 0 || this.standingStill) && this.direction === 0)
+    {
+        context.drawImage(this.playerSprite, 0, 0, this.width, this.height, canvasPosX, this.posY - canvasTop, 22, 40);
+    }
+
+    else if(this.direction === 0)
     {
         context.drawImage(this.playerSprite, this.width * this.currentSprite, 0, this.width, this.height, canvasPosX, this.posY - canvasTop, 22, 40);
 
@@ -90,11 +103,7 @@ Player.prototype.renderPlayer = function(context, canvasTop, canvasCenter, canva
             this.currentSprite = 0;
         }
     }
-    else if(this.direction === 2)
-    {
-        this.currentSprite = 0;
-        context.drawImage(this.playerSprite, this.width * this.currentSprite, 0, this.width, this.height, canvasPosX, this.posY - canvasTop, 22, 40);
-    }
+
 
     return "test";
 };
