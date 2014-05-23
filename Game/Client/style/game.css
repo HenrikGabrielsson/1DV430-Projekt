@@ -1,0 +1,36 @@
+#header
+{
+    height:200px;
+    background-image:url('headerbg.jpg')
+}
+
+#logo
+{
+    display:block;
+    margin:auto;
+}
+
+#content
+{
+    background-image:url('dirt.jpg');
+    margin:auto;
+}
+
+#gamecanvas
+{
+
+    display:block;
+    margin:auto;
+
+    background-image:url('../pics/cave.jpg');
+    width:900px;
+    height:600px;
+}
+
+h1
+{
+    display:none;
+}
+
+
+
