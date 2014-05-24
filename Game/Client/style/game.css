@@ -1,0 +1,49 @@
+#header
+{
+    height:200px;
+    background-image:url('headerbg.jpg')
+}
+
+#logo
+{
+    display:block;
+    margin:auto;
+}
+
+#content
+{
+    background-image:url('dirt.jpg');
+    margin:auto;
+}
+
+.gamecanvas
+{
+    display:block;
+    background-image:url('../pics/cave.jpg');
+}
+
+#canvasDiv 
+{ 
+    width:900px;
+    display:block;
+    margin:auto;
+}
+
+h1
+{
+    display:none;
+}
+
+#instructions
+{
+    margin:auto;
+    width:900px;
+
+    background-color:rgba(255,255,255,0.3);
+
+    font-family:Consolas;
+    color:white;
+}
+
+
+
