@@ -8,7 +8,7 @@ var init = function(){
     
     var socket = io.connect();
 
-    var canvas = document.getElementById("gamecanvas");
+    var canvas = document.getElementsByClassName("gamecanvas")[0];
     var context = canvas.getContext("2d");
 
     canvas.height = 600;
