@@ -46,9 +46,8 @@ function gameMenu(canvas, context, socket)
     var button = document.createElement("img");
     
     //singleplayer-knappen
-    //context.fillStyle = "#DDDDDD";
-    //context.fillRect(canvas.width/2 - buttonWidth/2 , canvas.height/2 - buttonHeight/2, buttonWidth, buttonHeight);
-    context.drawImage(button)
+    context.fillStyle = "#DDDDDD";
+    context.fillRect(canvas.width/2 - buttonWidth/2 , canvas.height/2 - buttonHeight/2, buttonWidth, buttonHeight);
 
 
     context.fillStyle = "black";
