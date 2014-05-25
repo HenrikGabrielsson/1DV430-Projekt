@@ -11,7 +11,7 @@ function Player(posX, posY, isOpponent)
     this.posX = posX;
     this.posY = posY;
 
-    this.reach = 60; //så här långt kan spelaren slå.
+    this.reach = 17; //så här långt kan spelaren slå.
 
     //en motståndare i ett mp-omgång över nätet.
     this.isOpponent = isOpponent;

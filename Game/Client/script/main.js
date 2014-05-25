@@ -8,7 +8,7 @@ var init = function(){
     
     var socket = io.connect();
 
-    var canvas = document.getElementsByClassName("gamecanvas")[0];
+    var canvas = document.getElementById("gamecanvas");
     var context = canvas.getContext("2d");
 
     canvas.height = 600;
@@ -42,10 +42,14 @@ function gameMenu(canvas, context, socket)
     var gap = 100;
     
     var mainmenu = true;
- 
+
+    var button = document.createElement("img");
+    
     //singleplayer-knappen
-    context.fillStyle = "#DDDDDD";
-    context.fillRect(canvas.width/2 - buttonWidth/2 , canvas.height/2 - buttonHeight/2, buttonWidth, buttonHeight);
+    //context.fillStyle = "#DDDDDD";
+    //context.fillRect(canvas.width/2 - buttonWidth/2 , canvas.height/2 - buttonHeight/2, buttonWidth, buttonHeight);
+    context.drawImage(button)
+
 
     context.fillStyle = "black";
     context.font = fontSize+"px Arial";

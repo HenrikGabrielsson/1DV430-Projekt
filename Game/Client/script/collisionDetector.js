@@ -249,6 +249,7 @@ CollisionDetector.prototype.hitting = function(hitter, target)
        
     else if(hitter.direction === 0) //slag åt höger
     {
+        //andra spelare om det är multiplayer
         if(target !== undefined && target.posY >= hitter.posY && target.posY <= hitter.posY+hitter.height && target.posX >= hitter.posX && target.posX <= hitter.posX + hitter.width + hitter.reach)
         {
             target.isDead = true;

@@ -6,7 +6,7 @@ app.listen(process.env.PORT); //lyssna genom denna port.
 
 
 //Game/Client är mappen där alla publika filer ligger
-var fileServer = new ns.Server('./Game/Client', {cache: 10}); 
+var fileServer = new ns.Server('Game/Client', {cache: 10}); 
 
 
 /**

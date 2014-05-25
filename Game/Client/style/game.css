@@ -18,7 +18,6 @@
 
 .gamecanvas
 {
-    display:block;
     background-image:url('../pics/cave.jpg');
 }
 
@@ -36,6 +35,8 @@ h1
 
 #instructions
 {
+    clear:both;
+
     margin:auto;
     width:900px;
 

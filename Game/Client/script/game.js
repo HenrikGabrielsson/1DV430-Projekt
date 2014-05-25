@@ -12,6 +12,7 @@ function Game(data,canvas,context)
     this.canvas = canvas;
     this.context = context;
 
+
     //en canvas till skapas och de får dela platsen vid splitscreen
     if(this.gameMode === "mp2")
     {
@@ -25,6 +26,7 @@ function Game(data,canvas,context)
         this.canvas2.width = this.canvas.width;
         this.canvas2.height = this.canvas.height;
         this.canvas2.style.float = "right";
+        this.canvas2.style.backgroundImage = "url('pics/cave2.jpg')";
 
         canvasDiv.appendChild(this.canvas2);
 
