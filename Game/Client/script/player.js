@@ -71,32 +71,76 @@ Player.prototype.renderPlayer = function(context, canvasTop, canvasCenter, canva
     }
     
 
+    //om spelare står still eller hoppar och kollar åt vänster
     if((this.jumpState > 0 || this.standingStill) && this.direction === 1)
     {
-        context.drawImage(this.playerSprite, this.width * 4, 0, this.width, this.height, canvasPosX, this.posY - canvasTop, 22, 40);        
+
+            if(Math.floor(this.hitState / 10) && this.jumpState > 0)//spelaren slår och hoppar
+            {
+                context.drawImage(this.playerSprite, this.width*8 + (this.width + this.reach) * 6 + this.width, 0, this.width, this.height + this.reach,   canvasPosX, this.posY - canvasTop - this.reach, this.width, this.height + this.reach );
+            }
+            else if (Math.floor(this.hitState / 10) && this.standingStill) //spelare slår och står still
+            {
+                context.drawImage(this.playerSprite, this.width*8 + (this.width + this.reach) * 3 + (Math.floor(this.hitState / 10)-1)*(this.width+this.reach), 0, this.width+this.reach, this.height,   canvasPosX - this.reach, this.posY - canvasTop, this.width+this.reach, this.height );
+            }
+            else
+            {
+                context.drawImage(this.playerSprite, this.width * 4, 0, this.width, this.height, canvasPosX, this.posY - canvasTop, this.width, this.height);      
+            }
+
+          
     }
 
+    //om spelare står still eller hoppar och kollar åt höger
     else if((this.jumpState > 0 || this.standingStill) && this.direction === 0)
     {
-        context.drawImage(this.playerSprite, 0, 0, this.width, this.height, canvasPosX, this.posY - canvasTop, 22, 40);
+            if(Math.floor(this.hitState / 10) && this.jumpState > 0)//spelaren slår och hoppar
+            {
+                context.drawImage(this.playerSprite, this.width*8 + (this.width + this.reach) * 6, 0, this.width, this.height + this.reach,   canvasPosX, this.posY - canvasTop - this.reach, this.width, this.height + this.reach );
+            }
+            else if (Math.floor(this.hitState / 10)) //spelare slår
+            {
+                context.drawImage(this.playerSprite, this.width*8 + (Math.floor(this.hitState / 10)-1)*(this.width+this.reach), 0, this.width+this.reach, this.height,   canvasPosX, this.posY - canvasTop, this.width+this.reach, this.height );
+            }
+            else
+            {
+                context.drawImage(this.playerSprite, 0, 0, this.width, this.height, canvasPosX, this.posY - canvasTop, 22, 40);
+            }
     }
 
+    //om spelare går åt höger
     else if(this.direction === 0)
     {
-        context.drawImage(this.playerSprite, this.width * this.currentSprite, 0, this.width, this.height, canvasPosX, this.posY - canvasTop, 22, 40);
-
-        this.currentSprite++;
+        if (Math.floor(this.hitState / 10)) //spelare slår
+        {
+            context.drawImage(this.playerSprite, this.width*8 + (Math.floor(this.hitState / 10)-1)*(this.width+this.reach), 0, this.width+this.reach, this.height,   canvasPosX, this.posY - canvasTop, this.width+this.reach, this.height );
+        }
+        else
+        {
+            context.drawImage(this.playerSprite, this.width * this.currentSprite, 0, this.width, this.height, canvasPosX, this.posY - canvasTop, this.width, this.height);
+            this.currentSprite++;
+        }
 
         if(this.currentSprite > 3)
         {
             this.currentSprite = 0;
         }
     }
+
+    //om spelare går åt vänster
     else if(this.direction === 1)
     {
-        context.drawImage(this.playerSprite, this.width * this.currentSprite + this.width * 4, 0, this.width, this.height, canvasPosX, this.posY - canvasTop, 22, 40);
+        if (Math.floor(this.hitState / 10)) //spelare slår
+        {
+            context.drawImage(this.playerSprite, this.width*8 + (this.width + this.reach) * 3 + (Math.floor(this.hitState / 10)-1)*(this.width+this.reach), 0, this.width+this.reach, this.height,   canvasPosX - this.reach, this.posY - canvasTop, this.width+this.reach, this.height );
+        }
 
-        this.currentSprite++;
+        else
+        {
+            context.drawImage(this.playerSprite, this.width * this.currentSprite + this.width * 4, 0, this.width, this.height, canvasPosX, this.posY - canvasTop, this.width, this.height);
+            this.currentSprite++;
+        }
+
 
         if(this.currentSprite > 3)
         {

@@ -26,7 +26,7 @@ function Monster(type,floor,direction,map)
     
     this.posY = this.floor * 64; //this.floor * map.tileSize men det fungerar inte just h�r. anledning: javascript
     
-    if(this.type !== 2) //startposition, inte f�r fallande stenar 
+    if(this.type !== 2) //startposition, inte för fallande stenar 
     {
         //positionering
         this.posX;
