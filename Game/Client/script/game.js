@@ -454,23 +454,29 @@ Game.prototype.renderer = function(map, player, monsters, frameCounter, gameMode
  * @param   canvas  canvas-elementet
  * @param   context canvas-elementets context
  */
-//funktion som körs när man dör
-
-
-//för att ladda dessa bilder innan det är dags att visa dom(annars visas de inte för javascript är så bra)
-var deathImage = new Image();
-deathImage.src ="pics/death.png";
-deathImage.width = 200;
-deathImage.height = 150;
-
-var winImage = new Image();
-winImage.src = "pics/youWin.png";
-winImage.width = 200;
-winImage.height = 200;
-
 Game.prototype.deathLoop = function(canvas,context)
 {
-    context.drawImage(deathImage, 0,0, deathImage.width, deathImage.height, canvas.width/2 - deathImage.width/2, canvas.height/2 - deathImage.height/2, deathImage.width, deathImage.height);
+    var deathImage = new Image(200,150);
+    deathImage.src ="pics/death.png";
+
+    var opacity = 0.01;
+
+    //när bilden har laddats färdigt
+    deathImage.addEventListener("load", function()
+    {  
+        setInterval(function()
+        {
+            
+            if(opacity < 100)
+            {
+                context.globalAlpha = opacity;
+                context.drawImage(deathImage, 0,0, deathImage.width, deathImage.height, canvas.width/2 - deathImage.width/2, canvas.height/2 - deathImage.height/2, deathImage.width, deathImage.height);
+            }
+
+            opacity = opacity + 0.01;
+            
+        },30);
+    }, false);
 }
 
 
@@ -484,5 +490,25 @@ Game.prototype.deathLoop = function(canvas,context)
  */
 Game.prototype.winLoop = function(canvas,context)
 {
-    context.drawImage(winImage, 0,0, winImage.width, winImage.height, canvas.width/2 - winImage.width/2, canvas.height/2 - winImage.height/2, winImage.width, winImage.height);
+    var winImage = new Image(177,176);
+    winImage.src ="pics/youWin.png";
+
+    var opacity = 0.01;
+
+    //när bilden har laddats färdigt
+    winImage.addEventListener("load", function()
+    {  
+        setInterval(function()
+        {
+            
+            if(opacity < 100)
+            {
+                context.globalAlpha = opacity;
+                context.drawImage(winImage, 0,0, winImage.width, winImage.height, canvas.width/2 - winImage.width/2, canvas.height/2 - winImage.height/2, winImage.width, winImage.height);
+            }
+
+            opacity = opacity + 0.01;
+            
+        },30);
+    }, false);
 }

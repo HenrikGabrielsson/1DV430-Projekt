@@ -115,6 +115,13 @@ function gameMenu(canvas, context, socket)
             {
                 canvas.removeEventListener("click",menuFunction,false);
 
+                //meddelar användaren att spelet laddar.
+                context.clearRect(0, 0, canvas.width, canvas.height);
+
+                context.fillStyle = "white";
+                context.font = fontSize+"px Arial";
+                context.fillText("Looking for other players. Please wait...", canvas.width/2  , canvas.height/2 + fontSize/2);
+
                 socket.emit('startGame', {gameMode:"mp1"}); //eftefråga multi-player-bana
             }
 
