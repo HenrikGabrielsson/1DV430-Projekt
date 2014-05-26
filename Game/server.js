@@ -52,7 +52,7 @@ io.sockets.on('connection', function(socket){
         if(data.gameMode === 'sp' || data.gameMode === "mp2") //singleplayer
         {
             var seed = mapSeedMaker(data.gameMode);
-            socket.emit("map", {map: seed, gameMode: data.gameMode} );
+            socket.emit("map", {map: seed, gameMode: data.gameMode, playerNumber: 0} );
         }
         
         else if(data.gameMode === 'mp1') //multiplayer
@@ -66,17 +66,23 @@ io.sockets.on('connection', function(socket){
 
             //om det finns mer än 1 spelare som vill spela mp
             //så plockas de två första ut ur arrayen(first in, first out) 
-            //och läggs i ett eget 'room'. De får samma bana skickade till sig
+            //och läggs i ett eget 'room'. De får samma bana skickade till sig men varsitt "spelarnummer"
             if(mpPlayers.length > 1)
             {
                 var roomName = Date.now(); //använder Date.now för att skapa ett 'unikt' namn för rummet.
 
-                mpPlayers.shift().join(roomName);
-                mpPlayers.shift().join(roomName);
+                var seed = mapSeedMaker(data.gameMode);
+
+                //skickar till spelare 1
+                var player = mpPlayers.shift();
+                player.join(roomName);
+                player.emit("map", {map: seed, gameMode: data.gameMode, room:roomName, playerNumber: 0});
                 
-                seed = mapSeedMaker(data.gameMode);
-                io.sockets.in(roomName).emit("map", {map: seed, gameMode: data.gameMode, room: roomName} );
-                
+                //skickar till spelare 2
+                player = mpPlayers.shift();
+                player.join(roomName);
+                player.emit("map", {map: seed, gameMode: data.gameMode, room:roomName, playerNumber: 1});
+     
             }
         }
 

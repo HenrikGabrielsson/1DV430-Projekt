@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Funktion som lyssnar efter de knappar som trycks in och returnerar en array med booleaner.
  * Om de är nedtryckta = True. Annars = False. 
  *
@@ -10,12 +10,13 @@ function listenToKeyboardInput()
 
     //trycker på tangent
     document.addEventListener('keydown', function(event) {
-
+        
         keys[event.keyCode] = true;
     });
     
     //släpper tangent
     document.addEventListener('keyup', function(event) {
+        
         keys[event.keyCode] = false;
     });
 

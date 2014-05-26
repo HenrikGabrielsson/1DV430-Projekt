@@ -22,7 +22,7 @@ var init = function(){
         //skapar ett spel-objekt
         var game = new Game(data,canvas,context);
 
-        game.gameInit();
+        game.gameInit(data.playerNumber);
     });
     
 };
@@ -43,30 +43,38 @@ function gameMenu(canvas, context, socket)
     
     var mainmenu = true;
 
-    var button = document.createElement("img");
+    var button = new Image();
+    button.src = "pics/button.jpg";
     
-    //singleplayer-knappen
-    context.fillStyle = "#DDDDDD";
-    context.fillRect(canvas.width/2 - buttonWidth/2 , canvas.height/2 - buttonHeight/2, buttonWidth, buttonHeight);
+    button.addEventListener("load", function()
+    {
+        context.fillStyle = "black";
+        context.textAlign = "center";
+        
+        //singleplayer-knappen
+        context.drawImage(button, 0,0,buttonWidth, buttonHeight, canvas.width/2 - buttonWidth/2 , canvas.height/2 - buttonHeight/2, buttonWidth, buttonHeight)  
+        
+        context.font = fontSize+"px Arial";
+        context.fillText("Singleplayer", canvas.width/2  , canvas.height/2+fontSize/2);
+        
+        
+        
+        
+        //multiplayer-knappen
+        context.drawImage(button, 0,0,buttonWidth, buttonHeight, canvas.width/2 - buttonWidth/2 , canvas.height/2 - buttonHeight/2 + gap+buttonHeight, buttonWidth, buttonHeight) 
+        
+        context.font = fontSize+"px Arial";
+        context.fillText("Multiplayer", canvas.width/2  , canvas.height/2 + gap + buttonHeight + fontSize/2);
+        
+    },false);
+    
 
-
-    context.fillStyle = "black";
-    context.font = fontSize+"px Arial";
-    context.textAlign = "center";
-    context.fillText("Singleplayer", canvas.width/2  , canvas.height/2+fontSize/2);
-    
-    
-    //multiplayer-knappen
-    context.fillStyle = "#DDDDDD";
-    context.fillRect(canvas.width/2 - buttonWidth/2 , canvas.height/2 - buttonHeight/2 + gap+buttonHeight, buttonWidth, buttonHeight);
-    
-    context.fillStyle = "black";
-    context.font = fontSize+"px Arial";
-    context.fillText("Multiplayer", canvas.width/2  , canvas.height/2 + gap + buttonHeight + fontSize/2);
-    
+   
     //funktion som körs när användaren interagerar med spelmenyn
     function menuFunction(e)
         {
+            
+            //spara
             var mouseX = e.x - canvas.offsetLeft;
             var mouseY = e.y - canvas.offsetTop;
             
@@ -86,20 +94,18 @@ function gameMenu(canvas, context, socket)
                 context.clearRect(0,0,canvas.width,canvas.height);
                 
                 //multiplayer online
-                context.fillStyle = "#DDDDDD";
-                context.fillRect(canvas.width/2 - buttonWidth/2 , canvas.height/2 - buttonHeight/2, buttonWidth, buttonHeight);
+                context.drawImage(button, 0,0,buttonWidth, buttonHeight, canvas.width/2 - buttonWidth/2 , canvas.height/2 - buttonHeight/2, buttonWidth, buttonHeight)  
                 
-                context.fillStyle = "black";
                 context.font = fontSize+"px Arial";
-                context.textAlign = "center";
                 context.fillText("Play with stranger", canvas.width/2  , canvas.height/2+fontSize/2);
                 
                 
-                //multiplayer knappen
-                context.fillStyle = "#DDDDDD";
-                context.fillRect(canvas.width/2 - buttonWidth/2 , canvas.height/2 - buttonHeight/2 + gap+buttonHeight, buttonWidth, buttonHeight);
                 
-                context.fillStyle = "black";
+                
+                
+                //multiplayer knappen
+                context.drawImage(button, 0,0,buttonWidth, buttonHeight, canvas.width/2 - buttonWidth/2 , canvas.height/2 - buttonHeight/2 + gap+buttonHeight, buttonWidth, buttonHeight) 
+                
                 context.font = fontSize+"px Arial";
                 context.fillText("Play with friend(Share keyboard)", canvas.width/2  , canvas.height/2 + gap + buttonHeight + fontSize/2);
                 

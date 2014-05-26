@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Konstruktor för Game-objektet
  * 
  * @param   data    Innehåller seed till banan som ska skapas
@@ -16,11 +16,13 @@ function Game(data,canvas,context)
     //en canvas till skapas och de får dela platsen vid splitscreen
     if(this.gameMode === "mp2")
     {
+        //halverar storleken på canvasen
         this.canvas.width = this.canvas.width/2 - 1;
         this.canvas.style.float = "left";
 
         var canvasDiv = document.getElementById("canvasDiv");
 
+        //kopierar den gamla canvasen
         this.canvas2 = document.createElement("canvas");
         this.canvas2.setAttribute("class", "gamecanvas");
         this.canvas2.width = this.canvas.width;
@@ -50,7 +52,7 @@ function Game(data,canvas,context)
  * 
  */
 //Startar spelet
-Game.prototype.gameInit = function()
+Game.prototype.gameInit = function(playerNumber)
 {
 
     var gameMode = this.gameMode;
@@ -74,17 +76,30 @@ Game.prototype.gameInit = function()
     var winLoop = this.winLoop;
     
     //skapa spelare och ange startposition
-    var player = new Player(map.tileSize * 5,(map.rows-2) * map.tileSize, false);
+    var player = new Player(map , playerNumber );
 
     //här skapas eventuella motspelare.
     if(gameMode === "mp1")
     {
+        
+        //motspelaren ska vara det spelarnummer som man själv inte är...
+        if(playerNumber === 1)
+        {
+            var thisPlayerNumber = 0;
+        }
+        else if(playerNumber === 0)
+        {
+            var thisPlayerNumber = 1;
+        }
+        
         var room = this.room;
-        var opponent = new Player(map.tileSize * 5,(map.rows-2) * map.tileSize, true);
+        var opponent = new Player(map, thisPlayerNumber);
     }
     if(gameMode === "mp2")
     {
-        var opponent = new Player(map.tileSize * 5,(map.rows-2) * map.tileSize, true);
+        
+        //i splitscreen så är motspelaren alltid spelare 2 (1) och får sin egen canvas
+        var opponent = new Player(map, 1);
         var canvas2 = this.canvas2;
         var context2 = this.context2;
 
@@ -198,23 +213,7 @@ Game.prototype.gameInit = function()
         //spawnar 1 monster i sekunden när det finns monster.
         if(waitingMonsters.length > 0 && waitingMonsters[0].monsterSpawnTime === frameCounter)
         {
-            if(gameMode === "sp")
-            {
-                spawnMonster(waitingMonsters.shift(), monsters, map, player.posY); //det första monstret i arrayen tas bort därifrån och spawnar.
-            }
-            else if(gameMode === "mp1" || gameMode === "mp2")
-            {
-
-                //monstret spawnar i relation till den första spelarens position
-                if(player.posY <= opponent.posY)
-                {
-                    spawnMonster(waitingMonsters.shift(), monsters, map, player.posY);
-                }
-                else if(opponent.posY < player.posY)
-                {
-                    spawnMonster(waitingMonsters.shift(), monsters, map, opponent.posY);
-                }
-            }
+            spawnMonster(waitingMonsters.shift(), monsters, map, frameCounter); //det första monstret i arrayen tas bort därifrån och spawnar.
         }
 
 
@@ -283,10 +282,11 @@ Game.prototype.gameInit = function()
  * @param   map         kartan som används i denna game-instance
  */
 
-Game.prototype.spawnMonster = function(monster, monsters, map, playerY)
+Game.prototype.spawnMonster = function(monster, monsters, map, frameCounter)
 {
     //bestämmer vilken våning som monstren ska spawnas på. För bats och trolls
-    var monsterFloor = Math.floor((playerY - (monster.monsterFloor/4) * map.tileSize) / map.tileSize);
+    //var monsterFloor = Math.floor((playerY - (monster.monsterFloor/4) * map.tileSize) / map.tileSize);
+    var monsterFloor = Math.floor(map.rows - (frameCounter / map.tileSize + monster.monsterFloor/2));
 
     //skapar ett nytt monster
     if(monster.monsterType === 0)

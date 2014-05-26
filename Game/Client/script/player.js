@@ -4,17 +4,24 @@
  * @param   posX    horisontell position
  * @param   posY    vertikal position
  */
-function Player(posX, posY, isOpponent)
+function Player(map, playerNumber)
 {
-
-    //position
-    this.posX = posX;
-    this.posY = posY;
-
+    
+    if(playerNumber === 0)
+    {
+        this.posX = map.tileSize * 5;
+    }
+    else if(playerNumber === 1)
+    {
+        this.posX = (map.rows * map.tileSize) - 5 * map.tileSize;  
+    }
+    
+    this.posY = (map.rows-2) * map.tileSize,
+    
     this.reach = 17; //så här långt kan spelaren slå.
 
     //en motståndare i ett mp-omgång över nätet.
-    this.isOpponent = isOpponent;
+    this.playerNumber = playerNumber;
     
     this.direction = 0;
     //0 = vänster-höger
@@ -77,15 +84,15 @@ Player.prototype.renderPlayer = function(context, canvasTop, canvasCenter, canva
 
             if(Math.floor(this.hitState / 10) && this.jumpState > 0)//spelaren slår och hoppar
             {
-                context.drawImage(this.playerSprite, this.width*8 + (this.width + this.reach) * 6 + this.width, 0, this.width, this.height + this.reach,   canvasPosX, this.posY - canvasTop - this.reach, this.width, this.height + this.reach );
+                context.drawImage(this.playerSprite, this.width*8 + (this.width + this.reach) * 6 + this.width, (this.height+this.reach)*this.playerNumber , this.width, this.height + this.reach,   canvasPosX, this.posY - canvasTop - this.reach, this.width, this.height + this.reach );
             }
             else if (Math.floor(this.hitState / 10) && this.standingStill) //spelare slår och står still
             {
-                context.drawImage(this.playerSprite, this.width*8 + (this.width + this.reach) * 3 + (Math.floor(this.hitState / 10)-1)*(this.width+this.reach), 0, this.width+this.reach, this.height,   canvasPosX - this.reach, this.posY - canvasTop, this.width+this.reach, this.height );
+                context.drawImage(this.playerSprite, this.width*8 + (this.width + this.reach) * 3 + (Math.floor(this.hitState / 10)-1)*(this.width+this.reach), (this.height+this.reach)*this.playerNumber, this.width+this.reach, this.height,   canvasPosX - this.reach, this.posY - canvasTop, this.width+this.reach, this.height );
             }
             else
             {
-                context.drawImage(this.playerSprite, this.width * 4, 0, this.width, this.height, canvasPosX, this.posY - canvasTop, this.width, this.height);      
+                context.drawImage(this.playerSprite, this.width * 4, (this.height+this.reach)*this.playerNumber, this.width, this.height, canvasPosX, this.posY - canvasTop, this.width, this.height);      
             }
 
           
@@ -96,15 +103,15 @@ Player.prototype.renderPlayer = function(context, canvasTop, canvasCenter, canva
     {
             if(Math.floor(this.hitState / 10) && this.jumpState > 0)//spelaren slår och hoppar
             {
-                context.drawImage(this.playerSprite, this.width*8 + (this.width + this.reach) * 6, 0, this.width, this.height + this.reach,   canvasPosX, this.posY - canvasTop - this.reach, this.width, this.height + this.reach );
+                context.drawImage(this.playerSprite, this.width*8 + (this.width + this.reach) * 6, (this.height+this.reach)*this.playerNumber, this.width, this.height + this.reach,   canvasPosX, this.posY - canvasTop - this.reach, this.width, this.height + this.reach );
             }
             else if (Math.floor(this.hitState / 10)) //spelare slår
             {
-                context.drawImage(this.playerSprite, this.width*8 + (Math.floor(this.hitState / 10)-1)*(this.width+this.reach), 0, this.width+this.reach, this.height,   canvasPosX, this.posY - canvasTop, this.width+this.reach, this.height );
+                context.drawImage(this.playerSprite, this.width*8 + (Math.floor(this.hitState / 10)-1)*(this.width+this.reach), (this.height+this.reach)*this.playerNumber, this.width+this.reach, this.height,   canvasPosX, this.posY - canvasTop, this.width+this.reach, this.height );
             }
             else
             {
-                context.drawImage(this.playerSprite, 0, 0, this.width, this.height, canvasPosX, this.posY - canvasTop, 22, 40);
+                context.drawImage(this.playerSprite, 0, (this.height+this.reach)*this.playerNumber, this.width, this.height, canvasPosX, this.posY - canvasTop, 22, 40);
             }
     }
 
@@ -113,11 +120,11 @@ Player.prototype.renderPlayer = function(context, canvasTop, canvasCenter, canva
     {
         if (Math.floor(this.hitState / 10)) //spelare slår
         {
-            context.drawImage(this.playerSprite, this.width*8 + (Math.floor(this.hitState / 10)-1)*(this.width+this.reach), 0, this.width+this.reach, this.height,   canvasPosX, this.posY - canvasTop, this.width+this.reach, this.height );
+            context.drawImage(this.playerSprite, this.width*8 + (Math.floor(this.hitState / 10)-1)*(this.width+this.reach), (this.height+this.reach)*this.playerNumber, this.width+this.reach, this.height,   canvasPosX, this.posY - canvasTop, this.width+this.reach, this.height );
         }
         else
         {
-            context.drawImage(this.playerSprite, this.width * this.currentSprite, 0, this.width, this.height, canvasPosX, this.posY - canvasTop, this.width, this.height);
+            context.drawImage(this.playerSprite, this.width * this.currentSprite, (this.height+this.reach)*this.playerNumber, this.width, this.height, canvasPosX, this.posY - canvasTop, this.width, this.height);
             this.currentSprite++;
         }
 
@@ -132,12 +139,12 @@ Player.prototype.renderPlayer = function(context, canvasTop, canvasCenter, canva
     {
         if (Math.floor(this.hitState / 10)) //spelare slår
         {
-            context.drawImage(this.playerSprite, this.width*8 + (this.width + this.reach) * 3 + (Math.floor(this.hitState / 10)-1)*(this.width+this.reach), 0, this.width+this.reach, this.height,   canvasPosX - this.reach, this.posY - canvasTop, this.width+this.reach, this.height );
+            context.drawImage(this.playerSprite, this.width*8 + (this.width + this.reach) * 3 + (Math.floor(this.hitState / 10)-1)*(this.width+this.reach), (this.height+this.reach)*this.playerNumber, this.width+this.reach, this.height,   canvasPosX - this.reach, this.posY - canvasTop, this.width+this.reach, this.height );
         }
 
         else
         {
-            context.drawImage(this.playerSprite, this.width * this.currentSprite + this.width * 4, 0, this.width, this.height, canvasPosX, this.posY - canvasTop, this.width, this.height);
+            context.drawImage(this.playerSprite, this.width * this.currentSprite + this.width * 4, (this.height+this.reach)*this.playerNumber, this.width, this.height, canvasPosX, this.posY - canvasTop, this.width, this.height);
             this.currentSprite++;
         }
 
@@ -148,7 +155,5 @@ Player.prototype.renderPlayer = function(context, canvasTop, canvasCenter, canva
         }
     }
 
-
-    return "test";
 };
 
