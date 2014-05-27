@@ -6,7 +6,7 @@ app.listen(process.env.PORT); //lyssna genom denna port.
 
 
 //Game/Client är mappen där alla publika filer ligger
-var fileServer = new ns.Server('Game/Client', {cache: 10}); 
+var fileServer = new ns.Server('./Game/Client', {cache: 10}); 
 
 
 /**
@@ -226,42 +226,36 @@ function mapSeedMaker (gameMode) {
     for (var i = 0; i < seedLength; i++) 
     {
         //ett nummber (0-9) bestämmer en tiletype. 
-        if(i != 356)
+        tileType = Math.floor(Math.random() * 10); 
+            
+        while(tileType === 8 && seed[i-1] == 8) //aldrig mer än en vägg efter varandra
         {
             tileType = Math.floor(Math.random() * 10); 
-            
-            while(tileType === 8 && seed[i-1] == 8) //aldrig mer än en vägg efter varandra
-            {
-                tileType = Math.floor(Math.random() * 10); 
-            }
-            seed[i] = tileType;
-            
-            if(tileType >= 1 && tileType <= 5) //En vanlig tvåslagsruta skapas i kluster om 1-3;
-            {
-                amount = Math.floor(Math.random() * 3 + 1); 
-            }
-            
-            else if(tileType >= 6 && tileType <= 7 || tileType === 9)//Enslagsrutor och oslagbara kommer ofta i par.
-            {
-                amount = Math.floor(Math.random() * 2 + 1); 
-            }
-            else //Tomma rutor och väggar = 1 gång
-            {
-                amount = 1;
-            }
-                    
-            //lägg till alla block i seedet.
-            for (var j = 1; j < amount; j++)
-            {
-                i++;
-                seed[i] = tileType;
-            }
-                
         }
-        else
+        seed[i] = tileType;
+            
+        if(tileType >= 1 && tileType <= 5) //En vanlig tvåslagsruta skapas i kluster om 1-3;
         {
-            seed[i] = tileType = 9; //Alltid en oförstörbara ruta ovanför startplatsen (för att undvika en vägg igenom spelaren)
+            amount = Math.floor(Math.random() * 3 + 1); 
         }
+            
+        else if(tileType >= 6 && tileType <= 7 || tileType === 9)//Enslagsrutor och oslagbara kommer ofta i par.
+        {
+            amount = Math.floor(Math.random() * 2 + 1); 
+        }
+        else //Tomma rutor och väggar = 1 gång
+        {
+            amount = 1;
+        }
+                    
+        //lägg till alla block i seedet.
+        for (var j = 1; j < amount; j++)
+        {
+            i++;
+            seed[i] = tileType;
+        }
+                
+
     }        
 
     return seed;

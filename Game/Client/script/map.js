@@ -71,6 +71,12 @@ Map.prototype.createMap = function(seed, startPlatform)
                     mapArray[i][j] = 10;
                 }
 
+                //en oförstörbar ruta ovanför spelarens startposition(för att inte väggar ska döda dem vid start)
+                else if(i === rows-4 && startPlatform && j === 5) 
+                {
+                    mapArray[i][j] = 9;
+                }
+
                 else if(i % 4 === 0 && ((j > cols/2 - ((i/4) + 2)) && (j < cols/2 + ((i/4) + 2))  )) //plattformar ska finnas på var 4:e rad. De ökar med 2 rutor varje gång.
                 {
                     //De översta våningarna ska alltid vara likadana och behöver inte använda seedet för att genereras .
@@ -152,8 +158,14 @@ Map.prototype.createMap = function(seed, startPlatform)
                     mapArray[i][j] = 10;
                 }
 
+                //en oförstörbar ruta ovanför spelarens startposition(för att inte väggar ska döda dem vid start)
+                else if(i === rows-5 && startPlatform && (j === 5 || j === cols-4))
+                {
+                    mapArray[i][j] = 9;
+                }
+
                 //Oförstörbara rutor under spelarens startposition. kan väljas bort
-                else if(i === rows-1 && startPlatform)
+                else if(i === rows-1 && startPlatform )
                 {
                     mapArray[i][j] = 10; 
                 }

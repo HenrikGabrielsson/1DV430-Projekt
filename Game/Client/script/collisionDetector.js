@@ -259,7 +259,7 @@ CollisionDetector.prototype.hitting = function(hitter, target)
         monsters.forEach(function(monster)
         {
             //kollar om något monster är inom räckhåll för att bli ihjälslagen
-            if(monster.posY >= hitter.posY && monster.posY <= hitter.posY+hitter.height && monster.posX >= hitter.posX && monster.posX <= hitter.posX + hitter.width + hitter.reach )
+            if((monster.posY >= hitter.posY || monster.posY + monster.height >= hitter.posY)&& (monster.posY <= hitter.posY+hitter.height || monster.posY + monster.height <= hitter.posY + hitter.height )  && monster.posX >= hitter.posX && monster.posX <= hitter.posX + hitter.width + hitter.reach )
             {
                 monsters.splice(monsterIndex,1); // tar bort monster från array
                 monster = null;
@@ -272,7 +272,7 @@ CollisionDetector.prototype.hitting = function(hitter, target)
     
     else if(hitter.direction === 1 ) //slag åt vänster
     {
-        if(target !== undefined && target.posY >= hitter.posY && target.posY <= hitter.posY+hitter.height && target.posX <= hitter.posX && target.posX >= hitter.posX - hitter.reach)
+        if(target !== undefined && target.posY >= hitter.posY && target.posY <= hitter.posY+hitter.height && target.posX+target.width <= hitter.posX && target.posX+target.width >= hitter.posX - hitter.reach)
         {
             target.isDead = true;
         }
@@ -281,7 +281,7 @@ CollisionDetector.prototype.hitting = function(hitter, target)
         monsters.forEach(function(monster)
         {
             //kollar om något monster är inom räckhåll för att bli ihjälslagen
-            if(monster.posY >= hitter.posY && monster.posY <= hitter.posY+hitter.height && monster.posX <= hitter.posX && monster.posX >= hitter.posX - hitter.reach )
+            if((monster.posY >= hitter.posY || monster.posY + monster.height >= hitter.posY)&& (monster.posY <= hitter.posY+hitter.height || monster.posY + monster.height <= hitter.posY + hitter.height ) && monster.posX + monster.width <= hitter.posX && monster.posX+monster.width >= hitter.posX - hitter.reach )
             {
                 monsters.splice(monsterIndex,1); // tar bort monster från array
                 monsters = null;

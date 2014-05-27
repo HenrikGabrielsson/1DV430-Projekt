@@ -12,12 +12,13 @@ function listenToKeyboardInput()
     document.addEventListener('keydown', function(event) {
         
         keys[event.keyCode] = true;
+        return false;
     });
     
     //släpper tangent
     document.addEventListener('keyup', function(event) {
-        
         keys[event.keyCode] = false;
+        return false;
     });
 
     return keys;

@@ -46,6 +46,7 @@ function gameMenu(canvas, context, socket)
     var button = new Image();
     button.src = "pics/button.jpg";
     
+    //när bilden har laddat klart så ritas den upp på canvasen
     button.addEventListener("load", function()
     {
         context.fillStyle = "black";
@@ -73,11 +74,13 @@ function gameMenu(canvas, context, socket)
     //funktion som körs när användaren interagerar med spelmenyn
     function menuFunction(e)
         {
-            
+            var canvasRectangle = canvas.getBoundingClientRect();
+
             //spara
-            var mouseX = e.x - canvas.offsetLeft;
-            var mouseY = e.y - canvas.offsetTop;
-            
+            var mouseX = e.x - canvasRectangle.left;
+            var mouseY = e.y - canvasRectangle.top;
+
+
             //singleplayer
             if(mainmenu && mouseX >= canvas.width/2 - buttonWidth/2 && mouseX <= canvas.width/2 + buttonWidth/2 && mouseY >= canvas.height/2 - buttonHeight/2 && mouseY <= canvas.height/2 + buttonHeight/2)
             {

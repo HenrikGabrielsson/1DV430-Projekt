@@ -129,8 +129,9 @@ Game.prototype.gameInit = function(playerNumber)
     {
               
         //anropar funktion som utför det spelaren ber om.
-        playerAction(keys, cd, 87, 65, 68, 16, player, opponent);
+        playerAction(keys, cd, 87, 65, 68, 69, player, opponent);
 
+        //kontroller för spelare 2
         if(gameMode === "mp2"){
             playerAction(keys, cd, 38, 37, 39, 45,opponent, player )
         }
@@ -317,13 +318,13 @@ Game.prototype.renderer = function(map, player, monsters, frameCounter, gameMode
 {
     //canvasen börjar inte flytta banan nedåt på 2 sekunder efter att spelet startat
     var currentPos;
-    if(frameCounter < 120)
+    if(frameCounter < 300)
     {
         currentPos = 0;
     }
     else 
     {
-        currentPos = frameCounter-120;
+        currentPos = frameCounter-300;
     }
 
     //Canvas hämtas    
@@ -511,4 +512,5 @@ Game.prototype.winLoop = function(canvas,context)
             
         },30);
     }, false);
+
 }
