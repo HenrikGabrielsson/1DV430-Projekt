@@ -45,6 +45,8 @@ var mpPlayers = [];
 //här bestäms det vad som ska göras när ett meddelande skickas från en klient
 io.sockets.on('connection', function(socket){
     
+    //behövs för annars skickas banor 5 biljarder gånger för socket.io är så duktigt
+    var gameNumber = 0;
 
     //en connection har valt ett spelläge och meddelar detta.
     socket.on('startGame', function(data){
@@ -52,7 +54,9 @@ io.sockets.on('connection', function(socket){
         if(data.gameMode === 'sp' || data.gameMode === "mp2") //singleplayer
         {
             var seed = mapSeedMaker(data.gameMode);
-            socket.emit("map", {map: seed, gameMode: data.gameMode, playerNumber: 0} );
+            socket.emit("map", {map: seed, gameMode: data.gameMode, playerNumber: 0, gameNumber: gameNumber} );
+
+            gameNumber++;
         }
         
         else if(data.gameMode === 'mp1') //multiplayer
@@ -76,12 +80,14 @@ io.sockets.on('connection', function(socket){
                 //skickar till spelare 1
                 var player = mpPlayers.shift();
                 player.join(roomName);
-                player.emit("map", {map: seed, gameMode: data.gameMode, room:roomName, playerNumber: 0});
+                player.emit("map", {map: seed, gameMode: data.gameMode, room:roomName, playerNumber: 0, gameNumber: gameNumber});
                 
                 //skickar till spelare 2
                 player = mpPlayers.shift();
                 player.join(roomName);
-                player.emit("map", {map: seed, gameMode: data.gameMode, room:roomName, playerNumber: 1});
+                player.emit("map", {map: seed, gameMode: data.gameMode, room:roomName, playerNumber: 1, gameNumber: gameNumber});
+
+                gameNumber++;
      
             }
         }
@@ -138,6 +144,8 @@ io.sockets.on('connection', function(socket){
 
         socket.on("gameOver", function()
         {
+
+
             clearInterval(monsterInterval);
             clearInterval(mapInterval);
         });

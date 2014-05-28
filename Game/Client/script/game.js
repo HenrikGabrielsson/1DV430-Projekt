@@ -72,8 +72,7 @@ Game.prototype.gameInit = function(playerNumber)
     
     var spawnMonster = this.spawnMonster;
     var renderer = this.renderer;
-    var deathLoop = this.deathLoop;
-    var winLoop = this.winLoop;
+    var endLoop = this.endLoop;
     
     //skapa spelare och ange startposition
     var player = new Player(map , playerNumber );
@@ -228,19 +227,22 @@ Game.prototype.gameInit = function(playerNumber)
             //om man vinner
             if(won)
             {
-                winLoop(canvas, context)
+                endLoop(canvas, context, true);
             }
+
+            //om man förlorar
             else if(player.isDead)
             {
                 if(gameMode === "mp1")
                 {
-                    socket.emit("imDead", {room: room});
+                    socket.emit("imDead", {room: room}); //meddela server om döden...
                 }
 
-                deathLoop(canvas, context)
+                endLoop(canvas, context, false)
             }
         }
 
+        //när nån dör i splitscreen vinner den andra spelaren
         if(gameMode === "mp2" && (player.isDead || opponent.isDead))
         {
             socket.emit("gameOver")
@@ -248,13 +250,13 @@ Game.prototype.gameInit = function(playerNumber)
 
             if(player.isDead)//om spelare 1 dog
             {
-                deathLoop(canvas,context);
-                winLoop(canvas2,context2);
+                endLoop(canvas,context, false);
+                endLoop(canvas2,context2, true);
             }
             else if(opponent.isDead) //om spelare 2 dog
             {
-                deathLoop(canvas2, context2);
-                winLoop(canvas, context);
+                endLoop(canvas2, context2, false);
+                endLoop(canvas, context, true);
             }
 
         }
@@ -318,13 +320,13 @@ Game.prototype.renderer = function(map, player, monsters, frameCounter, gameMode
 {
     //canvasen börjar inte flytta banan nedåt på 2 sekunder efter att spelet startat
     var currentPos;
-    if(frameCounter < 300)
+    if(frameCounter < 120)
     {
         currentPos = 0;
     }
     else 
     {
-        currentPos = frameCounter-300;
+        currentPos = frameCounter-120;
     }
 
     //Canvas hämtas    
@@ -449,68 +451,106 @@ Game.prototype.renderer = function(map, player, monsters, frameCounter, gameMode
 
 
 /**
- * Loop som körs för spelare som dör. Visar ett meddelande och skickar tillbaka 
+ * Loop som körs för spelare som dör eller vinner. Visar ett meddelande och skickar tillbaka 
  * spelaren till huvudmenyn.
  * 
  * @param   canvas  canvas-elementet
  * @param   context canvas-elementets context
+ * @param   won     bool. True om man vinner. False om man förlorar
  */
-Game.prototype.deathLoop = function(canvas,context)
+Game.prototype.endLoop = function(canvas,context, won)
 {
-    var deathImage = new Image(200,150);
-    deathImage.src ="pics/death.png";
 
+    var canvas2 = document.getElementsByClassName("gamecanvas")[1];
+
+    if(won)
+    {
+        var image = new Image(177,176);
+        image.src ="pics/youWin.png";
+    }
+
+    else
+    {
+        var image = new Image(200,150);
+        image.src ="pics/death.png";
+    }
     var opacity = 0.01;
 
     //när bilden har laddats färdigt
-    deathImage.addEventListener("load", function()
+    image.addEventListener("load", function()
     {  
-        setInterval(function()
+
+
+        var fadeInImage = setInterval(function()
         {
             
-            if(opacity < 100)
+            if(opacity < 1)
             {
                 context.globalAlpha = opacity;
-                context.drawImage(deathImage, 0,0, deathImage.width, deathImage.height, canvas.width/2 - deathImage.width/2, canvas.height/2 - deathImage.height/2, deathImage.width, deathImage.height);
+                context.drawImage(image, 0,0, image.width, image.height, canvas.width/2 - image.width/2, canvas.height/2 - image.height/2, image.width, image.height);
+                opacity = opacity + 0.01;
             }
 
-            opacity = opacity + 0.01;
+            //full opacitet: loopen avslutas och restart visas
+            else
+            {
+                clearInterval(fadeInImage);
+
+                //restartknappen visas bara i spelare 1's canvas
+                if(canvas !== canvas2)
+                {
+                    displayRestartButton();
+                }
+            }
+            
             
         },30);
     }, false);
-}
 
+    function displayRestartButton()
+    {
+        //Restart-knapp
+        var button = new Image(300,60)
+        button.src = "pics/button.jpg";
 
-
-/**
- * Loop som körs för spelare som vinner. Visar ett meddelande och skickar tillbaka 
- * spelaren till huvudmenyn.
- * 
- * @param   canvas  canvas-elementet
- * @param   context canvas-elementets context
- */
-Game.prototype.winLoop = function(canvas,context)
-{
-    var winImage = new Image(177,176);
-    winImage.src ="pics/youWin.png";
-
-    var opacity = 0.01;
-
-    //när bilden har laddats färdigt
-    winImage.addEventListener("load", function()
-    {  
-        setInterval(function()
+        button.addEventListener("load", function()
         {
-            
-            if(opacity < 100)
-            {
-                context.globalAlpha = opacity;
-                context.drawImage(winImage, 0,0, winImage.width, winImage.height, canvas.width/2 - winImage.width/2, canvas.height/2 - winImage.height/2, winImage.width, winImage.height);
-            }
+            context.drawImage(button, 0, 0, button.width, button.height, canvas.width/2 - button.width/2, canvas.height/2 - button.height/2 + 150, button.width, button.height);
 
-            opacity = opacity + 0.01;
-            
-        },30);
-    }, false);
+
+        }, false);
+
+
+        canvas.addEventListener("click", restartGame, false);
+        //gå tillbaka till huvudmeny
+        function restartGame(event)
+        {
+
+            var canvasRectangle = canvas.getBoundingClientRect();
+
+            //spara
+            var mouseX = event.x - canvasRectangle.left;
+            var mouseY = event.y - canvasRectangle.top;
+
+            //om användaren klickar på restartknappen
+            if(mouseX >= canvas.width/2 - button.width/2 && mouseX <= canvas.width/2 + button.width/2 && mouseY >= canvas.height/2 - button.height/2 + 150 && mouseY <= canvas.height/2 + button.height/2 + 150)
+            {
+                context.clearRect(0,0, canvas.width, canvas. height);
+
+                //tar bort canvas 2 om den finns
+                if(canvas2 !== undefined)
+                {
+                    canvas2.parentNode.removeChild(canvas2);
+                };
+
+                canvas.removeEventListener("click", restartGame, false);
+
+                //startfunktionen igen
+                init();
+            }
+        }
+    }
+
+
 
 }

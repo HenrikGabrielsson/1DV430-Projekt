@@ -4,9 +4,13 @@
  * 
  */
 
+
+var gameNumber = 0;
+
 var init = function(){
-    
+
     var socket = io.connect();
+
 
     var canvas = document.getElementsByClassName("gamecanvas")[0];
     var context = canvas.getContext("2d");
@@ -18,11 +22,17 @@ var init = function(){
     gameMenu(canvas,context, socket);
 
     socket.on('map', function(data){
-    
-        //skapar ett spel-objekt
-        var game = new Game(data,canvas,context);
 
-        game.gameInit(data.playerNumber);
+        if(data.gameNumber === gameNumber)
+        {
+            console.log("game");
+
+            //skapar ett spel-objekt och startar det
+            var game = new Game(data,canvas,context);
+            game.gameInit(data.playerNumber);
+
+            gameNumber++;
+        }
     });
     
 };
@@ -36,14 +46,13 @@ function gameMenu(canvas, context, socket)
 {
     
     var fontSize = 18;
-    var buttonWidth = 300;
-    var buttonHeight = 60;
 
-    var gap = 100;
+    var gap = 100; //utrymme mellan knapparna
     
+    //är det huvudmeny eller undermeny?
     var mainmenu = true;
 
-    var button = new Image();
+    var button = new Image(300, 60);
     button.src = "pics/button.jpg";
     
     //när bilden har laddat klart så ritas den upp på canvasen
@@ -53,7 +62,7 @@ function gameMenu(canvas, context, socket)
         context.textAlign = "center";
         
         //singleplayer-knappen
-        context.drawImage(button, 0,0,buttonWidth, buttonHeight, canvas.width/2 - buttonWidth/2 , canvas.height/2 - buttonHeight/2, buttonWidth, buttonHeight)  
+        context.drawImage(button, 0,0,button.width, button.height, canvas.width/2 - button.width/2 , canvas.height/2 - button.height/2, button.width, button.height)  
         
         context.font = fontSize+"px Arial";
         context.fillText("Singleplayer", canvas.width/2  , canvas.height/2+fontSize/2);
@@ -62,10 +71,10 @@ function gameMenu(canvas, context, socket)
         
         
         //multiplayer-knappen
-        context.drawImage(button, 0,0,buttonWidth, buttonHeight, canvas.width/2 - buttonWidth/2 , canvas.height/2 - buttonHeight/2 + gap+buttonHeight, buttonWidth, buttonHeight) 
+        context.drawImage(button, 0,0,button.width, button.height, canvas.width/2 - button.width/2 , canvas.height/2 - button.height/2 + gap+button.height, button.width, button.height) 
         
         context.font = fontSize+"px Arial";
-        context.fillText("Multiplayer", canvas.width/2  , canvas.height/2 + gap + buttonHeight + fontSize/2);
+        context.fillText("Multiplayer", canvas.width/2  , canvas.height/2 + gap + button.height + fontSize/2);
         
     },false);
     
@@ -74,6 +83,7 @@ function gameMenu(canvas, context, socket)
     //funktion som körs när användaren interagerar med spelmenyn
     function menuFunction(e)
         {
+
             var canvasRectangle = canvas.getBoundingClientRect();
 
             //spara
@@ -82,14 +92,14 @@ function gameMenu(canvas, context, socket)
 
 
             //singleplayer
-            if(mainmenu && mouseX >= canvas.width/2 - buttonWidth/2 && mouseX <= canvas.width/2 + buttonWidth/2 && mouseY >= canvas.height/2 - buttonHeight/2 && mouseY <= canvas.height/2 + buttonHeight/2)
+            if(mainmenu && mouseX >= canvas.width/2 - button.width/2 && mouseX <= canvas.width/2 + button.width/2 && mouseY >= canvas.height/2 - button.height/2 && mouseY <= canvas.height/2 + button.height/2)
             {
                 canvas.removeEventListener("click",menuFunction,false);
                 
                 socket.emit('startGame', {gameMode:"sp"}); //skicka single-player-bana
                 return;
             }
-            else if(mainmenu && mouseX >= canvas.width/2 - buttonWidth/2 && mouseX <= canvas.width/2 + buttonWidth/2 && mouseY >= canvas.height/2 - buttonHeight/2 + gap + buttonHeight && mouseY <= canvas.height/2 - buttonHeight/2 + gap + buttonHeight*2)
+            else if(mainmenu && mouseX >= canvas.width/2 - button.width/2 && mouseX <= canvas.width/2 + button.width/2 && mouseY >= canvas.height/2 - button.height/2 + gap + button.height && mouseY <= canvas.height/2 - button.height/2 + gap + button.height*2)
             {
                 mainmenu = false;
                 
@@ -97,7 +107,7 @@ function gameMenu(canvas, context, socket)
                 context.clearRect(0,0,canvas.width,canvas.height);
                 
                 //multiplayer online
-                context.drawImage(button, 0,0,buttonWidth, buttonHeight, canvas.width/2 - buttonWidth/2 , canvas.height/2 - buttonHeight/2, buttonWidth, buttonHeight)  
+                context.drawImage(button, 0,0,button.width, button.height, canvas.width/2 - button.width/2 , canvas.height/2 - button.height/2, button.width, button.height)  
                 
                 context.font = fontSize+"px Arial";
                 context.fillText("Play with stranger", canvas.width/2  , canvas.height/2+fontSize/2);
@@ -107,14 +117,14 @@ function gameMenu(canvas, context, socket)
                 
                 
                 //multiplayer knappen
-                context.drawImage(button, 0,0,buttonWidth, buttonHeight, canvas.width/2 - buttonWidth/2 , canvas.height/2 - buttonHeight/2 + gap+buttonHeight, buttonWidth, buttonHeight) 
+                context.drawImage(button, 0,0,button.width, button.height, canvas.width/2 - button.width/2 , canvas.height/2 - button.height/2 + gap+button.height, button.width, button.height) 
                 
                 context.font = fontSize+"px Arial";
-                context.fillText("Play with friend(Share keyboard)", canvas.width/2  , canvas.height/2 + gap + buttonHeight + fontSize/2);
+                context.fillText("Play with friend(Share keyboard)", canvas.width/2  , canvas.height/2 + gap + button.height + fontSize/2);
                 
             }
             
-            else if(!mainmenu && mouseX >= canvas.width/2 - buttonWidth/2 && mouseX <= canvas.width/2 + buttonWidth/2 && mouseY >= canvas.height/2 - buttonHeight/2 && mouseY <= canvas.height/2 + buttonHeight/2)
+            else if(!mainmenu && mouseX >= canvas.width/2 - button.width/2 && mouseX <= canvas.width/2 + button.width/2 && mouseY >= canvas.height/2 - button.height/2 && mouseY <= canvas.height/2 + button.height/2)
             {
                 canvas.removeEventListener("click",menuFunction,false);
 
@@ -128,7 +138,7 @@ function gameMenu(canvas, context, socket)
                 socket.emit('startGame', {gameMode:"mp1"}); //eftefråga multi-player-bana
             }
 
-            else if(!mainmenu && mouseX >= canvas.width/2 - buttonWidth/2 && mouseX <= canvas.width/2 + buttonWidth/2 && mouseY >= canvas.height/2 - buttonHeight/2 + gap + buttonHeight && mouseY <= canvas.height/2 - buttonHeight/2 + gap + buttonHeight*2)
+            else if(!mainmenu && mouseX >= canvas.width/2 - button.width/2 && mouseX <= canvas.width/2 + button.width/2 && mouseY >= canvas.height/2 - button.height/2 + gap + button.height && mouseY <= canvas.height/2 - button.height/2 + gap + button.height*2)
             {
                 canvas.removeEventListener("click",menuFunction,false);
                 
