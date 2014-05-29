@@ -318,6 +318,9 @@ Game.prototype.spawnMonster = function(monster, monsters, map, frameCounter)
 //funktion som anropar funktioner för att rita objekt i spelet.
 Game.prototype.renderer = function(map, player, monsters, frameCounter, gameMode, opponent)
 {
+    var lava = new Image(900,40);
+    lava.src = "pics/lava.png";
+
     //canvasen börjar inte flytta banan nedåt på 2 sekunder efter att spelet startat
     var currentPos;
     if(frameCounter < 120)
@@ -385,6 +388,11 @@ Game.prototype.renderer = function(map, player, monsters, frameCounter, gameMode
     
     //karta
     map.renderMap(context, canvasTop, canvasLeft); 
+
+    lava.addEventListener("load", function()
+    {
+        context.drawImage(lava, 0, 0, canvas.width, lava.height, 0, canvas.height - lava.height, canvas.width, lava.height);
+    },false);
   
     //kollar om spelaren dör (av brist på livslust för att dom nådde botten av fönstret)
     if(player.posY + player.height/2 > canvasTop + canvas.height)
@@ -434,6 +442,11 @@ Game.prototype.renderer = function(map, player, monsters, frameCounter, gameMode
         });  
 
         map.renderMap(context2, canvasTop, canvasLeft2);
+
+        lava.addEventListener("load", function()
+        {
+            context2.drawImage(lava, 0, 0, canvas2.width, lava.height, 0, canvas2.height - lava.height, canvas2.width, lava.height);
+        },false);
 
         //kollar om spelaren dör (av brist på livslust för att dom nådde botten av fönstret)
         if(opponent.posY + opponent.height/2 > canvasTop + canvas2.height)
@@ -515,13 +528,19 @@ Game.prototype.endLoop = function(canvas,context, won)
 
         button.addEventListener("load", function()
         {
-            context.drawImage(button, 0, 0, button.width, button.height, canvas.width/2 - button.width/2, canvas.height/2 - button.height/2 + 150, button.width, button.height);
+            var fontSize = 18;
+            context.textAlign = "center";
+            context.font = fontSize+"pt Arial";
+            context.fillStyle = "#000000";
 
+            context.drawImage(button, 0, 0, button.width, button.height, canvas.width/2 - button.width/2, canvas.height/2 - button.height/2 + 150, button.width, button.height);
+            context.fillText("Back to Main Menu", canvas.width/2, canvas.height/2 + 150 + fontSize/2);
 
         }, false);
 
 
         canvas.addEventListener("click", restartGame, false);
+        
         //gå tillbaka till huvudmeny
         function restartGame(event)
         {

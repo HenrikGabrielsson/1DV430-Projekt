@@ -28,8 +28,10 @@ function Map (data,canvas)
 
     this.tileSize = 64;
     
+    //de olika blockens bilder
     this.sprite = new Image();
     this.sprite.src = "pics/tileset.png";
+
 
 }
 

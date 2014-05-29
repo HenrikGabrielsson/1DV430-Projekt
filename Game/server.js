@@ -45,7 +45,7 @@ var mpPlayers = [];
 //här bestäms det vad som ska göras när ett meddelande skickas från en klient
 io.sockets.on('connection', function(socket){
     
-    //behövs för annars skickas banor 5 biljarder gånger för socket.io är så duktigt
+    //ska användas för att samma bana bara får tas emot en gång på klienten
     var gameNumber = 0;
 
     //en connection har valt ett spelläge och meddelar detta.
@@ -61,6 +61,8 @@ io.sockets.on('connection', function(socket){
         
         else if(data.gameMode === 'mp1') //multiplayer
         {
+            gameNumber = 0; //återställer game number för att två klienter måste få samma nummer.
+
             mpPlayers.push(socket); //sparar spelaren i en socket.
             
             socket.on("disconnect", function()

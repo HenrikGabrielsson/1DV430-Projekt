@@ -4,7 +4,7 @@
  * 
  */
 
-
+//nummer som används för att klienten bara ska ta emot en bana från servern
 var gameNumber = 0;
 
 var init = function(){
@@ -23,6 +23,7 @@ var init = function(){
 
     socket.on('map', function(data){
 
+        //ibland tas banan emot många gånger. Får bara tas emot en gång
         if(data.gameNumber === gameNumber)
         {
             console.log("game");
@@ -127,6 +128,9 @@ function gameMenu(canvas, context, socket)
             else if(!mainmenu && mouseX >= canvas.width/2 - button.width/2 && mouseX <= canvas.width/2 + button.width/2 && mouseY >= canvas.height/2 - button.height/2 && mouseY <= canvas.height/2 + button.height/2)
             {
                 canvas.removeEventListener("click",menuFunction,false);
+
+                //återställer gameNumber för klienten för att båda klienterna måste få samma nummer
+                gameNumber = 0;
 
                 //meddelar användaren att spelet laddar.
                 context.clearRect(0, 0, canvas.width, canvas.height);
