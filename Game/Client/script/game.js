@@ -107,9 +107,8 @@ Game.prototype.gameInit = function(playerNumber)
     //collision detector
     var cd = new CollisionDetector(map, monsters);
 
-
     //lyssnar efter input från spelare
-    var keys = listenToKeyboardInput();; //här sparas de tangenter som trycks ner med en boolean som bestämmer om de fortfarande är nertryckta
+    var keys = listenToKeyboardInput(); //här sparas de tangenter som trycks ner med en boolean som bestämmer om de fortfarande är nertryckta
 
     //så här ofta ska spel-loopen köras
     var frameTime = 1000/60;
@@ -118,6 +117,7 @@ Game.prototype.gameInit = function(playerNumber)
     //Annars kan datan tas emot flera gånger, och det blir problem.
     var mapPieces = 0;
     var monsterNumber = 0;
+    var opponentHit = 0;
 
     var won;
 
@@ -126,12 +126,13 @@ Game.prototype.gameInit = function(playerNumber)
     //Spel-loopen
     var gameLoop = setInterval(function()
     {
-              
+
         //anropar funktion som utför det spelaren ber om.
         playerAction(keys, cd, 87, 65, 68, 69, player, opponent);
 
         //kontroller för spelare 2
-        if(gameMode === "mp2"){
+        if(gameMode === "mp2")
+        {
             playerAction(keys, cd, 38, 37, 39, 45,opponent, player )
         }
 
@@ -180,8 +181,11 @@ Game.prototype.gameInit = function(playerNumber)
                 won = true;
             })
             
-            //Skickar data om spelaren till servern så att detta kan delas med motståndaren.
-            socket.emit("playerUpdate", {x:player.posX, y:player.posY, direction: player.direction, isHitting: player.hitState == 30, jumpState: player.jumpState,room: room});
+            if(frameCounter % 2 === 0)
+            {
+                //Skickar data om spelaren till servern så att detta kan delas med motståndaren.
+                socket.emit("playerUpdate", {x:player.posX, y:player.posY, direction: player.direction, isHitting: player.hitState == 30, hitNumber: opponentHit, jumpState: player.jumpState,room: room});
+            }
             
             //uppdatera motståndare
             socket.on("opponent", function(data)
@@ -191,9 +195,10 @@ Game.prototype.gameInit = function(playerNumber)
                 opponent.direction = data.direction;    
                 opponent.jumpState = data.jumpState;
             
-                if(data.isHitting)
+                if(data.isHitting && data.hitNumber === opponentHit)
                 {
                     cd.hitting(opponent, player);
+                    opponentHit++;
                 }  
                
             })
@@ -216,10 +221,8 @@ Game.prototype.gameInit = function(playerNumber)
             spawnMonster(waitingMonsters.shift(), monsters, map, frameCounter); //det första monstret i arrayen tas bort därifrån och spawnar.
         }
 
-
-
         //spelloopen stängs av ifall spelaren dör
-        if((gameMode === "sp" || gameMode === "mp1") && player.isDead || won )
+        if((gameMode === "sp" || gameMode === "mp1") && player.isDead || won)
         {
             socket.emit("gameOver");
             clearInterval(gameLoop);
@@ -323,13 +326,13 @@ Game.prototype.renderer = function(map, player, monsters, frameCounter, gameMode
 
     //canvasen börjar inte flytta banan nedåt på 2 sekunder efter att spelet startat
     var currentPos;
-    if(frameCounter < 120)
+    if(frameCounter < 300)
     {
         currentPos = 0;
     }
     else 
     {
-        currentPos = frameCounter-120;
+        currentPos = frameCounter-300;
     }
 
     //Canvas hämtas    

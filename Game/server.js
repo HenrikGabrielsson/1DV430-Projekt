@@ -45,8 +45,9 @@ var mpPlayers = [];
 //här bestäms det vad som ska göras när ett meddelande skickas från en klient
 io.sockets.on('connection', function(socket){
     
-    //ska användas för att samma bana bara får tas emot en gång på klienten
+    //ska användas för att samma bana och samma slag bara får tas emot en gång på klienten
     var gameNumber = 0;
+    var hitNumber = 0;
 
     //en connection har valt ett spelläge och meddelar detta.
     socket.on('startGame', function(data){
@@ -107,8 +108,16 @@ io.sockets.on('connection', function(socket){
         //data.jumpState = spelarens jumpstate
         //data.room = vilket spelrum spelaren är i
         
+        
+        
         //skicka data till motståndare
-        socket.broadcast.to(data.room).emit("opponent", {x:data.x, y: data.y, direction: data.direction, isHitting: data.isHitting, jumpState: data.jumpState});
+        socket.broadcast.to(data.room).emit("opponent", {x:data.x, y: data.y, direction: data.direction, isHitting: data.isHitting, hitNumber:hitNumber, jumpState: data.jumpState});
+        
+        if(data.isHitting)
+        {
+            hitNumber++;
+        }
+        
     })
     
     //En spelare har dött. motspelaren meddelas om att den har vunnit

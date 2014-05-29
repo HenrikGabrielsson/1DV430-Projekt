@@ -25,6 +25,7 @@
                 <h2>Instructions</h2>
 
                 <h3>Controls</h3>
+                <div id="player1"></div>
                 <h4>Player 1</h4>
                 <dl>
                     <dt>W</dt>
@@ -33,9 +34,11 @@
                     <dd>Go left</dd>
                     <dt>D</dt>
                     <dd>Go right</dd>
-                    <dt>Shift</dt>
+                    <dt>E</dt>
                     <dd>Hit enemies, players, blocks...anything!</dd>
                 </dl>
+
+                <div id="player2"></div>
                 <h4>Player 2</h4>
                 <dl>
                     <dt>Up Arrow</dt>
@@ -48,24 +51,28 @@
                     <dd>Hit enemies, players, blocks...anything!</dd>
                 </dl>
 
+                
                 <h3>Enemies</h3>
                 <dl>
-                    <dt>Bat</dt>
+                    <dt><div id="bat"></div>Bat</dt>
                     <dd>Bats can fly!</dd>
-                    <dt>Troll</dt>
+
+                    <dt><div id="troll"></div>Troll</dt>
                     <dd>Trolls live in the cave. They don't like it when you trespass in their home. So they will, look for you, they will find you, and they will kill you! </dd>
-                    <dt>Falling Rocks</dt>
+                    
+                    <dt><div id="fallingRock"></div>Falling Rocks</dt>
                     <dd>Falling rocks are falling rocks.</dd>
-                </dl>
+</dl>
 
                 <h3>Blocks</h3>
                 <p>You can destroy these blocks:</p>
-
-                <p>But not these:</p>
+                    <div id="destroyBlock"></div>
+                <p>But not this:</p>
+                    <div id="invincibleBlock"></div>
 
                 <h3>Goal</h3>
                 <p>Your goal in a singleplayer game is to get to the top without dying. Enemies and the bottom of the screen will kill you.</p>
-                <p>In Multiplayer you only need to survive longer than your opponent.</p>
+                <p>In Multiplayer you simply need to survive longer than your opponent.</p>
 
             </div>
         </div>

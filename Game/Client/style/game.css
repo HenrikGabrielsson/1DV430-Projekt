@@ -1,7 +1,7 @@
 #header
 {
     height:200px;
-    background-image:url('headerbg.jpg')
+    background-image:url('../pics/headerbg.jpg')
 }
 
 #logo
@@ -12,7 +12,7 @@
 
 #content
 {
-    background-image:url('dirt.jpg');
+    background-image:url('../pics/dirt.jpg');
     margin:auto;
 }
 
@@ -38,12 +38,73 @@ h1
     clear:both;
 
     margin:auto;
-    width:900px;
+    width:820px;
+    height:500px;
+    overflow:auto;
 
     background-color:rgba(255,255,255,0.3);
 
-    font-family:Consolas;
+    font-family:Consolas, arial;
     color:white;
+    padding:40px;
+}
+
+#instructions h3
+{
+    margin-top:50px;
+}
+
+#player1
+{
+    width:22px;
+    height:40px;
+    background:url("../pics/playerSprite.png") 0 0;
+    float:left;
+    margin-right:10px;
+}
+
+#player2
+{
+    width:22px;
+    height:40px;
+    background:url("../pics/playerSprite.png") 0 57px;
+    float:left;
+    margin-right:10px;
+}
+
+#bat 
+{
+    height:40px;
+    width:30px;
+    background:url("../pics/monsterSprite.png");
+}
+
+#troll 
+{
+    height:50px;
+    width:40px;
+    background:url("../pics/monsterSprite.png") 0 -40px;
+}
+
+#fallingRock 
+{
+    height:60px;
+    width:60px;
+    background:url("../pics/monsterSprite.png") 0 -90px;
+}
+
+#destroyBlock
+{
+    width:128px;
+    height:64px;
+    background:url("../pics/tileset.png");
+}
+
+#invincibleBlock
+{
+    width:64px;
+    height:64px;
+    background:url("../pics/tileset.png") -128px 0;
 }
 
 
