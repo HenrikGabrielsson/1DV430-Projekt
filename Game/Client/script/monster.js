@@ -1,11 +1,11 @@
 
 /**
- * Konstruktor f�r Monster. De olika monstren �rver h�rifr�n och anropas av andra konstruktorer.
+ * Konstruktor för Monster. De olika monstren ärver härifrån och anropas av andra konstruktorer.
  * 
- * @param   type        inneh�ller siffra som identiferar monstrets typ, 0 = bat, 1 = troll, 2 = falling rock
- * @param   floor       best�mmer vart fienden ska starta.
- * @param   direction   riktning som monstret  b�rjar att f�rdas i.
- * @param   map         banan d�r monstren ska vandra.
+ * @param   type        innehåller siffra som identiferar monstrets typ, 0 = bat, 1 = troll, 2 = falling rock
+ * @param   floor       bestämmer vart fienden ska starta.
+ * @param   direction   riktning som monstret  börjar att färdas i.
+ * @param   map         banan där monstren ska vandra.
  */
 function Monster(type,floor,direction,map)
 {
@@ -24,18 +24,19 @@ function Monster(type,floor,direction,map)
     this.monsterSprite = new Image();
     this.monsterSprite.src="pics/monsterSprite.png";
     
-    this.posY = this.floor * 64; //this.floor * map.tileSize men det fungerar inte just h�r. anledning: javascript
+    this.posY = this.floor * 64; //hårdkodat in map.tileSize, som inte fungerar här. Vet inte varför.
     
     if(this.type !== 2) //startposition, inte för fallande stenar 
     {
         //positionering
         this.posX;
-        if(this.direction === 0) //v�nster - h�ger
+        if(this.direction === 0) //vänster - höger
         {
             this.posX = 1;
         }
-        else if(this.direction === 1)//h�ger - v�nster 
+        else if(this.direction === 1)//höger - vänster
         {
+                        //kolla! map.tileSize funkar!
             this.posX = map.tileSize * map.cols - this.width; 
             
         }
@@ -47,12 +48,12 @@ function Monster(type,floor,direction,map)
 
 
 /**
- * Konstruktor f�r fladderm�ss. Subclass till Monster
+ * Konstruktor för fladdermöss. Subclass till Monster
  * 
- * @param   type        inneh�ller siffra som identiferar monstrets typ, 0 = bat, 1 = troll, 2 = falling rock
- * @param   floor       best�mmer vart fienden ska starta.
- * @param   direction   riktning som monstret  b�rjar att f�rdas i.
- * @param   map         banan d�r monstren ska vandra.
+ * @param   type        innehåller siffra som identiferar monstrets typ, 0 = bat, 1 = troll, 2 = falling rock
+ * @param   floor       bestämmer vart fienden ska starta.
+ * @param   direction   riktning som monstret  börjar att färdas i.
+ * @param   map         banan där monstren ska vandra.
  */
 
 //Fladdermus-konstruktor
@@ -66,38 +67,40 @@ function Bat(type,floor,direction, map)
 Bat.prototype = new Monster();
 
 /**
- * funktion som flyttar p� fladdermusen och ritar den sedan p� banan
+ * funktion som flyttar på fladdermusen och ritar den sedan på banan
  * 
- * @param   context     D�r fladdermusen ska ritas
+ * @param   context     Där fladdermusen ska ritas
+ * @param   canvasTop   y-position för toppen av canvasen, som monstren ska ritas relativt till.
+ * @param   canvasLeft  x-position för canvasens vänsterkant, som monstren ska ritas relativt till.
  */
 Bat.prototype.renderBat = function(context, canvasTop, canvasLeft)
 {
-    //v�nster-h�ger
+    //vänster-höger
     if(this.direction === 0)
     {
         this.posX += this.speed;
         context.drawImage(this.monsterSprite, (Math.floor(this.currentSprite/2)*this.width)+(this.width*2), 0, this.width, this.height, this.posX-canvasLeft, this.posY - canvasTop, this.width, this.height);
     }
     
-    //h�ger-v�nster
+    //höger-vänster
     else if(this.direction === 1)
     {
         this.posX -= this.speed;
         context.drawImage(this.monsterSprite, (Math.floor(this.currentSprite/2)*this.width), 0, this.width, this.height, this.posX-canvasLeft, this.posY - canvasTop, this.width, this.height);
     }
     this.currentSprite++;
-    if(this.currentSprite > 3){this.currentSprite = 0};//b�rjar om animationen
+    if(this.currentSprite > 3){this.currentSprite = 0};//börjar om animationen
 }
 
 
 
 /**
- * Konstruktor f�r troll. Subclass till Monster
+ * Konstruktor för troll. Subclass till Monster
  * 
- * @param   type        inneh�ller siffra som identiferar monstrets typ, 0 = bat, 1 = troll, 2 = falling rock
- * @param   floor       best�mmer vart fienden ska starta.
- * @param   direction   riktning som monstret  b�rjar att f�rdas i.
- * @param   map         banan d�r monstren ska vandra.
+ * @param   type        innehåller siffra som identiferar monstrets typ, 0 = bat, 1 = troll, 2 = falling rock
+ * @param   floor       bestämmer vart fienden ska starta.
+ * @param   direction   riktning som monstret  börjar att färdas i.
+ * @param   map         banan där monstren ska vandra.
  */
 function Troll(type,floor,direction,map)
 {
@@ -114,15 +117,17 @@ function Troll(type,floor,direction,map)
 Troll.prototype = new Monster();
 
 /**
- * funktion som flyttar p� trollet och ritar den sedan p� banan
+ * funktion som flyttar på trollet och ritar den sedan på banan
  * 
- * @param   context     D�r trollet ska ritas
- * @param   player      Spelare. Trollet jagar spelare som �r i n�rheten.
+ * @param   context     Där trollet ska ritas
+ * @param   player      Spelare. Trollet jagar spelare som är i närheten.
+ * @param   canvasTop   y-position för toppen av canvasen, som monstren ska ritas relativt till.
+ * @param   canvasLeft  x-position för canvasens vänsterkant, som monstren ska ritas relativt till.
  */
 Troll.prototype.renderTroll = function(context,player, canvasTop, canvasLeft)
 {
     
-    //Om ett troll m�rker att en spelare �r på samma level s� blir det argt och attackerar.
+    //Om ett troll märker att en spelare är på samma level så blir det argt och attackerar.
     if(player.posY <= this.posY+this.height && player.posY >= this.posY - this.map.tileSize * 2 && player.posX > this.posX)
     {
         this.speed = 4;
@@ -136,44 +141,45 @@ Troll.prototype.renderTroll = function(context,player, canvasTop, canvasLeft)
         this.direction = 1;        
     }
     
+    //Troll glad. troll gå lugnt.
     else
     {
         this.speed = 2;    
     }
    
-    //v�nster-h�ger
+    //vänster-höger
     if(this.direction === 0)
     {
     
         this.posX += this.speed;
 
-        //h�mta r�tt sprite
+        //hämta rätt sprite
         context.drawImage(this.monsterSprite, (Math.floor(this.currentSprite/2)*this.width)+(this.width*4), 41, this.width, this.height, this.posX-canvasLeft, this.posY - canvasTop, this.width, this.height);
     }
     
-    //h�ger-v�nster
+    //höger-vänster
     else
     {
         this.posX -= this.speed;
         
-        //h�mta r�tt sprite
+        //hämta rätt sprite
         context.drawImage(this.monsterSprite, Math.floor(this.currentSprite/2)*this.width, 41, this.width, this.height, this.posX-canvasLeft, this.posY - canvasTop, this.width, this.height);
 
     }
     this.currentSprite++;
-    if(this.currentSprite > 7){this.currentSprite = 0};//b�rjar om animationen
+    if(this.currentSprite > 7){this.currentSprite = 0};//börjar om animationen
 
 }
 
 
 
 /**
- * Konstruktor f�r stenar. Subclass till Monster
+ * Konstruktor för fallande stenar. Subclass till Monster
  * 
- * @param   type        inneh�ller siffra som identiferar monstrets typ, 0 = bat, 1 = troll, 2 = falling rock
- * @param   floor       best�mmer vart fienden ska starta.
- * @param   direction   riktning som monstret  b�rjar att f�rdas i.
- * @param   map         banan d�r monstren ska vandra.
+ * @param   type        innehåller siffra som identiferar monstrets typ, 0 = bat, 1 = troll, 2 = falling rock
+ * @param   floor       bestämmer vart fienden ska starta.
+ * @param   direction   riktning som monstret  börjar att färdas i.
+ * @param   map         banan där monstren ska vandra.
  */
 function FallingRock(type,floor,direction,map)
 {
@@ -192,6 +198,8 @@ FallingRock.prototype = new Monster();
  * funktion som flyttar på den fallande stenen och ritar den sedan på banan
  * 
  * @param   context     Där stenen ska ritas
+ * @param   canvasTop   y-position för toppen av canvasen, som monstren ska ritas relativt till.
+ * @param   canvasLeft  x-position för canvasens vänsterkant, som monstren ska ritas relativt till.
  */
 FallingRock.prototype.renderFallingRock = function(context, canvasTop, canvasLeft)
 {

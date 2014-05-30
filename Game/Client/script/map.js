@@ -3,7 +3,7 @@
  * Läser in sprites rill de olika blocken.
  * Sätter storleken på canvas.
  * 
- * @param   seed    data som bestämmer hur banan ska se ut.
+ * @param   data    data som bestämmer hur banan ska se ut.
  * @param   canvas  canvas-elementet där banan ska ritas.
  */
 function Map (data,canvas)
@@ -23,9 +23,10 @@ function Map (data,canvas)
     }
     this.cols = 40; 
 
-
+    //banan skapas 
     this.mapArray = this.createMap(this.seed);
 
+    //storlek på en tile
     this.tileSize = 64;
     
     //de olika blockens bilder
@@ -44,7 +45,7 @@ function Map (data,canvas)
  * 
  * @param   seed            "kod" som bestämmer banans utseende
  * @param   startPlatform   Bool. Bestämmer om en "startplattform" ska skapas. 
- * @return          En multidimensionell array som 
+ * @return                  En 2-dimensionell array som man kan rita upp en bana utifrån 
  */
 //Den här funktionen tar emot ett seed och skapar en bana (en tvådimensionell array).
 Map.prototype.createMap = function(seed, startPlatform)
@@ -203,7 +204,8 @@ Map.prototype.createMap = function(seed, startPlatform)
  * Ritar ut banan, efter den kod som skapas i createMap
  * 
  * @param   context     Där som banan ritas.
- * @param   canvasTop  Skickar nummer som berättar vilken pixel på banan som canvasen är på.
+ * @param   canvasTop   Skickar nummer som berättar vilken pixel på banan som canvasen är på.
+ * @param   canvasLeft  vilken pixle som är längst till vänster
  * 
  */
 Map.prototype.renderMap = function(context,canvasTop,canvasLeft)
@@ -256,6 +258,15 @@ Map.prototype.renderMap = function(context,canvasTop,canvasLeft)
     }   
 }
 
+/**
+ * Denna funktion används för att lägga till fler våningar på en existerande bana och uppdatera monsters
+ * och spelares positioner.
+ * 
+ * @param   seed        de tiles som ska läggas till
+ * @param   monsters    alla monster som ska flyttas till den nya positionen efter att banan har uppdaterats    
+ * @param   player      spelarens position måste uppdateras
+ * @param   opponent    motspelarens position måste uppdateras
+*/
 Map.prototype.addMoreMap = function(seed, monsters, player, opponent)
 {
     //gammal och ny array
@@ -277,6 +288,7 @@ Map.prototype.addMoreMap = function(seed, monsters, player, opponent)
     }
 
     var tileSize = this.tileSize;
+
 
     monsters.forEach(function(monster)
     {

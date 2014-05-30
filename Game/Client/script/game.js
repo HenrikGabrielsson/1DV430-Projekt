@@ -1,17 +1,16 @@
 /**
  * Konstruktor för Game-objektet
  * 
- * @param   data    Innehåller seed till banan som ska skapas
+ * @param   data    Innehåller seed till banan som ska skapas, och vilket spelläge. Vid multiplayer online innehåller den också ett 'rum'
  * @param   canvas  Referens till canvas-elementet
- * @param   context Canvas-elementets context(2d);
+ * @param   socket  socket man ska kommunicera med servern med hjälp av
  */
-function Game(data,canvas,context)
+function Game(data,canvas, socket)
 {
     this.gameMode = data.gameMode;
 
     this.canvas = canvas;
-    this.context = context;
-
+    this.socket = socket;
 
     //en canvas till skapas och de får dela platsen vid splitscreen
     if(this.gameMode === "mp2")
@@ -31,15 +30,12 @@ function Game(data,canvas,context)
         this.canvas2.style.backgroundImage = "url('pics/cave2.jpg')";
 
         canvasDiv.appendChild(this.canvas2);
-
-        this.context2 = this.canvas2.getContext("2d");
     }
 
-
-    this.socket = io.connect();
-
+    //rummet vid multiplayer.
     this.room = data.room;
-
+    
+    //skapa kartan
     this.map = new Map(data, canvas);
     
      
@@ -50,6 +46,7 @@ function Game(data,canvas,context)
 /**
  * gameInit deklarerar flera variabler som behövs för spelet och innehåller också spelloopen.
  * 
+ * @param   playerNumber    Är spelaren nummer 1 eller 2?
  */
 //Startar spelet
 Game.prototype.gameInit = function(playerNumber)
@@ -57,19 +54,16 @@ Game.prototype.gameInit = function(playerNumber)
 
     var gameMode = this.gameMode;
        
+    //meddela servern att det är redo att ta emot monster
     var socket = this.socket;
-    
     socket.emit("gameIsOn", {gameMode:gameMode, room: this.room});
-        
-    var canvas = this.canvas;
-    var context = this.context;
     
-       
+    //variabler som kan behövas i loopen där de inte kan nås annars    
+    var canvas = this.canvas;
+    var context = canvas.getContext("2d");  
     var map = this.map;
     var monsters = this.monsters;
-
-    var frameCounter = 0; //räknar vilken frame spelet är inne på
-    
+    var frameCounter = 0; //räknar vilken frame spelet är inne på  
     var spawnMonster = this.spawnMonster;
     var renderer = this.renderer;
     var endLoop = this.endLoop;
@@ -96,11 +90,10 @@ Game.prototype.gameInit = function(playerNumber)
     }
     if(gameMode === "mp2")
     {
-        
         //i splitscreen så är motspelaren alltid spelare 2 (1) och får sin egen canvas
         var opponent = new Player(map, 1);
         var canvas2 = this.canvas2;
-        var context2 = this.context2;
+        var context2 = canvas2.getContext("2d");
 
     }
     
@@ -119,8 +112,9 @@ Game.prototype.gameInit = function(playerNumber)
     var monsterNumber = 0;
     var opponentHit = 0;
 
-    var won;
+    var won; //blir true när når toppen
 
+    //här ska alla monster sparas innan de spawnar
     var waitingMonsters = [];
     
     //Spel-loopen
@@ -138,11 +132,8 @@ Game.prototype.gameInit = function(playerNumber)
 
         //kollisioner för monster
         cd.detectMonsterWallCollision();
-
-
         cd.detectMonsterCollision(player);
         if(gameMode === "mp2"){
-
             cd.detectMonsterCollision(opponent);
         }
 
@@ -230,7 +221,7 @@ Game.prototype.gameInit = function(playerNumber)
             //om man vinner
             if(won)
             {
-                endLoop(canvas, context, true);
+                endLoop(canvas, true);
             }
 
             //om man förlorar
@@ -241,7 +232,7 @@ Game.prototype.gameInit = function(playerNumber)
                     socket.emit("imDead", {room: room}); //meddela server om döden...
                 }
 
-                endLoop(canvas, context, false)
+                endLoop(canvas, false)
             }
         }
 
@@ -253,13 +244,13 @@ Game.prototype.gameInit = function(playerNumber)
 
             if(player.isDead)//om spelare 1 dog
             {
-                endLoop(canvas,context, false);
-                endLoop(canvas2,context2, true);
+                endLoop(canvas, false);
+                endLoop(canvas2, true);
             }
             else if(opponent.isDead) //om spelare 2 dog
             {
-                endLoop(canvas2, context2, false);
-                endLoop(canvas, context, true);
+                endLoop(canvas2, false);
+                endLoop(canvas, true);
             }
 
         }
@@ -283,9 +274,11 @@ Game.prototype.gameInit = function(playerNumber)
  * Den tar emot data från servern och skapar sedan ett monster genom att anropa en av flera 
  * konstruktorer
  * 
- * @param   data        innehåller data om monstret som ska skapas
- * @param   monsters    arrayen som innehåller alla monster. nya monster pushas hit
- * @param   map         kartan som används i denna game-instance
+ * @param   monster         innehåller data om monstret som ska skapas
+ * @param   monsters        arrayen som innehåller alla monster. nya monster pushas hit
+ * @param   map             kartan som används i denna game-instance
+ * @param   frameCounter    räknar bilder i loopen
+
  */
 
 Game.prototype.spawnMonster = function(monster, monsters, map, frameCounter)
@@ -307,20 +300,24 @@ Game.prototype.spawnMonster = function(monster, monsters, map, frameCounter)
     {
         monster = new FallingRock(monster.monsterType, monster.monsterFloor, monster.monsterDirection, map);
     }
-    monsters.push(monster);
+    monsters.push(monster); //lägger till monstret i arrayen för monster
 }
 
 
 /**
  * Funktion som anropar andra funktioner som ritar spelare, monster och bana
  * 
- * @param   map         banan som ska ritas
- * @param   player      spelaren som ska ritas
- * @param   monsters    array med alla monster   
+ * @param   map             banan som ska ritas
+ * @param   player          spelaren som ska ritas
+ * @param   monsters        array med alla monster
+ * @param   frameCounter    frameräknare
+ * @param   gameMode        spelläge
+ * @param   opponent        spelare 2 om den finns   
  */
 //funktion som anropar funktioner för att rita objekt i spelet.
 Game.prototype.renderer = function(map, player, monsters, frameCounter, gameMode, opponent)
 {
+    //lava-bilden
     var lava = new Image(900,40);
     lava.src = "pics/lava.png";
 
@@ -392,6 +389,7 @@ Game.prototype.renderer = function(map, player, monsters, frameCounter, gameMode
     //karta
     map.renderMap(context, canvasTop, canvasLeft); 
 
+    //ritar lava i botten
     lava.addEventListener("load", function()
     {
         context.drawImage(lava, 0, 0, canvas.width, lava.height, 0, canvas.height - lava.height, canvas.width, lava.height);
@@ -444,8 +442,10 @@ Game.prototype.renderer = function(map, player, monsters, frameCounter, gameMode
             }
         });  
 
+        //rita bana
         map.renderMap(context2, canvasTop, canvasLeft2);
 
+        //rita lava
         lava.addEventListener("load", function()
         {
             context2.drawImage(lava, 0, 0, canvas2.width, lava.height, 0, canvas2.height - lava.height, canvas2.width, lava.height);
@@ -471,32 +471,40 @@ Game.prototype.renderer = function(map, player, monsters, frameCounter, gameMode
  * spelaren till huvudmenyn.
  * 
  * @param   canvas  canvas-elementet
- * @param   context canvas-elementets context
  * @param   won     bool. True om man vinner. False om man förlorar
  */
-Game.prototype.endLoop = function(canvas,context, won)
+Game.prototype.endLoop = function(canvas, won)
 {
 
-    var canvas2 = document.getElementsByClassName("gamecanvas")[1];
+    var context = canvas.getContext("2d"); 
 
+    //hämtar in spelare 2s canvas om den finns
+    var canvas2 = document.getElementsByClassName("gamecanvas")[1];
+    if(canvas2 !== undefined)
+    {
+        var context2 = canvas2.getContext("2d");
+    }
+
+    //om man vann så ska denna bild visas
     if(won)
     {
         var image = new Image(177,176);
         image.src ="pics/youWin.png";
     }
 
+    //...annars denna
     else
     {
         var image = new Image(200,150);
         image.src ="pics/death.png";
     }
-    var opacity = 0.01;
 
+    var opacity = 0.01;
     //när bilden har laddats färdigt
     image.addEventListener("load", function()
     {  
 
-
+        //bilden fadeas in
         var fadeInImage = setInterval(function()
         {
             
@@ -523,12 +531,14 @@ Game.prototype.endLoop = function(canvas,context, won)
         },30);
     }, false);
 
+    //visa restart-knappen
     function displayRestartButton()
     {
         //Restart-knapp
         var button = new Image(300,60)
         button.src = "pics/button.jpg";
 
+        //när knappens bild laddats in så visas den
         button.addEventListener("load", function()
         {
             var fontSize = 18;
@@ -541,7 +551,6 @@ Game.prototype.endLoop = function(canvas,context, won)
 
         }, false);
 
-
         canvas.addEventListener("click", restartGame, false);
         
         //gå tillbaka till huvudmeny
@@ -550,7 +559,7 @@ Game.prototype.endLoop = function(canvas,context, won)
 
             var canvasRectangle = canvas.getBoundingClientRect();
 
-            //spara
+            //spara mus-koordinatoner vid klick
             var mouseX = event.x - canvasRectangle.left;
             var mouseY = event.y - canvasRectangle.top;
 

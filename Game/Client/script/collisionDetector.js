@@ -13,7 +13,10 @@ function CollisionDetector(map, monsters)
 }
 
 /**
- * Letar efter kollisioner mellan spelare och block
+ * Letar efter kollisioner mellan spelare och block i y-led
+ * 
+ * @param   player      spelaren som ska kontrolleras
+ * @param   jump        bool. Har spelaren hoppat?
  */
 CollisionDetector.prototype.checkForYCollision = function(player, jump)
 {
@@ -25,6 +28,7 @@ CollisionDetector.prototype.checkForYCollision = function(player, jump)
     var playerColL = Math.floor(player.posX / this.map.tileSize);
     var playerColR = Math.floor((player.posX+player.width) / this.map.tileSize);
 
+    //om spelaren hoppar så ska positionen uppdateras om det inte finns nåt över
     if(jump && (this.map.mapArray[playerRow+1][playerColL] > 0 || this.map.mapArray[playerRow+1][playerColR] > 0 ) && player.jumpState === 0)
     {
               
@@ -39,6 +43,8 @@ CollisionDetector.prototype.checkForYCollision = function(player, jump)
         player.jumpState --;
     }
 
+
+    //uppdatera tiles där spelaren befinner sig
     playerRow = Math.floor(player.posY / this.map.tileSize);
     playerRowB = Math.floor((player.posY+player.height) / this.map.tileSize);
     playerColL = Math.floor(player.posX / this.map.tileSize);
@@ -47,6 +53,7 @@ CollisionDetector.prototype.checkForYCollision = function(player, jump)
     
     //gravitation
     player.posY += 10;  
+
 
     //finns nåt över?
     if(this.map.mapArray[playerRow][playerColL] > 0 || this.map.mapArray[playerRow][playerColR] > 0 && player.jumpState > 0)
@@ -61,7 +68,11 @@ CollisionDetector.prototype.checkForYCollision = function(player, jump)
     }
 }
 
-
+/**
+ * Letar efter kollisioner mellan spelare och block i x-led
+ * 
+ * @param   player      spelaren som ska kontrolleras
+ */
 CollisionDetector.prototype.checkForXCollision = function(player)
 {
     //ta reda på vilken ruta i banans tileset som spelaren befinner sig i
@@ -105,6 +116,7 @@ CollisionDetector.prototype.checkForXCollision = function(player)
  */
 CollisionDetector.prototype.detectMonsterWallCollision = function()
 {
+
     var map = this.map;
     var monsters = this.monsters;
     
@@ -150,29 +162,24 @@ CollisionDetector.prototype.detectMonsterWallCollision = function()
                     monster.direction = 0;
                 }
             }
-            
-            
-            if(map.rows > monsterRow+1)
+
+            //finns nåt under? troll kan gå på sånt. Troll kan också gå rakt fram i en oförstörbar vägg, även om det inte finns nåt under.
+            if(map.rows > monsterRow+1 && monster.type === 1 && ((map.mapArray[monsterRow+1][monsterColL] > 0 || map.mapArray[monsterRow+1][monsterColR] > 0) ||(monster.direction === 0 && map.mapArray[monsterRow][monsterColR] === 10) || (monster.direction === 1 && map.mapArray[monsterRow][monsterColL] === 10)))
             {
-
-                //finns nåt under? troll kan gå på sånt. Troll kan också gå rakt fram i en oförstörbar vägg, även om det inte finns nåt under.
-                if(monster.type === 1 && ((map.mapArray[monsterRow+1][monsterColL] > 0 || map.mapArray[monsterRow+1][monsterColR] > 0) ||(monster.direction === 0 && map.mapArray[monsterRow][monsterColR] === 10) || (monster.direction === 1 && map.mapArray[monsterRow][monsterColL] === 10)))
-                {
-                    monster.posY = monsterRow * map.tileSize + map.tileSize - monster.height;
-                }
-
+                monster.posY = monsterRow * map.tileSize + map.tileSize - monster.height;
             }
-    
+
         }
-        monsterIndex++;
-        
-        
+        monsterIndex++; //nästa monster
+   
     });
 }
 
 
 /**
  * Letar efter kollisioner mellan monster och spelare. Kollar varje monster för sig.
+ * 
+ * @param   player  spelaren som ska kollas
  */
 CollisionDetector.prototype.detectMonsterCollision = function(player)
 {

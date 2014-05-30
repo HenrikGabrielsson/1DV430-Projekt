@@ -25,6 +25,18 @@ function listenToKeyboardInput()
     
 }
 
+
+/**
+ * Utför olika händelser beroende på spelarens input
+ * 
+ * @param   keys        array med knappar som tryckts ner
+ * @param   cd          collision detector som ska användas
+ * @param   jump        knapp för att hoppa
+ * @param   left        knapp för att gå till vänster
+ * @param   right       knapp för att gå till höger
+ * @param   player      spelaren som ska gå
+ * @param   opponent    motspelaren 
+ */
 function playerAction(keys, cd, jump, left, right, hit, player, opponent)
 {
        
@@ -36,6 +48,7 @@ function playerAction(keys, cd, jump, left, right, hit, player, opponent)
             player.standingStill = true;
         }
 
+        //vänster
         if(keys[left])
         {    
             player.standingStill = false;        
@@ -43,6 +56,7 @@ function playerAction(keys, cd, jump, left, right, hit, player, opponent)
             cd.checkForXCollision(player);
         }
 
+        //höger
         else if(keys[right])
         {
             player.standingStill = false; 

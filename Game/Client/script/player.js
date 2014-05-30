@@ -1,16 +1,17 @@
 /**
  *  Konstruktor för Player-objektet
  * 
- * @param   posX    horisontell position
- * @param   posY    vertikal position
+ * @param   map             Använder banan för att veta vart spelaren spawnar.
+ * @param   playerNumber    Spelaren är spelare 1 eller 2 i mp.    
  */
 function Player(map, playerNumber)
 {
-    
+    //spelare 1's startposition
     if(playerNumber === 0)
     {
         this.posX = map.tileSize * 5;
     }
+    //spelare 2's startposition
     else if(playerNumber === 1)
     {
         this.posX = (map.rows * map.tileSize) - 5 * map.tileSize;  
@@ -36,7 +37,10 @@ function Player(map, playerNumber)
     
     //mitt i ett hopp?
     this.jumpState = 0;
-    
+
+    //står still?
+    this.standingStill = true;   
+
     //slag
     this.hitState = 0;
 
@@ -47,11 +51,11 @@ function Player(map, playerNumber)
     this.playerSprite = new Image();
     this.playerSprite.src = "pics/playerSprite.png";
     this.currentSprite = 0;
-
-    this.standingStill = true;
-
-    
+   
 }
+
+
+
 
 /**
  * Ritar spelaren.
@@ -67,7 +71,6 @@ Player.prototype.renderPlayer = function(context, canvasTop, canvasCenter, canva
 
     //Spelaren placeras i mitten av canvasen(horisontalt). En motståndare placeras ut normalt på banan.
     var canvasPosX;
-    
     if(canvasLeft !== undefined)
     {
         canvasPosX = this.posX - canvasLeft;
@@ -93,10 +96,10 @@ Player.prototype.renderPlayer = function(context, canvasTop, canvasCenter, canva
             else
             {
                 context.drawImage(this.playerSprite, this.width * 4, (this.height+this.reach)*this.playerNumber, this.width, this.height, canvasPosX, this.posY - canvasTop, this.width, this.height);      
-            }
-
-          
+            }        
     }
+
+
 
     //om spelare står still eller hoppar och kollar åt höger
     else if((this.jumpState > 0 || this.standingStill) && this.direction === 0)
@@ -114,6 +117,8 @@ Player.prototype.renderPlayer = function(context, canvasTop, canvasCenter, canva
                 context.drawImage(this.playerSprite, 0, (this.height+this.reach)*this.playerNumber, this.width, this.height, canvasPosX, this.posY - canvasTop, 22, 40);
             }
     }
+
+
 
     //om spelare går åt höger
     else if(this.direction === 0)
@@ -134,6 +139,8 @@ Player.prototype.renderPlayer = function(context, canvasTop, canvasCenter, canva
         }
     }
 
+
+
     //om spelare går åt vänster
     else if(this.direction === 1)
     {
@@ -148,7 +155,7 @@ Player.prototype.renderPlayer = function(context, canvasTop, canvasCenter, canva
             this.currentSprite++;
         }
 
-
+        //nollställer sprites
         if(this.currentSprite > 3)
         {
             this.currentSprite = 0;

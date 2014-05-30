@@ -42,30 +42,28 @@ var mpPlayers = [];
  * i synk.
  * 
  */
-//här bestäms det vad som ska göras när ett meddelande skickas från en klient
 io.sockets.on('connection', function(socket){
     
     //ska användas för att samma bana och samma slag bara får tas emot en gång på klienten
-    var gameNumber = 0;
     var hitNumber = 0;
 
     //en connection har valt ett spelläge och meddelar detta.
     socket.on('startGame', function(data){
 
-        if(data.gameMode === 'sp' || data.gameMode === "mp2") //singleplayer
-        {
-            var seed = mapSeedMaker(data.gameMode);
-            socket.emit("map", {map: seed, gameMode: data.gameMode, playerNumber: 0, gameNumber: gameNumber} );
 
-            gameNumber++;
+        if(data.gameMode === 'sp' || data.gameMode === "mp2") //singleplayer eller splitscreen
+        {
+            //ett seed skapas och skickas tillbaka till klienten
+            var seed = mapSeedMaker(data.gameMode);
+            socket.emit("map", {map: seed, gameMode: data.gameMode, playerNumber: 0} );
         }
         
-        else if(data.gameMode === 'mp1') //multiplayer
+        else if(data.gameMode === 'mp1') //multiplayer online
         {
-            gameNumber = 0; //återställer game number för att två klienter måste få samma nummer.
 
             mpPlayers.push(socket); //sparar spelaren i en socket.
             
+            //spelare tas bort vid disconnect
             socket.on("disconnect", function()
             {
                 mpPlayers.splice(mpPlayers.indexOf(socket),1);
@@ -78,19 +76,19 @@ io.sockets.on('connection', function(socket){
             {
                 var roomName = Date.now(); //använder Date.now för att skapa ett 'unikt' namn för rummet.
 
+                //skapa ett seed
                 var seed = mapSeedMaker(data.gameMode);
 
                 //skickar till spelare 1
                 var player = mpPlayers.shift();
                 player.join(roomName);
-                player.emit("map", {map: seed, gameMode: data.gameMode, room:roomName, playerNumber: 0, gameNumber: gameNumber});
+                player.emit("map", {map: seed, gameMode: data.gameMode, room:roomName, playerNumber: 0});
                 
                 //skickar till spelare 2
                 player = mpPlayers.shift();
                 player.join(roomName);
-                player.emit("map", {map: seed, gameMode: data.gameMode, room:roomName, playerNumber: 1, gameNumber: gameNumber});
+                player.emit("map", {map: seed, gameMode: data.gameMode, room:roomName, playerNumber: 1});
 
-                gameNumber++;
      
             }
         }
@@ -105,6 +103,7 @@ io.sockets.on('connection', function(socket){
         //data.y = y-position
         //data.direction = hållet spelaren kollar åt
         //data.isHitting = bool. Slår spelaren?
+        //data.hitNumber = slaget får ett nummer för att jämföras med. Annars kan ett slag ske flera gånger hos den andra spelaren
         //data.jumpState = spelarens jumpstate
         //data.room = vilket spelrum spelaren är i
         
@@ -112,7 +111,7 @@ io.sockets.on('connection', function(socket){
         
         //skicka data till motståndare
         socket.broadcast.to(data.room).emit("opponent", {x:data.x, y: data.y, direction: data.direction, isHitting: data.isHitting, hitNumber:hitNumber, jumpState: data.jumpState});
-        
+
         if(data.isHitting)
         {
             hitNumber++;
@@ -136,9 +135,10 @@ io.sockets.on('connection', function(socket){
 
     });
 
+    //klienten är redo att starta spelet och få monster och ev. mer bana
     socket.on("gameIsOn", function(data)
     {
-        //ger varje monster ett unikt id för att undvika dupliceringar
+        //ger varje monster och banbit ett unikt id för att undvika dupliceringar
         var monsterNumber = 0;
         var mapPiece = 0;
 
@@ -153,14 +153,14 @@ io.sockets.on('connection', function(socket){
         //skickar nya monster var 4:e sekund
         var monsterInterval = setInterval(sendMonsters,4000);
 
+        //sluta skicka när spelet är slut
         socket.on("gameOver", function()
         {
-
-
             clearInterval(monsterInterval);
             clearInterval(mapInterval);
         });
 
+        //skicka mer karta vid mp
         function moreMap()
         {
             var seed = mapSeedMaker("mp1");
@@ -187,6 +187,7 @@ io.sockets.on('connection', function(socket){
                 spawnTime += 30;
             }
 
+            //skicka monstren till klient/klienterna i rummet
             if(data.gameMode === "sp" || data.gameMode ===  "mp2")
             {
                 socket.emit("monsters", {monsterArray: monsterArray, monsterNumber: monsterNumber});
@@ -232,6 +233,7 @@ function mapSeedMaker (gameMode) {
     */
     var seedLength;
 
+    //olika längder beroende på typ av spel
     if(gameMode === "sp")
     {
         seedLength = 390;
@@ -242,6 +244,7 @@ function mapSeedMaker (gameMode) {
         seedLength = 400;
     }
 
+    //fyller arrayen med banan som ska till klienten
     for (var i = 0; i < seedLength; i++) 
     {
         //ett nummber (0-9) bestämmer en tiletype. 
@@ -274,7 +277,6 @@ function mapSeedMaker (gameMode) {
             seed[i] = tileType;
         }
                 
-
     }        
 
     return seed;
