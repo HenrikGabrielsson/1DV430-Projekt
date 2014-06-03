@@ -68,8 +68,11 @@ Game.prototype.gameInit = function(playerNumber)
     var renderer = this.renderer;
     var endLoop = this.endLoop;
     
+    //kontroller som spelaren ska använda
+    var playerControls = [87, 65, 68, 32];
+
     //skapa spelare och ange startposition
-    var player = new Player(map , playerNumber );
+    var player = new Player(map , playerNumber, playerControls);
 
     //här skapas eventuella motspelare.
     if(gameMode === "mp1")
@@ -83,15 +86,17 @@ Game.prototype.gameInit = function(playerNumber)
         else if(playerNumber === 0)
         {
             var thisPlayerNumber = 1;
-        }
-        
+        } 
+
         var room = this.room;
         var opponent = new Player(map, thisPlayerNumber);
     }
     if(gameMode === "mp2")
     {
+        playerControls = [38, 37, 39, 45];
+
         //i splitscreen så är motspelaren alltid spelare 2 (1) och får sin egen canvas
-        var opponent = new Player(map, 1);
+        var opponent = new Player(map, 1, playerControls);
         var canvas2 = this.canvas2;
         var context2 = canvas2.getContext("2d");
 
@@ -101,7 +106,15 @@ Game.prototype.gameInit = function(playerNumber)
     var cd = new CollisionDetector(map, monsters);
 
     //lyssnar efter input från spelare
-    var keys = listenToKeyboardInput(); //här sparas de tangenter som trycks ner med en boolean som bestämmer om de fortfarande är nertryckta
+    if(this.gameMode === "sp" || this.gameMode === "mp1")
+    {
+        var keys = listenToKeyboardInput(player); //här sparas de tangenter som trycks ner med en boolean som bestämmer om de fortfarande är nertryckta
+    }
+    else if(this.gameMode === "mp2")
+    {
+        var keys = listenToKeyboardInput(player,opponent);
+    }
+
 
     //så här ofta ska spel-loopen köras
     var frameTime = 1000/60;
@@ -121,13 +134,13 @@ Game.prototype.gameInit = function(playerNumber)
     var gameLoop = setInterval(function()
     {
 
-        //anropar funktion som utför det spelaren ber om.
-        playerAction(keys, cd, 87, 65, 68, 69, player, opponent);
+        //efter att kontroller tagits emot så flyttar/slår spelaren
+        playerAction(keys, cd, player, opponent);
 
         //kontroller för spelare 2
         if(gameMode === "mp2")
         {
-            playerAction(keys, cd, 38, 37, 39, 45,opponent, player )
+            playerAction(keys, cd, opponent, player )
         }
 
         //kollisioner för monster

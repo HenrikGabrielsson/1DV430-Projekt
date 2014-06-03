@@ -16,9 +16,14 @@
         </div>
             
         <div id="content">
+
+            <audio preload="auto" id="jumpAudio" >
+                <source src="audio/jump.wav" type="audio/wav" /> 
+            </audio>
+
             <div id="canvasDiv">
                 <canvas class="gamecanvas">
-                    <p>Sorry, Your web browser can not run this game :(</p> <!--Gammal webbläsare eller ingen javascript-->
+                    Sorry, Your web browser can not run this game :( <!--Gammal webbläsare eller ingen javascript-->
                 </canvas>
             </div>
             <div id="instructions">
@@ -34,7 +39,7 @@
                     <dd>Go left</dd>
                     <dt>D</dt>
                     <dd>Go right</dd>
-                    <dt>E</dt>
+                    <dt>Space</dt>
                     <dd>Hit enemies, players, blocks...anything!</dd>
                 </dl>
 
@@ -58,7 +63,7 @@
                     <dd>Bats can fly!</dd>
 
                     <dt><div id="troll"></div>Troll</dt>
-                    <dd>Trolls live in the cave. They don't like it when you trespass in their home. So they will, look for you, they will find you, and they will kill you! </dd>
+                    <dd>Trolls live in the cave. They don't like it when you trespass in their home. So they will look for you, they will find you and they will kill you! </dd>
                     
                     <dt><div id="fallingRock"></div>Falling Rocks</dt>
                     <dd>Falling rocks are falling rocks.</dd>
@@ -71,8 +76,8 @@
                     <div id="invincibleBlock"></div>
 
                 <h3>Goal</h3>
-                <p>Your goal in a singleplayer game is to get to the top without dying. Enemies and the bottom of the screen will kill you.</p>
-                <p>In Multiplayer you simply need to survive longer than your opponent.</p>
+                <p>Your goal in a singleplayer game is to get to the top without dying. Enemies and the lava at the bottom of the screen will kill you.</p>
+                <p>In multiplayer you simply need to survive longer than your opponent.</p>
 
             </div>
         </div>

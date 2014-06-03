@@ -2,23 +2,46 @@
  * Funktion som lyssnar efter de knappar som trycks in och returnerar en array med booleaner.
  * Om de är nedtryckta = True. Annars = False. 
  *
+ * @param   player      spelare 1. Behöver ha dess kontroller.
+ * @param   opponent    spelare 2 vid splitscreen. Behöver ha dess kontroller.
+ * 
  *@Return   keys    En array med de tangenter som har tryckts ner ellers släppts.
 */
-function listenToKeyboardInput()
+function listenToKeyboardInput(player, opponent)
 {
     var keys = [];
+
+    //spelarnas kontroller
+    var playerControls = [player.jump, player.left, player.right, player.hit];
+    var opponentControls = [];
+
+    if(opponent !== undefined)
+    {
+        var opponentControls = [opponent.jump, opponent.left, opponent.right, opponent.hit];
+    }
+
+
 
     //trycker på tangent
     document.addEventListener('keydown', function(event) {
         
-        keys[event.keyCode] = true;
-        return false;
+        if(playerControls.indexOf(event.keyCode) > -1 || opponentControls.indexOf(event.keyCode) > -1)
+        { 
+            event.preventDefault();
+            keys[event.keyCode] = true;
+            return false;
+        }
     });
     
     //släpper tangent
     document.addEventListener('keyup', function(event) {
-        keys[event.keyCode] = false;
-        return false;
+
+        if(playerControls.indexOf(event.keyCode) >= 0 || opponentControls.indexOf(event.keyCode >= 0))
+        {
+            event.preventDefault();
+            keys[event.keyCode] = false;
+            return false;
+        }
     });
 
     return keys;
@@ -31,25 +54,21 @@ function listenToKeyboardInput()
  * 
  * @param   keys        array med knappar som tryckts ner
  * @param   cd          collision detector som ska användas
- * @param   jump        knapp för att hoppa
- * @param   left        knapp för att gå till vänster
- * @param   right       knapp för att gå till höger
  * @param   player      spelaren som ska gå
  * @param   opponent    motspelaren 
  */
-function playerAction(keys, cd, jump, left, right, hit, player, opponent)
+function playerAction(keys, cd, player, opponent)
 {
-       
-        //hopp och kolla vertikala kollisioner 
-        cd.checkForYCollision(player, keys[jump]);
+
+        cd.checkForYCollision(player, keys[player.jump]);
         
-        if(!keys[left] && !keys[right]) //karaktären står still
+        if(!keys[player.left] && !keys[player.right]) //karaktären står still
         {
             player.standingStill = true;
         }
 
         //vänster
-        if(keys[left])
+        if(keys[player.left])
         {    
             player.standingStill = false;        
             player.direction = 1;
@@ -57,7 +76,7 @@ function playerAction(keys, cd, jump, left, right, hit, player, opponent)
         }
 
         //höger
-        else if(keys[right])
+        else if(keys[player.right])
         {
             player.standingStill = false; 
             player.direction = 0;
@@ -65,7 +84,7 @@ function playerAction(keys, cd, jump, left, right, hit, player, opponent)
         }
         
         //slag
-        if(keys[hit] && player.hitState === 0) //Shift
+        if(keys[player.hit] && player.hitState === 0) //Shift
         {
             cd.hitting(player, opponent);
             player.hitState = 30;   

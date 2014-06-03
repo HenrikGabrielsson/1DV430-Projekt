@@ -2,9 +2,10 @@
  *  Konstruktor för Player-objektet
  * 
  * @param   map             Använder banan för att veta vart spelaren spawnar.
- * @param   playerNumber    Spelaren är spelare 1 eller 2 i mp.    
+ * @param   playerNumber    Spelaren är spelare 1 eller 2 i mp. 
+ * @param   playerControls  En array med keycodes till de kontroller som spelaren ska använda  
  */
-function Player(map, playerNumber)
+function Player(map, playerNumber, playerControls)
 {
     //spelare 1's startposition
     if(playerNumber === 0)
@@ -51,6 +52,16 @@ function Player(map, playerNumber)
     this.playerSprite = new Image();
     this.playerSprite.src = "pics/playerSprite.png";
     this.currentSprite = 0;
+
+    //kontroller om det finns
+    if(playerControls !== undefined)
+    {
+        this.jump = playerControls[0];
+        this.left = playerControls[1];
+        this.right = playerControls[2];
+        this.hit = playerControls[3];
+    }
+
    
 }
 
